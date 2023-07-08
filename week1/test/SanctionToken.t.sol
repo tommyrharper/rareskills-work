@@ -9,16 +9,10 @@ contract SanctionTokenTest is Test {
 
     function setUp() public {
         sactionToken = new SanctionToken();
-        sactionToken.setNumber(0);
     }
 
-    function testIncrement() public {
-        sactionToken.increment();
-        assertEq(sactionToken.number(), 1);
+    function testOwner() public {
+        assertEq(sactionToken.owner(), address(this));
     }
 
-    function testSetNumber(uint256 x) public {
-        sactionToken.setNumber(x);
-        assertEq(sactionToken.number(), x);
-    }
 }
