@@ -126,6 +126,24 @@ contract BondingTokenTest is TestHelpers {
         assertEq(user1.balance, startingEtherBalance);
     }
 
+    function test_Sell_Partial_Tokens() public {
+        vm.prank(user1);
+        bondingToken.purchase{value: 1000}();
+
+        uint256 balanceBeforeSelling = user1.balance;
+        vm.prank(user1);
+        bondingToken.sell(22);
+        assertEq(bondingToken.balanceOf(user1), 22);
+
+        // expected returned eth
+        // initial_total_supply = 44
+        // final_total_supply = 22
+        // new_reserve_balance = (22 ** 2) / 2 = 242
+        // change_in_reserves = 1000 - 242 = 758
+
+        assertEq(user1.balance, balanceBeforeSelling + 758);
+    }
+
     function test_Sell_Tokens_Transfer_Fails() public {
         bondingToken.purchase{value: 1000}();
 
