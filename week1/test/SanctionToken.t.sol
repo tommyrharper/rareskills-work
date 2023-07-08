@@ -50,7 +50,7 @@ contract SanctionTokenTest is TestHelpers {
         sactionToken.ban(user1, true);
     }
 
-    function testBanBlocksTransfers() public {
+    function testBanBlocksTransfersToBannedAddresses() public {
         sactionToken.ban(user1, true);
         assertEq(sactionToken.blackList(user1), true);
 
@@ -58,6 +58,19 @@ contract SanctionTokenTest is TestHelpers {
             abi.encodeWithSelector(
                 SanctionToken.BannedToAddress.selector,
                 user1
+            )
+        );
+        sactionToken.transfer(user1, 100);
+    }
+
+    function testBanBlocksTransfersFromBannedAddresses() public {
+        sactionToken.ban(address(this), true);
+        assertEq(sactionToken.blackList(address(this)), true);
+
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                SanctionToken.BannedFromAddress.selector,
+                address(this)
             )
         );
         sactionToken.transfer(user1, 100);
