@@ -22,4 +22,9 @@ contract BondingTokenTest is TestHelpers {
     function testSymbol() public {
         assertEq(bondingToken.symbol(), "BT");
     }
+
+    function test_buyBondingToken_First_Purchase() public {
+        bondingToken.buyBondingToken{value: 8 ether}();
+        assertEq(bondingToken.balanceOf(address(this)), 4 ether);
+    }
 }
