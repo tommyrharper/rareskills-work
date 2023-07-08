@@ -15,4 +15,12 @@ contract SanctionTokenTest is Test {
         assertEq(sactionToken.owner(), address(this));
     }
 
+    function testName() public {
+        assertEq(sactionToken.name(), "SanctionToken");
+    }
+
+    function testSymbol() public {
+        assertEq(sactionToken.name(), "ST");
+    }
+
 }
