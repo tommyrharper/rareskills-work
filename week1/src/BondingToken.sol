@@ -15,11 +15,10 @@ contract BondingToken is ERC20 {
         if (msg.value == 0) revert MustPayGreaterThanZero();
 
         uint256 oldReserveBalance = reserveBalance;
-        reserveBalance = oldReserveBalance + msg.value;
+        reserveBalance += msg.value;
 
         uint256 newSupply = Math.sqrt(2 * reserveBalance);
-        uint256 supplyChange = newSupply - totalSupply();
-
+        uint256 supplyChange = newSupply - oldReserveBalance;
 
         _mint(msg.sender, supplyChange);
     }
