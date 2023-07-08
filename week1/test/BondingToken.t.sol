@@ -5,15 +5,27 @@ import "./TestHelpers.t.sol";
 import "../src/BondingToken.sol";
 
 contract BondingTokenTest is TestHelpers {
+    /*//////////////////////////////////////////////////////////////
+                                 STATE
+    //////////////////////////////////////////////////////////////*/
+
     BondingToken public bondingToken;
     address public user1;
     address public user2;
+
+    /*//////////////////////////////////////////////////////////////
+                                 SETUP
+    //////////////////////////////////////////////////////////////*/
 
     function setUp() public {
         bondingToken = new BondingToken();
         user1 = createAndDealUser();
         user2 = createAndDealUser();
     }
+
+    /*//////////////////////////////////////////////////////////////
+                              ERC20 TESTS
+    //////////////////////////////////////////////////////////////*/
 
     function testName() public {
         assertEq(bondingToken.name(), "BondingToken");
@@ -22,6 +34,10 @@ contract BondingTokenTest is TestHelpers {
     function testSymbol() public {
         assertEq(bondingToken.symbol(), "BT");
     }
+
+    /*//////////////////////////////////////////////////////////////
+                             PURCHASE TESTS
+    //////////////////////////////////////////////////////////////*/
 
     function test_First_Purchase_0() public {
         vm.expectRevert(BondingToken.MustPayGreaterThanZero.selector);
@@ -50,13 +66,12 @@ contract BondingTokenTest is TestHelpers {
 
     function test_First_Purchase_Fuzz(uint64 purchaseAmount) public {
         vm.assume(purchaseAmount > 0);
-
         bondingToken.purchase{value: purchaseAmount}();
 
-        uint256 newReserveBalance = purchaseAmount;
-        uint256 newSupply = sqrt(newReserveBalance * 2);
-
-        assertEq(bondingToken.balanceOf(address(this)), newSupply);
+        assertEq(
+            bondingToken.balanceOf(address(this)),
+            calculateSupplyChange(0, purchaseAmount)
+        );
     }
 
     function test_Second_Purchase() public {
@@ -73,17 +88,40 @@ contract BondingTokenTest is TestHelpers {
         assertEq(bondingToken.balanceOf(user1), 19);
     }
 
-    // function test_Second_Purchase() public {
-    //     bondingToken.purchase{value: 1000}();
+    function test_Second_Purchase_Fuzz(
+        uint64 firstPurchase,
+        uint64 secondPurchase
+    ) public {
+        vm.assume(firstPurchase > 0);
+        vm.assume(secondPurchase > 0);
 
-    //     uint256 totalSupply = bondingToken.totalSupply();
-    //     uint256 newReserves = bondingToken.reserveBalance() + 1000;
+        bondingToken.purchase{value: firstPurchase}();
+        assertEq(
+            bondingToken.balanceOf(address(this)),
+            calculateSupplyChange(0, firstPurchase)
+        );
 
-    //     uint256 newSupply = sqrt(newReserves * 2);
-    //     uint256 supplyChange = newSupply - totalSupply;
+        vm.prank(user1);
+        bondingToken.purchase{value: secondPurchase}();
+        assertEq(
+            bondingToken.balanceOf(user1),
+            calculateSupplyChange(firstPurchase, secondPurchase)
+        );
+    }
 
-    //     vm.prank(user1);
-    //     bondingToken.purchase{value: 1000}();
-    //     assertEq(bondingToken.balanceOf(user1), supplyChange);
-    // }
+    /*//////////////////////////////////////////////////////////////
+                                HELPERS
+    //////////////////////////////////////////////////////////////*/
+
+    function calculateSupplyChange(
+        uint256 initialReserves,
+        uint256 addedReserves
+    ) internal view returns (uint256) {
+        uint256 newReserves = initialReserves + addedReserves;
+
+        uint256 initialSupply = sqrt(initialReserves * 2);
+        uint256 newSupply = sqrt(newReserves * 2);
+
+        return newSupply - initialSupply;
+    }
 }
