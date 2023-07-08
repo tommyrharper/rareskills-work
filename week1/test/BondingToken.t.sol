@@ -23,8 +23,23 @@ contract BondingTokenTest is TestHelpers {
         assertEq(bondingToken.symbol(), "BT");
     }
 
-    function test_buyBondingToken_First_Purchase() public {
-        bondingToken.buyBondingToken{value: 8 ether}();
-        assertEq(bondingToken.balanceOf(address(this)), 4 ether);
+    function test_buyBondingToken_First_Purchase_0() public {
+        vm.expectRevert(BondingToken.MustPayGreaterThanZero.selector);
+        bondingToken.buyBondingToken{value: 0}();
     }
+
+    function test_buyBondingToken_First_Purchase_1() public {
+        bondingToken.buyBondingToken{value: 1}();
+        assertEq(bondingToken.balanceOf(address(this)), 1);
+    }
+
+    function test_buyBondingToken_First_Purchase_8() public {
+        bondingToken.buyBondingToken{value: 8}();
+        assertEq(bondingToken.balanceOf(address(this)), 4);
+    }
+
+    // function test_buyBondingToken_First_Purchase_Fuzz(uint128 purchaseSize) public {
+    //     bondingToken.buyBondingToken{value: purchaseSize}();
+    //     assertEq(bondingToken.balanceOf(address(this)), purchaseSize);
+    // }
 }
