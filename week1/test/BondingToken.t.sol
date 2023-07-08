@@ -11,8 +11,8 @@ contract BondingTokenTest is TestHelpers {
 
     function setUp() public {
         bondingToken = new BondingToken();
-        user1 = createUser();
-        user2 = createUser();
+        user1 = createAndDealUser();
+        user2 = createAndDealUser();
     }
 
     function testName() public {
@@ -60,4 +60,32 @@ contract BondingTokenTest is TestHelpers {
 
         assertEq(bondingToken.balanceOf(address(this)), newSupply);
     }
+
+    function test_buyBondingToken_Second_Purchase() public {
+        bondingToken.buyBondingToken{value: 1000}();
+
+        // firstPurchaseReserves = 1000
+        // firstPurchaseSupply = sqrt(1000 * 2) = 44
+        // newReservers = 2000
+        // newSupply = sqrt(2000 * 2) = 63
+        // change in supply = 63 - 44 = 19
+
+        vm.prank(user1);
+        bondingToken.buyBondingToken{value: 1000}();
+        assertEq(bondingToken.balanceOf(user1), 19);
+    }
+
+    // function test_buyBondingToken_Second_Purchase() public {
+    //     bondingToken.buyBondingToken{value: 1000}();
+
+    //     uint256 totalSupply = bondingToken.totalSupply();
+    //     uint256 newReserves = bondingToken.reserveBalance() + 1000;
+
+    //     uint256 newSupply = sqrt(newReserves * 2);
+    //     uint256 supplyChange = newSupply - totalSupply;
+
+    //     vm.prank(user1);
+    //     bondingToken.buyBondingToken{value: 1000}();
+    //     assertEq(bondingToken.balanceOf(user1), supplyChange);
+    // }
 }
