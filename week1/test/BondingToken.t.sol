@@ -110,6 +110,31 @@ contract BondingTokenTest is TestHelpers {
     }
 
     /*//////////////////////////////////////////////////////////////
+                               SELL TESTS
+    //////////////////////////////////////////////////////////////*/
+
+    function test_Sell_All_Tokens() public {
+        uint256 startingEtherBalance = user1.balance;
+        vm.prank(user1);
+        bondingToken.purchase{value: 1000}();
+
+        uint256 tokenBalance = bondingToken.balanceOf(user1);
+        vm.prank(user1);
+        bondingToken.sell(tokenBalance);
+        assertEq(bondingToken.balanceOf(user1), 0);
+
+        assertEq(user1.balance, startingEtherBalance);
+    }
+
+    function test_Sell_Tokens_Transfer_Fails() public {
+        bondingToken.purchase{value: 1000}();
+
+        uint256 tokenBalance = bondingToken.balanceOf(address(this));
+        vm.expectRevert(BondingToken.PayoutFailed.selector);
+        bondingToken.sell(tokenBalance);
+    }
+
+    /*//////////////////////////////////////////////////////////////
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
 
