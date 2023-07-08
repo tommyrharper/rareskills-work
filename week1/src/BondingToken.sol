@@ -14,11 +14,10 @@ contract BondingToken is ERC20 {
     function buyBondingToken() external payable {
         if (msg.value == 0) revert MustPayGreaterThanZero();
 
-        uint256 oldReserveBalance = reserveBalance;
         reserveBalance += msg.value;
 
         uint256 newSupply = Math.sqrt(2 * reserveBalance);
-        uint256 supplyChange = newSupply - oldReserveBalance;
+        uint256 supplyChange = newSupply - totalSupply();
 
         _mint(msg.sender, supplyChange);
     }
