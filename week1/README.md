@@ -1,5 +1,13 @@
 # Week 1 Work
 
+## Markdown File 1
+
+- Markdown File 1 - [ERC777.md](./ERC777.md)
+
+## Markdown File 2
+
+- Markdown File 2 - [SafeERC20.md](./SafeERC20.md)
+
 ## Solidity Contract 1
 
 - Solidity Contract 1 - [SanctionToken.sol](./src/SanctionToken.sol)
