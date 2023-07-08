@@ -53,8 +53,18 @@ I have taken the approach of just overriding the `_spendAllowance` function so t
 
 ### Assumptions
 
+- I have followed a very simple linear model where `token_price = total_supply`
+- I have the same purchasing and selling curve.
+- I have made the trading pair eth/the token.
 - I haven't allowed any kind of contract owner or entity to access the reserve funds.
   - The funds are simply locked until they are redeemed by burning purchased tokens.
+
+### Could have implemented
+
+- It is generally better to accept a `_to` address in the `purchase` and `sell` functions.
+  - This allows the user to specify the address that the tokens are sent to.
+  - This is a better UX as it allows the user to specify the address that they want to receive the tokens.
+    - I haven't done this just for simplicities sake.
 
 ## TODO
 
