@@ -7,6 +7,12 @@ contract TestHelpers is Test {
     uint256 public userNonce;
     uint256 public nonce;
 
+    function createAndDealUser() public returns (address) {
+        address user = createUser();
+        vm.deal(user, 100 ether);
+        return user;
+    }
+
     /// @dev create a new user address
     function createUser() public returns (address) {
         userNonce++;
