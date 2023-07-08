@@ -20,7 +20,12 @@ contract SanctionTokenTest is Test {
     }
 
     function testSymbol() public {
-        assertEq(sactionToken.name(), "ST");
+        assertEq(sactionToken.symbol(), "ST");
+    }
+
+    function testBan() public {
+        sactionToken.ban(address(0x1), true);
+        assertEq(sactionToken.blackList(address(0x1)), true);
     }
 
 }
