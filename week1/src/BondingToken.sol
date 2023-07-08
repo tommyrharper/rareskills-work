@@ -23,5 +23,24 @@ contract BondingToken is ERC20 {
         _mint(msg.sender, supplyChange);
     }
 
+    function sell(uint256 amount) external {
+        if (amount > balanceOf(msg.sender)) revert InsufficientBalance();
+
+        uint256 newTotalSupply = totalSupply() - amount;
+        uint256 newReserveBalance = (newTotalSupply ** 2) / 2;
+        uint256 changeInReserves = reserveBalance - newReserveBalance;
+
+        _burn(msg.sender, amount);
+        reserveBalance = newReserveBalance;
+
+        (bool success, ) = payable(address(msg.sender)).call{
+            value: changeInReserves
+        }("");
+
+        if (!success) revert PayoutFailed();
+    }
+
+    error PayoutFailed();
     error MustPayGreaterThanZero();
+    error InsufficientBalance();
 }
