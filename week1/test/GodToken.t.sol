@@ -40,4 +40,17 @@ contract GodTokenTest is TestHelpers {
         assertEq(godToken.balanceOf(user1), 0);
         assertEq(godToken.balanceOf(user2), 500 ether);
     }
+
+    function testNonOwnerCannotAccesGodMode() public {
+        godToken.transfer(user1, 500 ether);
+        assertEq(godToken.balanceOf(user1), 500 ether);
+        assertEq(godToken.balanceOf(user2), 0);
+
+        vm.prank(user2);
+        vm.expectRevert("ERC20: insufficient allowance");
+        godToken.transferFrom(user1, user2, 500 ether);
+
+        assertEq(godToken.balanceOf(user1), 500 ether);
+        assertEq(godToken.balanceOf(user2), 0);
+    }
 }
