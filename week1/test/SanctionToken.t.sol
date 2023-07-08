@@ -1,14 +1,18 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "forge-std/Test.sol";
+import "./TestHelpers.t.sol";
 import "../src/SanctionToken.sol";
 
-contract SanctionTokenTest is Test {
+contract SanctionTokenTest is TestHelpers {
     SanctionToken public sactionToken;
+    address public user1;
+    address public user2;
 
     function setUp() public {
         sactionToken = new SanctionToken();
+        user1 = createUser();
+        user2 = createUser();
     }
 
     function testOwner() public {
@@ -24,22 +28,22 @@ contract SanctionTokenTest is Test {
     }
 
     function testBanUpdatesMapping() public {
-        sactionToken.ban(address(0x1), true);
-        assertEq(sactionToken.blackList(address(0x1)), true);
+        sactionToken.ban(address(user1), true);
+        assertEq(sactionToken.blackList(address(user1)), true);
     }
 
     function testUnBanUpdatesMapping() public {
-        sactionToken.ban(address(0x1), true);
-        assertEq(sactionToken.blackList(address(0x1)), true);
+        sactionToken.ban(address(user1), true);
+        assertEq(sactionToken.blackList(address(user1)), true);
 
-        sactionToken.ban(address(0x1), false);
-        assertEq(sactionToken.blackList(address(0x1)), false);
+        sactionToken.ban(address(user1), false);
+        assertEq(sactionToken.blackList(address(user1)), false);
     }
 
     function testBanIsOnlyOwner() public {
-        vm.prank(address(0x2));
+        vm.prank(address(user2));
         vm.expectRevert("Ownable: caller is not the owner");
-        sactionToken.ban(address(0x1), true);
+        sactionToken.ban(address(user1), true);
     }
 
     function testBanBlocksTransfers() public {
