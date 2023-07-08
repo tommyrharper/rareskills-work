@@ -24,6 +24,7 @@ contract BondingToken is ERC20 {
     }
 
     function sell(uint256 amount) external {
+        if (amount == 0) revert MustSellGreaterThanZero();
         if (amount > balanceOf(msg.sender)) revert InsufficientBalance();
 
         uint256 newTotalSupply = totalSupply() - amount;
@@ -42,5 +43,6 @@ contract BondingToken is ERC20 {
 
     error PayoutFailed();
     error MustPayGreaterThanZero();
+    error MustSellGreaterThanZero();
     error InsufficientBalance();
 }
