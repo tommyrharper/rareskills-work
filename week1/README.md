@@ -1,5 +1,11 @@
 # Week 1 Work
 
+Thank you for taking the time to review my work.
+
+Any feedback is greatly appreciated!
+
+Also let me know if you have any feedback as to how I can structure this such that it easier to review.
+
 ## Markdown File 1
 
 - Markdown File 1 - [ERC777.md](./ERC777.md)
