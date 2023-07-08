@@ -33,13 +33,31 @@ contract BondingTokenTest is TestHelpers {
         assertEq(bondingToken.balanceOf(address(this)), 1);
     }
 
+    function test_buyBondingToken_First_Purchase_3() public {
+        bondingToken.buyBondingToken{value: 3}();
+        assertEq(bondingToken.balanceOf(address(this)), 2);
+    }
+
     function test_buyBondingToken_First_Purchase_8() public {
         bondingToken.buyBondingToken{value: 8}();
         assertEq(bondingToken.balanceOf(address(this)), 4);
     }
 
-    // function test_buyBondingToken_First_Purchase_Fuzz(uint128 purchaseSize) public {
-    //     bondingToken.buyBondingToken{value: purchaseSize}();
-    //     assertEq(bondingToken.balanceOf(address(this)), purchaseSize);
-    // }
+    function test_buyBondingToken_First_Purchase_1000() public {
+        bondingToken.buyBondingToken{value: 1000}();
+        assertEq(bondingToken.balanceOf(address(this)), 44);
+    }
+
+    function test_buyBondingToken_First_Purchase_Fuzz(
+        uint64 purchaseAmount
+    ) public {
+        vm.assume(purchaseAmount > 0);
+
+        bondingToken.buyBondingToken{value: purchaseAmount}();
+
+        uint256 newReserveBalance = purchaseAmount;
+        uint256 newSupply = sqrt(newReserveBalance * 2);
+
+        assertEq(bondingToken.balanceOf(address(this)), newSupply);
+    }
 }
