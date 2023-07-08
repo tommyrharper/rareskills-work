@@ -47,6 +47,20 @@ I have taken the approach of just overriding the `_spendAllowance` function so t
 - God mode is does allow minting and burning of tokens.
   - This doesn't quite match up with what you might expect God mode to be, but this wasn't mentioned in the spec so I left it out.
 
+## Solidity Contract 3
+
+- Solidity Contract 3 - [BondingToken.sol](./src/BondingToken.sol)
+
+### Assumptions
+
+- I haven't allowed any kind of contract owner or entity to access the reserve funds.
+  - The funds are simply locked until they are redeemed by burning purchased tokens.
+
 ## TODO
 
 - Add natspec
+
+### Solidity Contract 3
+
+- Use gasleft() protection against front-running
+- Use cooldown period as a protection against a sandwich attack
