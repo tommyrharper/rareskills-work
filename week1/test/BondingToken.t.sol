@@ -113,6 +113,15 @@ contract BondingTokenTest is TestHelpers {
                                SELL TESTS
     //////////////////////////////////////////////////////////////*/
 
+    function test_Cannot_Sell_Zero() public {
+        vm.prank(user1);
+        bondingToken.purchase{value: 1000}();
+
+        vm.prank(user1);
+        vm.expectRevert(BondingToken.MustSellGreaterThanZero.selector);
+        bondingToken.sell(0);
+    }
+
     function test_Sell_All_Tokens() public {
         uint256 startingEtherBalance = user1.balance;
         vm.prank(user1);
@@ -144,6 +153,36 @@ contract BondingTokenTest is TestHelpers {
         assertEq(user1.balance, balanceBeforeSelling + 758);
     }
 
+    function test_Sell_Tokens_Fuzz(
+        uint64 purchaseAmount,
+        uint64 saleAmount
+    ) public {
+        vm.assume(purchaseAmount > 0);
+        vm.assume(saleAmount > 0);
+
+        bondingToken.purchase{value: purchaseAmount}();
+        uint256 purchasedTokens = calculateSupplyChange(0, purchaseAmount);
+        bondingToken.transfer(user1, purchasedTokens);
+
+        uint256 balanceBefore = user1.balance;
+        if (saleAmount > purchasedTokens) {
+            vm.prank(user1);
+            vm.expectRevert(BondingToken.InsufficientBalance.selector);
+            bondingToken.sell(saleAmount);
+            return;
+        } else {
+            vm.prank(user1);
+            bondingToken.sell(saleAmount);
+        }
+
+        uint256 expectedPayout = calculatePayout(
+            purchasedTokens,
+            purchaseAmount,
+            saleAmount
+        );
+        assertEq(user1.balance, balanceBefore + expectedPayout);
+    }
+
     function test_Sell_Tokens_Transfer_Fails() public {
         bondingToken.purchase{value: 1000}();
 
@@ -159,12 +198,22 @@ contract BondingTokenTest is TestHelpers {
     function calculateSupplyChange(
         uint256 initialReserves,
         uint256 addedReserves
-    ) internal view returns (uint256) {
+    ) internal pure returns (uint256) {
         uint256 newReserves = initialReserves + addedReserves;
 
         uint256 initialSupply = sqrt(initialReserves * 2);
         uint256 newSupply = sqrt(newReserves * 2);
 
         return newSupply - initialSupply;
+    }
+
+    function calculatePayout(
+        uint256 initialTotalSupply,
+        uint256 oldReserves,
+        uint256 amountBurnt
+    ) internal pure returns (uint256) {
+        uint256 newTotalSupply = initialTotalSupply - amountBurnt;
+        uint256 newReserves = (newTotalSupply ** 2) / 2;
+        return oldReserves - newReserves;
     }
 }
