@@ -11,7 +11,7 @@ contract BondingToken is ERC20 {
 
     constructor() ERC20("BondingToken", "BT") {}
 
-    function buyBondingToken() external payable {
+    function purchase() external payable {
         if (msg.value == 0) revert MustPayGreaterThanZero();
 
         reserveBalance += msg.value;
