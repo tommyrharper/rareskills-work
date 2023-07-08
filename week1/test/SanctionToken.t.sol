@@ -27,27 +27,39 @@ contract SanctionTokenTest is TestHelpers {
         assertEq(sactionToken.symbol(), "ST");
     }
 
+    function testBalance() public {
+        assertEq(sactionToken.balanceOf(address(this)), 1000 ether);
+    }
+
     function testBanUpdatesMapping() public {
-        sactionToken.ban(address(user1), true);
-        assertEq(sactionToken.blackList(address(user1)), true);
+        sactionToken.ban(user1, true);
+        assertEq(sactionToken.blackList(user1), true);
     }
 
     function testUnBanUpdatesMapping() public {
-        sactionToken.ban(address(user1), true);
-        assertEq(sactionToken.blackList(address(user1)), true);
+        sactionToken.ban(user1, true);
+        assertEq(sactionToken.blackList(user1), true);
 
-        sactionToken.ban(address(user1), false);
-        assertEq(sactionToken.blackList(address(user1)), false);
+        sactionToken.ban(user1, false);
+        assertEq(sactionToken.blackList(user1), false);
     }
 
     function testBanIsOnlyOwner() public {
         vm.prank(address(user2));
         vm.expectRevert("Ownable: caller is not the owner");
-        sactionToken.ban(address(user1), true);
+        sactionToken.ban(user1, true);
     }
 
     function testBanBlocksTransfers() public {
+        sactionToken.ban(user1, true);
+        assertEq(sactionToken.blackList(user1), true);
 
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                SanctionToken.BannedToAddress.selector,
+                user1
+            )
+        );
+        sactionToken.transfer(user1, 100);
     }
-
 }
