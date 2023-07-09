@@ -26,7 +26,6 @@ contract Escrow {
         address _seller,
         uint256 _amount
     ) external {
-        IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
         uint256 withdrawalTime = block.timestamp + WAIT_TIME;
         escrowEntries[numEntries] = EscrowEntry({
             token: _token,
@@ -46,6 +45,8 @@ contract Escrow {
             _token,
             _amount
         );
+
+        IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
     }
 
     function withdraw(uint256 _entryId, address _to) external {
