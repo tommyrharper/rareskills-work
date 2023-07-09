@@ -255,14 +255,43 @@ contract BondingTokenTest is TestHelpers {
         bondingToken.sell(44, 63);
     }
 
-    // function test_Min_Exit_Price_Fuzz() public {
-    //     bondingToken.purchase{value: 1000}(0);
+    function test_Min_Exit_Price_Fuzz(
+        uint64 user1Purchase,
+        uint64 user2Purchase,
+        uint64 slippageAllowed
+    ) public {
+        vm.assume(user1Purchase > 0);
+        vm.assume(user2Purchase > 0);
 
-    //     vm.prank
+        uint256 user1MintedTokens = calculateSupplyChange(0, user1Purchase);
+        uint256 user2MintedTokens = calculateSupplyChange(
+            user1Purchase,
+            user2Purchase
+        );
 
-    //     vm.expectRevert(BondingToken.MaxSlippageExceeded.selector);
-    //     bondingToken.sell(44, 45);
-    // }
+        vm.assume(user2MintedTokens > 0);
+
+        vm.prank(user1);
+        bondingToken.purchase{value: user1Purchase}(0);
+
+        vm.prank(user2);
+        bondingToken.purchase{value: user2Purchase}(user1MintedTokens);
+        uint256 newTotalSupply = bondingToken.totalSupply();
+
+        // frontrunner
+        vm.prank(user2);
+        bondingToken.sell(user2MintedTokens, newTotalSupply);
+
+        uint256 minExitPrice = slippageAllowed > newTotalSupply
+            ? 0
+            : newTotalSupply - slippageAllowed;
+
+        if (minExitPrice > bondingToken.totalSupply()) {
+            vm.expectRevert(BondingToken.MaxSlippageExceeded.selector);
+        }
+        vm.prank(user1);
+        bondingToken.sell(user1MintedTokens, minExitPrice);
+    }
 
     /*//////////////////////////////////////////////////////////////
                                 HELPERS
