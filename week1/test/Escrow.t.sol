@@ -21,6 +21,9 @@ contract EscrowTest is TestHelpers {
     }
 
     function test_Create_Escrow_Entry() public {
+        assertEq(token.balanceOf(address(escrow)), 0);
+        assertEq(escrow.numEntries(), 0);
+
         token.approve(address(escrow), 100 ether);
         escrow.createEscrow(address(token), user1, 100 ether);
         (
@@ -38,5 +41,18 @@ contract EscrowTest is TestHelpers {
         assertEq(_amount, 100 ether);
         assertEq(_withdrawalTime, block.timestamp + 3 days);
         assertEq(_withdrawn, false);
+
+        assertEq(escrow.numEntries(), 1);
+        assertEq(token.balanceOf(address(escrow)), 100 ether);
+    }
+
+    function test_Cannot_Create_Escrow_Without_Approval() public {
+        vm.expectRevert("ERC20: insufficient allowance");
+        escrow.createEscrow(address(token), user1, 100 ether);
+    }
+
+    function test_Cannot_Create_Entry_With_EOA_Token_Address() public {
+        vm.expectRevert("Address: call to non-contract");
+        escrow.createEscrow(user2, user1, 100 ether);
     }
 }

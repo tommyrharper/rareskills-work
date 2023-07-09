@@ -7,7 +7,7 @@ import "openzeppelin/token/ERC20/utils/SafeERC20.sol";
 contract Escrow {
     using SafeERC20 for IERC20;
 
-    uint256 numEntries;
+    uint256 public numEntries;
     mapping(uint256 => EscrowEntry) public escrowEntries;
 
     struct EscrowEntry {
