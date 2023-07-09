@@ -117,7 +117,7 @@ contract BondingTokenTest is TestHelpers {
 
         vm.prank(user1);
         vm.expectRevert(BondingToken.MustSellGreaterThanZero.selector);
-        bondingToken.sell(0);
+        bondingToken.sell(0, 44);
     }
 
     function test_Sell_All_Tokens() public {
@@ -127,7 +127,7 @@ contract BondingTokenTest is TestHelpers {
 
         uint256 tokenBalance = bondingToken.balanceOf(user1);
         vm.prank(user1);
-        bondingToken.sell(tokenBalance);
+        bondingToken.sell(tokenBalance, 44);
         assertEq(bondingToken.balanceOf(user1), 0);
 
         assertEq(user1.balance, startingEtherBalance);
@@ -139,7 +139,7 @@ contract BondingTokenTest is TestHelpers {
 
         uint256 balanceBeforeSelling = user1.balance;
         vm.prank(user1);
-        bondingToken.sell(22);
+        bondingToken.sell(22, 44);
         assertEq(bondingToken.balanceOf(user1), 22);
 
         // expected returned eth
@@ -166,11 +166,11 @@ contract BondingTokenTest is TestHelpers {
         if (saleAmount > purchasedTokens) {
             vm.prank(user1);
             vm.expectRevert(BondingToken.InsufficientBalance.selector);
-            bondingToken.sell(saleAmount);
+            bondingToken.sell(saleAmount, purchasedTokens);
             return;
         } else {
             vm.prank(user1);
-            bondingToken.sell(saleAmount);
+            bondingToken.sell(saleAmount, purchasedTokens);
         }
 
         uint256 expectedPayout = calculatePayout(
@@ -186,7 +186,7 @@ contract BondingTokenTest is TestHelpers {
 
         uint256 tokenBalance = bondingToken.balanceOf(address(this));
         vm.expectRevert(BondingToken.PayoutFailed.selector);
-        bondingToken.sell(tokenBalance);
+        bondingToken.sell(tokenBalance, 44);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -234,6 +234,35 @@ contract BondingTokenTest is TestHelpers {
             );
         }
     }
+
+    /*//////////////////////////////////////////////////////////////
+                          MIN EXIT PRICE TESTS
+    //////////////////////////////////////////////////////////////*/
+
+    function test_Min_Exit_Price() public {
+        vm.prank(user1);
+        bondingToken.purchase{value: 1000}(0);
+
+        vm.prank(user2);
+        bondingToken.purchase{value: 1000}(44);
+
+        // frontrunner
+        vm.prank(user2);
+        bondingToken.sell(19, 63);
+
+        vm.prank(user1);
+        vm.expectRevert(BondingToken.MaxSlippageExceeded.selector);
+        bondingToken.sell(44, 63);
+    }
+
+    // function test_Min_Exit_Price_Fuzz() public {
+    //     bondingToken.purchase{value: 1000}(0);
+
+    //     vm.prank
+
+    //     vm.expectRevert(BondingToken.MaxSlippageExceeded.selector);
+    //     bondingToken.sell(44, 45);
+    // }
 
     /*//////////////////////////////////////////////////////////////
                                 HELPERS
