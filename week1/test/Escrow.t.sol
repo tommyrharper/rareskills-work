@@ -77,11 +77,21 @@ contract EscrowTest is TestHelpers {
         escrow.createEscrow(address(token), user1, 100 ether);
 
         vm.warp(block.timestamp + 3 days);
-        
+
         vm.prank(user1);
         escrow.withdraw(0, user1);
 
         assertEq(token.balanceOf(user1), 100 ether);
         assertEq(token.balanceOf(address(escrow)), 0);
+    }
+
+    function test_Cannot_Withdraw_Funds_Early() public {
+        token.approve(address(escrow), 100 ether);
+        escrow.createEscrow(address(token), user1, 100 ether);
+
+        vm.warp(block.timestamp + 3 days - 1);
+        vm.expectRevert(Escrow.WithdrawalTimeNotReached.selector);
+        vm.prank(user1);
+        escrow.withdraw(0, user1);
     }
 }
