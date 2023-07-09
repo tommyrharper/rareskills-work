@@ -90,11 +90,13 @@ Other approaches that I didn't attempt include:
   - I like the robustness of this approach, however it is quite complex and I didn't have time to implement it
   - Also I don't like the fact that users need to execute at least two transactions
 
+## Solidity Contract 4
+
+- Solidity Contract 4 - [Escrow.sol](./src/Escrow.sol)
+
 ## TODO
 
 - Add natspec
+- Solidity Contract 3
+  - Use cooldown period as a protection against a sandwich attack
 
-### Solidity Contract 3
-
-- Use gasleft() protection against front-running
-- Use cooldown period as a protection against a sandwich attack
