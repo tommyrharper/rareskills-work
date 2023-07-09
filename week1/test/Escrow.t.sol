@@ -146,4 +146,20 @@ contract EscrowTest is TestHelpers {
         vm.expectRevert(Escrow.OnlySeller.selector);
         escrow.withdraw(0, user2);
     }
+
+    function test_Cannot_Withdraw_Funds_Twice() public {
+        token.approve(address(escrow), 100 ether);
+        escrow.createEscrow(address(token), user1, 100 ether);
+
+        vm.warp(block.timestamp + 3 days);
+
+        vm.prank(user1);
+        escrow.withdraw(0, user1);
+        vm.prank(user1);
+        vm.expectRevert(Escrow.EscrowAlreadyWithdrawn.selector);
+        escrow.withdraw(0, user1);
+
+        assertEq(token.balanceOf(user1), 100 ether);
+        assertEq(token.balanceOf(address(escrow)), 0);
+    }
 }
