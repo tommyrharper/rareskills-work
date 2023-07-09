@@ -225,6 +225,23 @@ contract BondingTokenTest is TestHelpers {
         bondingToken.transferAndCall(address(bondingToken), tokenBalance);
     }
 
+    function test_Cannot_Sell_Via_Transfer_And_Call_With_High_Exit_Price()
+        public
+    {
+        vm.prank(user1);
+        bondingToken.purchase{value: 1000}(0);
+
+        uint256 tokenBalance = bondingToken.balanceOf(user1);
+        vm.prank(user1);
+        uint256 minExitPrice = 45;
+        vm.expectRevert(BondingToken.MaxSlippageExceeded.selector);
+        bondingToken.transferAndCall(
+            address(bondingToken),
+            tokenBalance,
+            abi.encodePacked(minExitPrice)
+        );
+    }
+
     /*//////////////////////////////////////////////////////////////
                          MAX ENTRY PRICE TESTS
     //////////////////////////////////////////////////////////////*/
