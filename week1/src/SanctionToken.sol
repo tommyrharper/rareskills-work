@@ -22,6 +22,10 @@ contract SanctionToken is ERC20, Ownable {
         _mint(msg.sender, 1000 ether);
     }
 
+    /*//////////////////////////////////////////////////////////////
+                               FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
+
     /// @notice Ban or unban a given user
     /// @param _account the address of the user to ban or unban
     /// @param _banned whether or not the user should be banned
