@@ -53,7 +53,16 @@ I have taken the approach of just overriding the `_spendAllowance` function so t
 
 ### Notes
 
-For the point "When a person sends a token to the contract with ERC1363 or ERC777, it should trigger the receive function", I was not sure exactly what is meant by this.
+I was confused as to exactly what I was meant to build in this instance. It wasn't clear to me whether to create a token sale contract that would be able to create a token sale for any ERC1363, ERC777 or ERC20 token. Or whether to create a token sale contract that would be able to create a token sale for a specific token.
+
+I have gone the latter route and implemented it as a ERC1363 token (mainly for learning purposes, as I have not used this standard before).
+
+The way it works is the contract has 3 main parts:
+1. It is an ERC1363 token
+2. It allows purchase and sale of the token via a linear bonding curve
+3. It is a IERC1363Receiver - meaning if you send tokens to the contract, it automatically treats it as a sale of the token
+
+This is a bit strange admittedly and the use of `ERC1363` is unnecessary in this instance, but I used it just to get it feel for how it works for my own learning.
 
 ### Assumptions
 
