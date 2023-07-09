@@ -205,6 +205,36 @@ contract BondingTokenTest is TestHelpers {
         bondingToken.purchase{value: 100}(44);
     }
 
+    function test_Max_Entry_Price_Fuzz(
+        uint64 firstPurchase,
+        uint64 secondPurchase,
+        uint64 slippageAllowed
+    ) public {
+        vm.assume(firstPurchase > 0);
+        vm.assume(secondPurchase > 0);
+
+        /// front runner
+        bondingToken.purchase{value: firstPurchase}(0);
+        uint256 frontRunnerPriceImpact = calculateSupplyChange(
+            0,
+            firstPurchase
+        );
+        assertEq(bondingToken.balanceOf(address(this)), frontRunnerPriceImpact);
+
+        // user being frontrun
+        vm.prank(user1);
+        if (slippageAllowed < frontRunnerPriceImpact) {
+            vm.expectRevert(BondingToken.MaxSlippageExceeded.selector);
+            bondingToken.purchase{value: secondPurchase}(slippageAllowed);
+        } else {
+            bondingToken.purchase{value: secondPurchase}(slippageAllowed);
+            assertEq(
+                bondingToken.balanceOf(user1),
+                calculateSupplyChange(firstPurchase, secondPurchase)
+            );
+        }
+    }
+
     /*//////////////////////////////////////////////////////////////
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
