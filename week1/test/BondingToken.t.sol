@@ -121,7 +121,7 @@ contract BondingTokenTest is TestHelpers {
 
         vm.prank(user1);
         vm.expectRevert(BondingToken.MustSellGreaterThanZero.selector);
-        bondingToken.sell(0, 44);
+        bondingToken.sell(user1, 0, 44);
     }
 
     function test_Sell_All_Tokens() public {
@@ -131,10 +131,25 @@ contract BondingTokenTest is TestHelpers {
 
         uint256 tokenBalance = bondingToken.balanceOf(user1);
         vm.prank(user1);
-        bondingToken.sell(tokenBalance, 44);
+        bondingToken.sell(user1, tokenBalance, 44);
         assertEq(bondingToken.balanceOf(user1), 0);
 
         assertEq(user1.balance, startingEtherBalance);
+    }
+
+    function test_Sell_And_Send_To_Other_Address() public {
+        uint256 startingUser1EtherBalance = user1.balance;
+        uint256 startingUser2EtherBalance = user2.balance;
+        vm.prank(user1);
+        bondingToken.purchase{value: 1000}(0);
+
+        uint256 tokenBalance = bondingToken.balanceOf(user1);
+        vm.prank(user1);
+        bondingToken.sell(user2, tokenBalance, 44);
+        assertEq(bondingToken.balanceOf(user1), 0);
+
+        assertEq(user1.balance, startingUser1EtherBalance - 1000);
+        assertEq(user2.balance, startingUser2EtherBalance + 1000);
     }
 
     function test_Sell_Partial_Tokens() public {
@@ -143,7 +158,7 @@ contract BondingTokenTest is TestHelpers {
 
         uint256 balanceBeforeSelling = user1.balance;
         vm.prank(user1);
-        bondingToken.sell(22, 44);
+        bondingToken.sell(user1, 22, 44);
         assertEq(bondingToken.balanceOf(user1), 22);
 
         // expected returned eth
@@ -170,11 +185,11 @@ contract BondingTokenTest is TestHelpers {
         if (saleAmount > purchasedTokens) {
             vm.prank(user1);
             vm.expectRevert(BondingToken.InsufficientBalance.selector);
-            bondingToken.sell(saleAmount, purchasedTokens);
+            bondingToken.sell(user1, saleAmount, purchasedTokens);
             return;
         } else {
             vm.prank(user1);
-            bondingToken.sell(saleAmount, purchasedTokens);
+            bondingToken.sell(user1, saleAmount, purchasedTokens);
         }
 
         uint256 expectedPayout = calculatePayout(
@@ -190,7 +205,7 @@ contract BondingTokenTest is TestHelpers {
 
         uint256 tokenBalance = bondingToken.balanceOf(address(this));
         vm.expectRevert(BondingToken.PayoutFailed.selector);
-        bondingToken.sell(tokenBalance, 44);
+        bondingToken.sell(address(this), tokenBalance, 44);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -305,11 +320,11 @@ contract BondingTokenTest is TestHelpers {
 
         // frontrunner
         vm.prank(user2);
-        bondingToken.sell(19, 63);
+        bondingToken.sell(user2, 19, 63);
 
         vm.prank(user1);
         vm.expectRevert(BondingToken.MaxSlippageExceeded.selector);
-        bondingToken.sell(44, 63);
+        bondingToken.sell(user1, 44, 63);
     }
 
     function test_Min_Exit_Price_Fuzz(
@@ -337,7 +352,7 @@ contract BondingTokenTest is TestHelpers {
 
         // frontrunner
         vm.prank(user2);
-        bondingToken.sell(user2MintedTokens, newTotalSupply);
+        bondingToken.sell(user2, user2MintedTokens, newTotalSupply);
 
         uint256 minExitPrice = slippageAllowed > newTotalSupply
             ? 0
@@ -347,7 +362,7 @@ contract BondingTokenTest is TestHelpers {
             vm.expectRevert(BondingToken.MaxSlippageExceeded.selector);
         }
         vm.prank(user1);
-        bondingToken.sell(user1MintedTokens, minExitPrice);
+        bondingToken.sell(user1, user1MintedTokens, minExitPrice);
     }
 
     /*//////////////////////////////////////////////////////////////

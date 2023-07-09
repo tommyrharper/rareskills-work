@@ -49,12 +49,13 @@ contract BondingToken is ERC1363, IERC1363Receiver {
     }
 
     /// @notice Sell tokens for eth
+    /// @param to the address to send the eth to
     /// @param amount the amount of tokens to sell
     /// @param minExitPrice the minimum price per token that the user is willing to begin selling tokens at
     /// @dev Note: again, the sale price is not garuanteed to be better than minExitPrice, minExitPrice is the price
     /// that is acceptable for this user before the price impact of this sale is taken into account
-    function sell(uint256 amount, uint256 minExitPrice) public {
-        _sell(msg.sender, msg.sender, amount, minExitPrice);
+    function sell(address to, uint256 amount, uint256 minExitPrice) public {
+        _sell(msg.sender, to, amount, minExitPrice);
     }
 
     function _sell(
