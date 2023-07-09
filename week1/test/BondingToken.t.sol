@@ -294,6 +294,18 @@ contract BondingTokenTest is TestHelpers {
     }
 
     /*//////////////////////////////////////////////////////////////
+                         TRADE TOO SMALL TESTS
+    //////////////////////////////////////////////////////////////*/
+
+    function test_Purchase_Too_Small() public {
+        bondingToken.purchase{value: 1000 ether}(0);
+        uint256 supply = bondingToken.totalSupply();
+
+        vm.expectRevert(BondingToken.TradeTooSmall.selector);
+        bondingToken.purchase{value: 100}(supply);
+    }
+
+    /*//////////////////////////////////////////////////////////////
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
 
