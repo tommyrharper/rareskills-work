@@ -94,9 +94,20 @@ Other approaches that I didn't attempt include:
 
 - Solidity Contract 4 - [Escrow.sol](./src/Escrow.sol)
 
+### Notes
+
+I implemented this in the simplest way I could imagine, where the tokens simply get locked in the contract and are available after the specified period of time.
+
+I did think about adding the ability to add an "arbitrator" who could resolve disputes between the buyer and the seller, but it seemed to deviate from the spec too much. If I had done this, I would have added an `EscrowState` enum to the `EscrowEntry` struct.
+
+I would have added a few states, `REFUNDED`, `WITHDRAWN`, `DISPUTED` and `PAID`. The seller would be able to refund anytime before they withdraw, and the buyer would also be able to change the state to `DISPUTED` at which point the provided arbitrator address would be able to change the state to `REFUNDED` or `PAID`.
+
+For security I used the `SafeERC20` library by OpenZeppelin to safely handle a variety of ERC20 implementations, and I followed the check-effects-interactions pattern to protect against reentrancy. In this case the ERC20 tokens are untrusted.
+
 ## TODO
 
-- Add natspec
 - Solidity Contract 3
   - Use cooldown period as a protection against a sandwich attack
+- Solidity Contract 4
+  - Add event tests
 
