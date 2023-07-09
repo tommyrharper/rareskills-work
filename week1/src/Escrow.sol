@@ -7,6 +7,8 @@ import "openzeppelin/token/ERC20/utils/SafeERC20.sol";
 contract Escrow {
     using SafeERC20 for IERC20;
 
+    uint256 public constant WAIT_TIME = 3 days;
+
     uint256 public numEntries;
     mapping(uint256 => EscrowEntry) public escrowEntries;
 
@@ -25,7 +27,7 @@ contract Escrow {
         uint256 _amount
     ) external {
         IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
-        uint256 withdrawalTime = block.timestamp + 3 days;
+        uint256 withdrawalTime = block.timestamp + WAIT_TIME;
         escrowEntries[numEntries] = EscrowEntry({
             token: _token,
             buyer: msg.sender,
@@ -46,20 +48,20 @@ contract Escrow {
         );
     }
 
-    // function withdraw(uint256 _entryId, address _to) external {
-    //     EscrowEntry storage entry = escrowEntries[_entryId];
+    function withdraw(uint256 _entryId, address _to) external {
+        EscrowEntry storage entry = escrowEntries[_entryId];
 
-    //     if (msg.sender != entry.seller) revert OnlySeller();
-    //     if (entry.withdrawalTime > block.timestamp)
-    //         revert WithdrawalTimeNotReached();
-    //     if (entry.withdrawn) revert EscrowAlreadyWithdrawn();
+        if (msg.sender != entry.seller) revert OnlySeller();
+        if (entry.withdrawalTime > block.timestamp)
+            revert WithdrawalTimeNotReached();
+        if (entry.withdrawn) revert EscrowAlreadyWithdrawn();
 
-    //     entry.withdrawn = true;
+        entry.withdrawn = true;
 
-    //     emit EscrowWithdrawn(_entryId);
+        emit EscrowWithdrawn(_entryId);
 
-    //     IERC20(entry.token).safeTransfer(_to, entry.amount);
-    // }
+        IERC20(entry.token).safeTransfer(_to, entry.amount);
+    }
 
     event EscrowCreated(
         uint256 indexed escrowId,
@@ -68,7 +70,7 @@ contract Escrow {
         address token,
         uint256 amount
     );
-    // event EscrowWithdrawn(uint256 escrowId);
+    event EscrowWithdrawn(uint256 escrowId);
 
     error OnlySeller();
     error WithdrawalTimeNotReached();
