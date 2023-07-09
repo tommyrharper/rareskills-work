@@ -195,6 +195,27 @@ contract BondingTokenTest is TestHelpers {
     }
 
     /*//////////////////////////////////////////////////////////////
+                       SELL VIA TRANSFER AND CALL
+    //////////////////////////////////////////////////////////////*/
+
+    function test_Sell_Via_Transfer_And_Call() public {
+        uint256 startingEtherBalance = user1.balance;
+        vm.prank(user1);
+        bondingToken.purchase{value: 1000}(0);
+
+        uint256 tokenBalance = bondingToken.balanceOf(user1);
+        console.log("user1", user1);
+        vm.prank(user1);
+        // 44
+        uint256 minExitPrice = 0;
+        bondingToken.transferAndCall(address(bondingToken), tokenBalance, abi.encodePacked(minExitPrice));
+        // bondingToken.transferAndCall(address(bondingToken), tokenBalance);
+        assertEq(bondingToken.balanceOf(user1), 0);
+
+        assertEq(user1.balance, startingEtherBalance);
+    }
+
+    /*//////////////////////////////////////////////////////////////
                          MAX ENTRY PRICE TESTS
     //////////////////////////////////////////////////////////////*/
 
