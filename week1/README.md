@@ -63,13 +63,6 @@ For the point "When a person sends a token to the contract with ERC1363 or ERC77
 - I haven't allowed any kind of contract owner or entity to access the reserve funds.
   - The funds are simply locked until they are redeemed by burning purchased tokens.
 
-### Could have implemented
-
-- It is generally better to accept a `_to` address in the `purchase` and `sell` functions.
-  - This allows the user to specify the address that the tokens are sent to.
-  - This is a better UX as it allows the user to specify the address that they want to receive the tokens.
-    - I haven't done this just for simplicities sake.
-
 ### Sandwich attack protection
 
 There are a number of methods to protect against sandwich attacks.
