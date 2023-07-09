@@ -41,32 +41,32 @@ contract BondingTokenTest is TestHelpers {
 
     function test_First_Purchase_0() public {
         vm.expectRevert(BondingToken.MustPayGreaterThanZero.selector);
-        bondingToken.purchase{value: 0}();
+        bondingToken.purchase{value: 0}(0);
     }
 
     function test_First_Purchase_1() public {
-        bondingToken.purchase{value: 1}();
+        bondingToken.purchase{value: 1}(0);
         assertEq(bondingToken.balanceOf(address(this)), 1);
     }
 
     function test_First_Purchase_3() public {
-        bondingToken.purchase{value: 3}();
+        bondingToken.purchase{value: 3}(0);
         assertEq(bondingToken.balanceOf(address(this)), 2);
     }
 
     function test_First_Purchase_8() public {
-        bondingToken.purchase{value: 8}();
+        bondingToken.purchase{value: 8}(0);
         assertEq(bondingToken.balanceOf(address(this)), 4);
     }
 
     function test_First_Purchase_1000() public {
-        bondingToken.purchase{value: 1000}();
+        bondingToken.purchase{value: 1000}(0);
         assertEq(bondingToken.balanceOf(address(this)), 44);
     }
 
     function test_First_Purchase_Fuzz(uint64 purchaseAmount) public {
         vm.assume(purchaseAmount > 0);
-        bondingToken.purchase{value: purchaseAmount}();
+        bondingToken.purchase{value: purchaseAmount}(0);
 
         assertEq(
             bondingToken.balanceOf(address(this)),
@@ -75,7 +75,7 @@ contract BondingTokenTest is TestHelpers {
     }
 
     function test_Second_Purchase() public {
-        bondingToken.purchase{value: 1000}();
+        bondingToken.purchase{value: 1000}(0);
 
         // firstPurchaseReserves = 1000
         // firstPurchaseSupply = sqrt(1000 * 2) = 44
@@ -84,7 +84,7 @@ contract BondingTokenTest is TestHelpers {
         // change in supply = 63 - 44 = 19
 
         vm.prank(user1);
-        bondingToken.purchase{value: 1000}();
+        bondingToken.purchase{value: 1000}(44);
         assertEq(bondingToken.balanceOf(user1), 19);
     }
 
@@ -95,14 +95,12 @@ contract BondingTokenTest is TestHelpers {
         vm.assume(firstPurchase > 0);
         vm.assume(secondPurchase > 0);
 
-        bondingToken.purchase{value: firstPurchase}();
-        assertEq(
-            bondingToken.balanceOf(address(this)),
-            calculateSupplyChange(0, firstPurchase)
-        );
+        bondingToken.purchase{value: firstPurchase}(0);
+        uint256 initalMintAmount = calculateSupplyChange(0, firstPurchase);
+        assertEq(bondingToken.balanceOf(address(this)), initalMintAmount);
 
         vm.prank(user1);
-        bondingToken.purchase{value: secondPurchase}();
+        bondingToken.purchase{value: secondPurchase}(initalMintAmount);
         assertEq(
             bondingToken.balanceOf(user1),
             calculateSupplyChange(firstPurchase, secondPurchase)
@@ -115,7 +113,7 @@ contract BondingTokenTest is TestHelpers {
 
     function test_Cannot_Sell_Zero() public {
         vm.prank(user1);
-        bondingToken.purchase{value: 1000}();
+        bondingToken.purchase{value: 1000}(0);
 
         vm.prank(user1);
         vm.expectRevert(BondingToken.MustSellGreaterThanZero.selector);
@@ -125,7 +123,7 @@ contract BondingTokenTest is TestHelpers {
     function test_Sell_All_Tokens() public {
         uint256 startingEtherBalance = user1.balance;
         vm.prank(user1);
-        bondingToken.purchase{value: 1000}();
+        bondingToken.purchase{value: 1000}(0);
 
         uint256 tokenBalance = bondingToken.balanceOf(user1);
         vm.prank(user1);
@@ -137,7 +135,7 @@ contract BondingTokenTest is TestHelpers {
 
     function test_Sell_Partial_Tokens() public {
         vm.prank(user1);
-        bondingToken.purchase{value: 1000}();
+        bondingToken.purchase{value: 1000}(0);
 
         uint256 balanceBeforeSelling = user1.balance;
         vm.prank(user1);
@@ -160,7 +158,7 @@ contract BondingTokenTest is TestHelpers {
         vm.assume(purchaseAmount > 0);
         vm.assume(saleAmount > 0);
 
-        bondingToken.purchase{value: purchaseAmount}();
+        bondingToken.purchase{value: purchaseAmount}(0);
         uint256 purchasedTokens = calculateSupplyChange(0, purchaseAmount);
         bondingToken.transfer(user1, purchasedTokens);
 
@@ -184,11 +182,27 @@ contract BondingTokenTest is TestHelpers {
     }
 
     function test_Sell_Tokens_Transfer_Fails() public {
-        bondingToken.purchase{value: 1000}();
+        bondingToken.purchase{value: 1000}(0);
 
         uint256 tokenBalance = bondingToken.balanceOf(address(this));
         vm.expectRevert(BondingToken.PayoutFailed.selector);
         bondingToken.sell(tokenBalance);
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                         MAX ENTRY PRICE TESTS
+    //////////////////////////////////////////////////////////////*/
+
+    function test_Max_Entry_Price() public {
+        bondingToken.purchase{value: 1000}(0);
+
+        // mock front runner
+        vm.prank(user1);
+        bondingToken.purchase{value: 100}(44);
+
+        // user being frontrun - transaction reverts due to max slippage setting
+        vm.expectRevert(BondingToken.MaxSlippageExceeded.selector);
+        bondingToken.purchase{value: 100}(44);
     }
 
     /*//////////////////////////////////////////////////////////////
