@@ -108,6 +108,7 @@ For security I used the `SafeERC20` library by OpenZeppelin to safely handle a v
 
 - Solidity Contract 3
   - Use cooldown period as a protection against a sandwich attack
+  - Add to address
 - Solidity Contract 4
   - Add event tests
 
