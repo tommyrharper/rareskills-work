@@ -12,13 +12,16 @@ contract BondingToken is ERC20 {
 
     constructor() ERC20("BondingToken", "BT") {}
 
-    function purchase() external payable {
+    function purchase(uint256 maxEntryPrice) external payable {
+        uint256 _totalSupply = totalSupply();
+
+        if (_totalSupply > maxEntryPrice) revert MaxSlippageExceeded();
         if (msg.value == 0) revert MustPayGreaterThanZero();
 
         reserveBalance += msg.value;
 
         uint256 newSupply = Math.sqrt(2 * reserveBalance);
-        uint256 supplyChange = newSupply - totalSupply();
+        uint256 supplyChange = newSupply - _totalSupply;
 
         _mint(msg.sender, supplyChange);
     }
@@ -41,6 +44,7 @@ contract BondingToken is ERC20 {
         if (!success) revert PayoutFailed();
     }
 
+    error MaxSlippageExceeded();
     error PayoutFailed();
     error MustPayGreaterThanZero();
     error MustSellGreaterThanZero();
