@@ -100,11 +100,15 @@ contract BondingTokenTest is TestHelpers {
         assertEq(bondingToken.balanceOf(address(this)), initalMintAmount);
 
         vm.prank(user1);
-        bondingToken.purchase{value: secondPurchase}(initalMintAmount);
-        assertEq(
-            bondingToken.balanceOf(user1),
-            calculateSupplyChange(firstPurchase, secondPurchase)
+        uint256 secondPurchaseReturn = calculateSupplyChange(
+            firstPurchase,
+            secondPurchase
         );
+        if (secondPurchaseReturn == 0) {
+            vm.expectRevert(BondingToken.PurchaseTooSmall.selector);
+        }
+        bondingToken.purchase{value: secondPurchase}(initalMintAmount);
+        assertEq(bondingToken.balanceOf(user1), secondPurchaseReturn);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -213,6 +217,13 @@ contract BondingTokenTest is TestHelpers {
         vm.assume(firstPurchase > 0);
         vm.assume(secondPurchase > 0);
 
+        uint256 finalPurchaseReturn = calculateSupplyChange(
+            firstPurchase,
+            secondPurchase
+        );
+
+        vm.assume(finalPurchaseReturn > 0);
+
         /// front runner
         bondingToken.purchase{value: firstPurchase}(0);
         uint256 frontRunnerPriceImpact = calculateSupplyChange(
@@ -228,10 +239,7 @@ contract BondingTokenTest is TestHelpers {
             bondingToken.purchase{value: secondPurchase}(slippageAllowed);
         } else {
             bondingToken.purchase{value: secondPurchase}(slippageAllowed);
-            assertEq(
-                bondingToken.balanceOf(user1),
-                calculateSupplyChange(firstPurchase, secondPurchase)
-            );
+            assertEq(bondingToken.balanceOf(user1), finalPurchaseReturn);
         }
     }
 
