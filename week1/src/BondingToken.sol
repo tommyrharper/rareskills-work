@@ -26,11 +26,14 @@ contract BondingToken is ERC20 {
         _mint(msg.sender, supplyChange);
     }
 
-    function sell(uint256 amount) external {
+    function sell(uint256 amount, uint256 minExitPrice) external {
+        uint256 _totalSupply = totalSupply();
+
+        if (_totalSupply < minExitPrice) revert MaxSlippageExceeded();
         if (amount == 0) revert MustSellGreaterThanZero();
         if (amount > balanceOf(msg.sender)) revert InsufficientBalance();
 
-        uint256 newTotalSupply = totalSupply() - amount;
+        uint256 newTotalSupply = _totalSupply - amount;
         uint256 newReserveBalance = (newTotalSupply ** 2) / 2;
         uint256 changeInReserves = reserveBalance - newReserveBalance;
 
