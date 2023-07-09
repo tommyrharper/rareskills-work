@@ -27,6 +27,7 @@ contract SanctionToken is ERC20, Ownable {
     /// @param _banned whether or not the user should be banned
     function ban(address _account, bool _banned) external onlyOwner {
         blackList[_account] = _banned;
+        emit UserBanStatusUpdated(_account, _banned);
     }
 
     /// @dev Override the _beforeTokenTransfer function to prevent banned users from transacting
@@ -38,6 +39,19 @@ contract SanctionToken is ERC20, Ownable {
         if (blackList[to]) revert BannedToAddress(to);
         if (blackList[from]) revert BannedFromAddress(from);
     }
+
+    /*//////////////////////////////////////////////////////////////
+                                 EVENTS
+    //////////////////////////////////////////////////////////////*/
+
+    /// @notice emitted when a user is banned or unbanned
+    /// @param account the address of the user that was banned or unbanned
+    /// @param banned whether or not the user is banned
+    event UserBanStatusUpdated(address account, bool banned);
+
+    /*//////////////////////////////////////////////////////////////
+                                 ERRORS
+    //////////////////////////////////////////////////////////////*/
 
     /// @notice Error message when a transfer is made to a banned address
     /// @param to the address that is banned
