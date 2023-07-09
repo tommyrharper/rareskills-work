@@ -58,6 +58,8 @@ contract EscrowTest is TestHelpers {
         assertEq(token.balanceOf(address(escrow)), 100 ether);
     }
 
+    // function test_Can_Create_Second_Escrow_Entry
+
     function test_Cannot_Create_Escrow_Without_Approval() public {
         vm.expectRevert("ERC20: insufficient allowance");
         escrow.createEscrow(address(token), user1, 100 ether);
@@ -108,5 +110,14 @@ contract EscrowTest is TestHelpers {
         escrow.withdraw(0, user1);
     }
 
-    // function test_Cannot_Withdraw_Funds
+    function test_Cannot_Withdraw_Funds_If_Not_Seller() public {
+        token.approve(address(escrow), 100 ether);
+        escrow.createEscrow(address(token), user1, 100 ether);
+
+        vm.warp(block.timestamp + 3 days);
+
+        vm.prank(user2);
+        vm.expectRevert(Escrow.OnlySeller.selector);
+        escrow.withdraw(0, user2);
+    }
 }
