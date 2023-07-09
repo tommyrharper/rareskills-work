@@ -84,6 +84,13 @@ contract BondingToken is ERC1363, IERC1363Receiver {
         if (!success) revert PayoutFailed();
     }
 
+    /// @notice Called when a user invokes transferAndCall to this contract address
+    /// @param spender address The address which called `transferAndCall` or `transferFromAndCall` function
+    /// @param sender address The address which are token transferred from
+    /// @param amount uint256 the amount of tokens transferred
+    /// @param data bytes Additional data with no specified format
+    /// @dev the data param is expected to be a 32 byte uint representing the minExitPrice
+    /// @dev tokens will be sent to the sender address
     function onTransferReceived(
         address spender,
         address sender,
