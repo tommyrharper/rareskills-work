@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.19;
-import {Test, console} from "forge-std/Test.sol";
 
 import "openzeppelin/token/ERC20/ERC20.sol";
 import "erc1363-payable-token/contracts/token/ERC1363/ERC1363.sol";
@@ -29,10 +28,11 @@ contract BondingToken is ERC1363, IERC1363Receiver {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Purchase tokens with eth
+    /// @param to the address to send the tokens to
     /// @param maxEntryPrice the maximum price per token that the user is willing to begin purchasing tokens at
     /// @dev Note: that the maxEntryPrice is not the price that a user will get their tokens at, as the price will be pushed
     ///  up the bonding curve by the price impact of this transaction. This is simply the max price allowed before this purchase executes
-    function purchase(uint256 maxEntryPrice) external payable {
+    function purchase(address to, uint256 maxEntryPrice) external payable {
         uint256 _totalSupply = totalSupply();
 
         if (_totalSupply > maxEntryPrice) revert MaxSlippageExceeded();
@@ -45,7 +45,7 @@ contract BondingToken is ERC1363, IERC1363Receiver {
 
         if (supplyChange == 0) revert PurchaseTooSmall();
 
-        _mint(msg.sender, supplyChange);
+        _mint(to, supplyChange);
     }
 
     /// @notice Sell tokens for eth
@@ -92,7 +92,9 @@ contract BondingToken is ERC1363, IERC1363Receiver {
     ) public returns (bytes4) {
         if (data.length != 32) revert InvalidMinExitPriceData();
         uint256 minExitPrice = uint256(bytes32(data));
+
         _sell(address(this), sender, amount, minExitPrice);
+
         return IERC1363Receiver.onTransferReceived.selector;
     }
 
