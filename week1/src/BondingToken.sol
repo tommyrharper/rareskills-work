@@ -28,7 +28,7 @@ contract BondingToken is ERC1363, IERC1363Receiver {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Purchase tokens with eth
-    /// @param to the address to send the tokens to
+    /// @param to the address to mint the new tokens to
     /// @param maxEntryPrice the maximum price per token that the user is willing to begin purchasing tokens at
     /// @dev Note: that the maxEntryPrice is not the price that a user will get their tokens at, as the price will be pushed
     ///  up the bonding curve by the price impact of this transaction. This is simply the max price allowed before this purchase executes
