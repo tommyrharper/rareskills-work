@@ -75,7 +75,6 @@ contract BondingTokenTest is TestHelpers {
     }
 
     function test_Second_Purchase() public {
-
         bondingToken.purchase{value: 1000}(0);
 
         // firstPurchaseReserves = 1000
@@ -204,15 +203,26 @@ contract BondingTokenTest is TestHelpers {
         bondingToken.purchase{value: 1000}(0);
 
         uint256 tokenBalance = bondingToken.balanceOf(user1);
-        console.log("user1", user1);
         vm.prank(user1);
-        // 44
-        uint256 minExitPrice = 0;
-        bondingToken.transferAndCall(address(bondingToken), tokenBalance, abi.encodePacked(minExitPrice));
-        // bondingToken.transferAndCall(address(bondingToken), tokenBalance);
+        uint256 minExitPrice = 44;
+        bondingToken.transferAndCall(
+            address(bondingToken),
+            tokenBalance,
+            abi.encodePacked(minExitPrice)
+        );
         assertEq(bondingToken.balanceOf(user1), 0);
 
         assertEq(user1.balance, startingEtherBalance);
+    }
+
+    function test_Cannot_Sell_Via_Transfer_And_Call_Without_Data() public {
+        vm.prank(user1);
+        bondingToken.purchase{value: 1000}(0);
+
+        uint256 tokenBalance = bondingToken.balanceOf(user1);
+        vm.prank(user1);
+        vm.expectRevert(BondingToken.InvalidMinExitPriceData.selector);
+        bondingToken.transferAndCall(address(bondingToken), tokenBalance);
     }
 
     /*//////////////////////////////////////////////////////////////
