@@ -51,6 +51,10 @@ I have taken the approach of just overriding the `_spendAllowance` function so t
 
 - Solidity Contract 3 - [BondingToken.sol](./src/BondingToken.sol)
 
+### Notes
+
+For the point "When a person sends a token to the contract with ERC1363 or ERC777, it should trigger the receive function", I was not sure exactly what is meant by this.
+
 ### Assumptions
 
 - I have followed a very simple linear model where `token_price = total_supply`
@@ -65,6 +69,26 @@ I have taken the approach of just overriding the `_spendAllowance` function so t
   - This allows the user to specify the address that the tokens are sent to.
   - This is a better UX as it allows the user to specify the address that they want to receive the tokens.
     - I haven't done this just for simplicities sake.
+
+### Sandwich attack protection
+
+There are a number of methods to protect against sandwich attacks.
+
+I used a `maxEntryPrice` and `minExitPrice` to protect against sandwich attacks. This allows the user to set the maximum slippage they are happy with in their trade. The advantage of this is it provides some flexibility, but it puts the burden on the user to protect themselves by using a reasonable value.
+
+Another option would be to use a cooldown period. This would mean that the user would have to wait a certain amount of time before they could sell their tokens. This would protect against sandwich attacks, but it would also be a bit annoying for the user.
+
+I would have implemented in this in addition to slippage limits if I had more time.
+
+Other approaches that I didn't attempt include:
+- Transaction counters
+  - I don't like this approach as it is quite frustrating for users
+- Gas price limits
+  - I also don't like this approach as you have to keep adjusting the limits depending on network conditions
+  - Also it does not protect against block constructors who can order transactions independent of gas price
+- Commit-reveal strategies
+  - I like the robustness of this approach, however it is quite complex and I didn't have time to implement it
+  - Also I don't like the fact that users need to execute at least two transactions
 
 ## TODO
 
