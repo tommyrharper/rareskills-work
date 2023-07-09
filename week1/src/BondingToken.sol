@@ -23,7 +23,7 @@ contract BondingToken is ERC20 {
         uint256 newSupply = Math.sqrt(2 * reserveBalance);
         uint256 supplyChange = newSupply - _totalSupply;
 
-        if (supplyChange == 0) revert TradeTooSmall();
+        if (supplyChange == 0) revert PurchaseTooSmall();
 
         _mint(msg.sender, supplyChange);
     }
@@ -49,7 +49,7 @@ contract BondingToken is ERC20 {
         if (!success) revert PayoutFailed();
     }
 
-    error TradeTooSmall();
+    error PurchaseTooSmall();
     error MaxSlippageExceeded();
     error PayoutFailed();
     error MustPayGreaterThanZero();

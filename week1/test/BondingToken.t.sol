@@ -301,7 +301,7 @@ contract BondingTokenTest is TestHelpers {
         bondingToken.purchase{value: 1000 ether}(0);
         uint256 supply = bondingToken.totalSupply();
 
-        vm.expectRevert(BondingToken.TradeTooSmall.selector);
+        vm.expectRevert(BondingToken.PurchaseTooSmall.selector);
         bondingToken.purchase{value: 100}(supply);
     }
 
