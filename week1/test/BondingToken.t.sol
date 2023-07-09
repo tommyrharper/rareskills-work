@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity 0.8.19;
 
 import "./TestHelpers.t.sol";
 import "../src/BondingToken.sol";
@@ -75,6 +75,7 @@ contract BondingTokenTest is TestHelpers {
     }
 
     function test_Second_Purchase() public {
+
         bondingToken.purchase{value: 1000}(0);
 
         // firstPurchaseReserves = 1000
