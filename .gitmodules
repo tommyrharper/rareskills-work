@@ -10,3 +10,6 @@
 [submodule "week1/lib/ERC777"]
 	path = week1/lib/ERC777
 	url = https://github.com/0xjac/ERC777
+[submodule "week1/lib/Simple777Token"]
+	path = week1/lib/Simple777Token
+	url = https://github.com/abcoathup/Simple777Token
