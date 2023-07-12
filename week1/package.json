@@ -1,0 +1,15 @@
+{
+  "name": "week1",
+  "version": "1.0.0",
+  "description": "Thank you for taking the time to review my work.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "forge test --fork-url $(grep L1_ARCHIVE_NODE_URL .env | cut -d '=' -f2) -vv"
+  },
+  "author": "",
+  "license": "ISC"
+}
