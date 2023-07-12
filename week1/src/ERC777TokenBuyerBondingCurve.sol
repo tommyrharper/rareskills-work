@@ -7,7 +7,9 @@ import "openzeppelin/utils/math/Math.sol";
 import "openzeppelin/utils/introspection/IERC1820Registry.sol";
 
 /// @notice Bonding token with a linear bonding curve of price = total_supply
-contract BondingTokenERC777 is ERC20, IERC777Recipient {
+/// @notice this contract simply sells the underlying ERC20 token for any ERC777 token
+/// @notice this contract will not buy back the underlying ERC20 token
+contract ERC777TokenBuyerBondingCurve is ERC20, IERC777Recipient {
     /*//////////////////////////////////////////////////////////////
                                  STATE
     //////////////////////////////////////////////////////////////*/
@@ -21,7 +23,7 @@ contract BondingTokenERC777 is ERC20, IERC777Recipient {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Instantiates the contract with the name and symbol
-    constructor() ERC20("BondingTokenERC777", "BT") {
+    constructor() ERC20("ERC777TokenBuyerBondingCurve", "BT") {
         IERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24)
             .setInterfaceImplementer(
                 address(this),

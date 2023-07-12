@@ -2,15 +2,15 @@
 pragma solidity 0.8.19;
 
 import "./TestHelpers.t.sol";
-import "../src/BondingTokenERC777.sol";
+import "../src/ERC777TokenBuyerBondingCurve.sol";
 import "../src/erc777/ERC777Token.sol";
 
-contract BondingTokenERC777Test is TestHelpers {
+contract ERC777TokenBuyerBondingCurveTest is TestHelpers {
     /*//////////////////////////////////////////////////////////////
                                  STATE
     //////////////////////////////////////////////////////////////*/
 
-    BondingTokenERC777 public bondingToken;
+    ERC777TokenBuyerBondingCurve public bondingToken;
     ERC777Token public erc777;
     address public user1;
     address public user2;
@@ -22,12 +22,16 @@ contract BondingTokenERC777Test is TestHelpers {
     function setUp() public {
         vm.rollFork(17676290);
 
-        bondingToken = new BondingTokenERC777();
+        bondingToken = new ERC777TokenBuyerBondingCurve();
         user1 = createAndDealUser();
         user2 = createAndDealUser();
         address[] memory defaultOperators = new address[](1);
         defaultOperators[0] = address(this);
-        erc777 = new ERC777Token("BondingTokenERC777", "BT", defaultOperators);
+        erc777 = new ERC777Token(
+            "ERC777TokenBuyerBondingCurve",
+            "BT",
+            defaultOperators
+        );
         erc777.mint(user1, 1000 ether);
         erc777.mint(user2, 1000 ether);
     }
@@ -37,7 +41,7 @@ contract BondingTokenERC777Test is TestHelpers {
     //////////////////////////////////////////////////////////////*/
 
     function testName() public {
-        assertEq(bondingToken.name(), "BondingTokenERC777");
+        assertEq(bondingToken.name(), "ERC777TokenBuyerBondingCurve");
     }
 
     function testSymbol() public {
@@ -51,7 +55,9 @@ contract BondingTokenERC777Test is TestHelpers {
     function test_First_Purchase_0() public {
         uint256 maxEntryPrice = 0;
         vm.prank(user1);
-        vm.expectRevert(BondingTokenERC777.MustPayGreaterThanZero.selector);
+        vm.expectRevert(
+            ERC777TokenBuyerBondingCurve.MustPayGreaterThanZero.selector
+        );
         erc777.send(address(bondingToken), 0, abi.encodePacked(maxEntryPrice));
     }
 
@@ -107,7 +113,11 @@ contract BondingTokenERC777Test is TestHelpers {
     function test_Second_Purchase() public {
         uint256 maxEntryPrice = 0;
         vm.prank(user1);
-        erc777.send(address(bondingToken), 1000, abi.encodePacked(maxEntryPrice));
+        erc777.send(
+            address(bondingToken),
+            1000,
+            abi.encodePacked(maxEntryPrice)
+        );
 
         // firstPurchaseReserves = 1000
         // firstPurchaseSupply = sqrt(1000 * 2) = 44
@@ -117,7 +127,11 @@ contract BondingTokenERC777Test is TestHelpers {
 
         maxEntryPrice = 44;
         vm.prank(user2);
-        erc777.send(address(bondingToken), 1000, abi.encodePacked(maxEntryPrice));
+        erc777.send(
+            address(bondingToken),
+            1000,
+            abi.encodePacked(maxEntryPrice)
+        );
         assertEq(bondingToken.balanceOf(user2), 19);
     }
 
