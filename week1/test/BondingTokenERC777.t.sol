@@ -29,6 +29,7 @@ contract BondingTokenERC777Test is TestHelpers {
         defaultOperators[0] = address(this);
         erc777 = new ERC777Token("BondingTokenERC777", "BT", defaultOperators);
         erc777.mint(user1, 1000 ether);
+        erc777.mint(user2, 1000 ether);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -103,19 +104,22 @@ contract BondingTokenERC777Test is TestHelpers {
         );
     }
 
-    // function test_Second_Purchase() public {
-    //     bondingToken.purchase{value: 1000}(address(this), 0);
+    function test_Second_Purchase() public {
+        uint256 maxEntryPrice = 0;
+        vm.prank(user1);
+        erc777.send(address(bondingToken), 1000, abi.encodePacked(maxEntryPrice));
 
-    //     // firstPurchaseReserves = 1000
-    //     // firstPurchaseSupply = sqrt(1000 * 2) = 44
-    //     // newReservers = 2000
-    //     // newSupply = sqrt(2000 * 2) = 63
-    //     // change in supply = 63 - 44 = 19
+        // firstPurchaseReserves = 1000
+        // firstPurchaseSupply = sqrt(1000 * 2) = 44
+        // newReservers = 2000
+        // newSupply = sqrt(2000 * 2) = 63
+        // change in supply = 63 - 44 = 19
 
-    //     vm.prank(user1);
-    //     bondingToken.purchase{value: 1000}(user1, 44);
-    //     assertEq(bondingToken.balanceOf(user1), 19);
-    // }
+        maxEntryPrice = 44;
+        vm.prank(user2);
+        erc777.send(address(bondingToken), 1000, abi.encodePacked(maxEntryPrice));
+        assertEq(bondingToken.balanceOf(user2), 19);
+    }
 
     // function test_Second_Purchase_Fuzz(
     //     uint64 firstPurchase,
