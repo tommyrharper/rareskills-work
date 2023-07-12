@@ -5,13 +5,10 @@ import "openzeppelin/token/ERC20/ERC20.sol";
 import "./erc777/IERC777Recipient.sol";
 import "./erc777/IERC777Sender.sol";
 import "openzeppelin/utils/math/Math.sol";
+import "openzeppelin/utils/introspection/IERC1820Registry.sol";
 
 /// @notice Bonding token with a linear bonding curve of price = total_supply
-contract BondingTokenERC777 is
-    ERC20,
-    IERC777Recipient,
-    IERC777Sender
-{
+contract BondingTokenERC777 is ERC20, IERC777Recipient, IERC777Sender {
     /*//////////////////////////////////////////////////////////////
                                  STATE
     //////////////////////////////////////////////////////////////*/
@@ -25,24 +22,32 @@ contract BondingTokenERC777 is
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Instantiates the contract with the name and symbol
-    constructor() ERC20("BondingTokenERC777", "BT") {}
+    constructor() ERC20("BondingTokenERC777", "BT") {
+        IERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24)
+            .setInterfaceImplementer(
+                address(this),
+                keccak256("ERC777TokensRecipient"),
+                address(this)
+            );
+    }
 
     /*//////////////////////////////////////////////////////////////
                                FUNCTIONS
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Purchase tokens with eth
+    /// @notice Purchase tokens with an erc777 token
     /// @param to the address to mint the new tokens to
     /// @param maxEntryPrice the maximum price per token that the user is willing to begin purchasing tokens at
+    /// @param amount amount of tokens sent to the contract
     /// @dev Note: that the maxEntryPrice is not the price that a user will get their tokens at, as the price will be pushed
     ///  up the bonding curve by the price impact of this transaction. This is simply the max price allowed before this purchase executes
-    function purchase(address to, uint256 maxEntryPrice) external payable {
+    function purchase(address to, uint256 maxEntryPrice, uint256 amount) internal {
         uint256 _totalSupply = totalSupply();
 
         if (_totalSupply > maxEntryPrice) revert MaxSlippageExceeded();
-        if (msg.value == 0) revert MustPayGreaterThanZero();
+        if (amount == 0) revert MustPayGreaterThanZero();
 
-        reserveBalance += msg.value;
+        reserveBalance += amount;
 
         uint256 newSupply = Math.sqrt(2 * reserveBalance);
         uint256 supplyChange = newSupply - _totalSupply;
@@ -92,16 +97,21 @@ contract BondingTokenERC777 is
                                  ERC777
     //////////////////////////////////////////////////////////////*/
 
-    function tokensToSend(
+    function tokensReceived(
         address operator,
         address from,
         address to,
         uint amount,
         bytes memory userData,
         bytes memory operatorData
-    ) external {}
+    ) external {
+        if (userData.length != 32) revert InvalidMinExitPriceData();
+        uint256 maxEntryPrice = uint256(bytes32(userData));
 
-    function tokensReceived(
+        purchase(from, maxEntryPrice, amount);
+    }
+
+    function tokensToSend(
         address operator,
         address from,
         address to,
