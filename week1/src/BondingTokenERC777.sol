@@ -2,15 +2,15 @@
 pragma solidity 0.8.19;
 
 import "openzeppelin/token/ERC20/ERC20.sol";
-import "./ERC777TokensRecipient.sol";
-import "./ERC777TokensSender.sol";
+import "./erc777/IERC777Recipient.sol";
+import "./erc777/IERC777Sender.sol";
 import "openzeppelin/utils/math/Math.sol";
 
 /// @notice Bonding token with a linear bonding curve of price = total_supply
 contract BondingTokenERC777 is
     ERC20,
-    ERC777TokensRecipient,
-    ERC777TokensSender
+    IERC777Recipient,
+    IERC777Sender
 {
     /*//////////////////////////////////////////////////////////////
                                  STATE
