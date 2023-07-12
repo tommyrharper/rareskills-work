@@ -2,14 +2,14 @@
 pragma solidity 0.8.19;
 
 import "./TestHelpers.t.sol";
-import "../src/BondingToken.sol";
+import "../src/BondingTokenERC777.sol";
 
 contract BondingTokenERC777Test is TestHelpers {
     /*//////////////////////////////////////////////////////////////
                                  STATE
     //////////////////////////////////////////////////////////////*/
 
-    BondingToken public bondingToken;
+    BondingTokenERC777 public bondingToken;
     address public user1;
     address public user2;
 
@@ -18,7 +18,7 @@ contract BondingTokenERC777Test is TestHelpers {
     //////////////////////////////////////////////////////////////*/
 
     function setUp() public {
-        bondingToken = new BondingToken();
+        bondingToken = new BondingTokenERC777();
         user1 = createAndDealUser();
         user2 = createAndDealUser();
     }
@@ -28,7 +28,7 @@ contract BondingTokenERC777Test is TestHelpers {
     //////////////////////////////////////////////////////////////*/
 
     function testName() public {
-        assertEq(bondingToken.name(), "BondingToken");
+        assertEq(bondingToken.name(), "BondingTokenERC777");
     }
 
     function testSymbol() public {
@@ -40,7 +40,7 @@ contract BondingTokenERC777Test is TestHelpers {
     //////////////////////////////////////////////////////////////*/
 
     function test_First_Purchase_0() public {
-        vm.expectRevert(BondingToken.MustPayGreaterThanZero.selector);
+        vm.expectRevert(BondingTokenERC777.MustPayGreaterThanZero.selector);
         bondingToken.purchase{value: 0}(address(this), 0);
     }
 
@@ -109,7 +109,7 @@ contract BondingTokenERC777Test is TestHelpers {
             secondPurchase
         );
         if (secondPurchaseReturn == 0) {
-            vm.expectRevert(BondingToken.PurchaseTooSmall.selector);
+            vm.expectRevert(BondingTokenERC777.PurchaseTooSmall.selector);
         }
         vm.prank(user1);
         bondingToken.purchase{value: secondPurchase}(user1, initalMintAmount);
@@ -125,7 +125,7 @@ contract BondingTokenERC777Test is TestHelpers {
         bondingToken.purchase{value: 1000}(user1, 0);
 
         vm.prank(user1);
-        vm.expectRevert(BondingToken.MustSellGreaterThanZero.selector);
+        vm.expectRevert(BondingTokenERC777.MustSellGreaterThanZero.selector);
         bondingToken.sell(user1, 0, 44);
     }
 
@@ -189,7 +189,7 @@ contract BondingTokenERC777Test is TestHelpers {
         uint256 balanceBefore = user1.balance;
         if (saleAmount > purchasedTokens) {
             vm.prank(user1);
-            vm.expectRevert(BondingToken.InsufficientBalance.selector);
+            vm.expectRevert(BondingTokenERC777.InsufficientBalance.selector);
             bondingToken.sell(user1, saleAmount, purchasedTokens);
             return;
         } else {
@@ -209,7 +209,7 @@ contract BondingTokenERC777Test is TestHelpers {
         bondingToken.purchase{value: 1000}(address(this), 0);
 
         uint256 tokenBalance = bondingToken.balanceOf(address(this));
-        vm.expectRevert(BondingToken.PayoutFailed.selector);
+        vm.expectRevert(BondingTokenERC777.PayoutFailed.selector);
         bondingToken.sell(address(this), tokenBalance, 44);
     }
 
@@ -217,50 +217,50 @@ contract BondingTokenERC777Test is TestHelpers {
                        SELL VIA TRANSFER AND CALL
     //////////////////////////////////////////////////////////////*/
 
-    function test_Sell_Via_Transfer_And_Call() public {
-        uint256 startingEtherBalance = user1.balance;
-        vm.prank(user1);
-        bondingToken.purchase{value: 1000}(user1, 0);
+    // function test_Sell_Via_Transfer_And_Call() public {
+    //     uint256 startingEtherBalance = user1.balance;
+    //     vm.prank(user1);
+    //     bondingToken.purchase{value: 1000}(user1, 0);
 
-        uint256 tokenBalance = bondingToken.balanceOf(user1);
-        vm.prank(user1);
-        uint256 minExitPrice = 44;
-        bondingToken.transferAndCall(
-            address(bondingToken),
-            tokenBalance,
-            abi.encodePacked(minExitPrice)
-        );
-        assertEq(bondingToken.balanceOf(user1), 0);
+    //     uint256 tokenBalance = bondingToken.balanceOf(user1);
+    //     vm.prank(user1);
+    //     uint256 minExitPrice = 44;
+    //     bondingToken.transferAndCall(
+    //         address(bondingToken),
+    //         tokenBalance,
+    //         abi.encodePacked(minExitPrice)
+    //     );
+    //     assertEq(bondingToken.balanceOf(user1), 0);
 
-        assertEq(user1.balance, startingEtherBalance);
-    }
+    //     assertEq(user1.balance, startingEtherBalance);
+    // }
 
-    function test_Cannot_Sell_Via_Transfer_And_Call_Without_Data() public {
-        vm.prank(user1);
-        bondingToken.purchase{value: 1000}(user1, 0);
+    // function test_Cannot_Sell_Via_Transfer_And_Call_Without_Data() public {
+    //     vm.prank(user1);
+    //     bondingToken.purchase{value: 1000}(user1, 0);
 
-        uint256 tokenBalance = bondingToken.balanceOf(user1);
-        vm.prank(user1);
-        vm.expectRevert(BondingToken.InvalidMinExitPriceData.selector);
-        bondingToken.transferAndCall(address(bondingToken), tokenBalance);
-    }
+    //     uint256 tokenBalance = bondingToken.balanceOf(user1);
+    //     vm.prank(user1);
+    //     vm.expectRevert(BondingTokenERC777.InvalidMinExitPriceData.selector);
+    //     bondingToken.transferAndCall(address(bondingToken), tokenBalance);
+    // }
 
-    function test_Cannot_Sell_Via_Transfer_And_Call_With_High_Exit_Price()
-        public
-    {
-        vm.prank(user1);
-        bondingToken.purchase{value: 1000}(user1, 0);
+    // function test_Cannot_Sell_Via_Transfer_And_Call_With_High_Exit_Price()
+    //     public
+    // {
+    //     vm.prank(user1);
+    //     bondingToken.purchase{value: 1000}(user1, 0);
 
-        uint256 tokenBalance = bondingToken.balanceOf(user1);
-        vm.prank(user1);
-        uint256 minExitPrice = 45;
-        vm.expectRevert(BondingToken.MaxSlippageExceeded.selector);
-        bondingToken.transferAndCall(
-            address(bondingToken),
-            tokenBalance,
-            abi.encodePacked(minExitPrice)
-        );
-    }
+    //     uint256 tokenBalance = bondingToken.balanceOf(user1);
+    //     vm.prank(user1);
+    //     uint256 minExitPrice = 45;
+    //     vm.expectRevert(BondingTokenERC777.MaxSlippageExceeded.selector);
+    //     bondingToken.transferAndCall(
+    //         address(bondingToken),
+    //         tokenBalance,
+    //         abi.encodePacked(minExitPrice)
+    //     );
+    // }
 
     /*//////////////////////////////////////////////////////////////
                          MAX ENTRY PRICE TESTS
@@ -274,7 +274,7 @@ contract BondingTokenERC777Test is TestHelpers {
         bondingToken.purchase{value: 100}(user1, 44);
 
         // user being frontrun - transaction reverts due to max slippage setting
-        vm.expectRevert(BondingToken.MaxSlippageExceeded.selector);
+        vm.expectRevert(BondingTokenERC777.MaxSlippageExceeded.selector);
         bondingToken.purchase{value: 100}(address(this), 44);
     }
 
@@ -304,7 +304,7 @@ contract BondingTokenERC777Test is TestHelpers {
         // user being frontrun
         vm.prank(user1);
         if (slippageAllowed < frontRunnerPriceImpact) {
-            vm.expectRevert(BondingToken.MaxSlippageExceeded.selector);
+            vm.expectRevert(BondingTokenERC777.MaxSlippageExceeded.selector);
             bondingToken.purchase{value: secondPurchase}(
                 user1,
                 slippageAllowed
@@ -334,7 +334,7 @@ contract BondingTokenERC777Test is TestHelpers {
         bondingToken.sell(user2, 19, 63);
 
         vm.prank(user1);
-        vm.expectRevert(BondingToken.MaxSlippageExceeded.selector);
+        vm.expectRevert(BondingTokenERC777.MaxSlippageExceeded.selector);
         bondingToken.sell(user1, 44, 63);
     }
 
@@ -370,7 +370,7 @@ contract BondingTokenERC777Test is TestHelpers {
             : newTotalSupply - slippageAllowed;
 
         if (minExitPrice > bondingToken.totalSupply()) {
-            vm.expectRevert(BondingToken.MaxSlippageExceeded.selector);
+            vm.expectRevert(BondingTokenERC777.MaxSlippageExceeded.selector);
         }
         vm.prank(user1);
         bondingToken.sell(user1, user1MintedTokens, minExitPrice);
@@ -384,7 +384,7 @@ contract BondingTokenERC777Test is TestHelpers {
         bondingToken.purchase{value: 1000 ether}(address(this), 0);
         uint256 supply = bondingToken.totalSupply();
 
-        vm.expectRevert(BondingToken.PurchaseTooSmall.selector);
+        vm.expectRevert(BondingTokenERC777.PurchaseTooSmall.selector);
         bondingToken.purchase{value: 100}(address(this), supply);
     }
 

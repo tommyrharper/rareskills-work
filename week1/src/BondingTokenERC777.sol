@@ -2,12 +2,16 @@
 pragma solidity 0.8.19;
 
 import "openzeppelin/token/ERC20/ERC20.sol";
-import "erc1363-payable-token/contracts/token/ERC1363/ERC1363.sol";
-import "erc1363-payable-token/contracts/token/ERC1363/IERC1363Receiver.sol";
+import "./ERC777TokensRecipient.sol";
+import "./ERC777TokensSender.sol";
 import "openzeppelin/utils/math/Math.sol";
 
 /// @notice Bonding token with a linear bonding curve of price = total_supply
-contract BondingTokenERC777 is ERC1363, IERC1363Receiver {
+contract BondingTokenERC777 is
+    ERC20,
+    ERC777TokensRecipient,
+    ERC777TokensSender
+{
     /*//////////////////////////////////////////////////////////////
                                  STATE
     //////////////////////////////////////////////////////////////*/
@@ -21,7 +25,7 @@ contract BondingTokenERC777 is ERC1363, IERC1363Receiver {
     //////////////////////////////////////////////////////////////*/
 
     /// @notice Instantiates the contract with the name and symbol
-    constructor() ERC20("BondingToken", "BT") {}
+    constructor() ERC20("BondingTokenERC777", "BT") {}
 
     /*//////////////////////////////////////////////////////////////
                                FUNCTIONS
@@ -84,26 +88,27 @@ contract BondingTokenERC777 is ERC1363, IERC1363Receiver {
         if (!success) revert PayoutFailed();
     }
 
-    /// @notice Called when a user invokes transferAndCall to this contract address
-    /// @param spender address The address which called `transferAndCall` or `transferFromAndCall` function
-    /// @param sender address The address which are token transferred from
-    /// @param amount uint256 the amount of tokens transferred
-    /// @param data bytes Additional data with no specified format
-    /// @dev the data param is expected to be a 32 byte uint representing the minExitPrice
-    /// @dev tokens will be sent to the sender address
-    function onTransferReceived(
-        address spender,
-        address sender,
-        uint256 amount,
-        bytes calldata data
-    ) public returns (bytes4) {
-        if (data.length != 32) revert InvalidMinExitPriceData();
-        uint256 minExitPrice = uint256(bytes32(data));
+    /*//////////////////////////////////////////////////////////////
+                                 ERC777
+    //////////////////////////////////////////////////////////////*/
 
-        _sell(address(this), sender, amount, minExitPrice);
+    function tokensToSend(
+        address operator,
+        address from,
+        address to,
+        uint amount,
+        bytes memory userData,
+        bytes memory operatorData
+    ) external {}
 
-        return IERC1363Receiver.onTransferReceived.selector;
-    }
+    function tokensReceived(
+        address operator,
+        address from,
+        address to,
+        uint amount,
+        bytes memory userData,
+        bytes memory operatorData
+    ) external {}
 
     /*//////////////////////////////////////////////////////////////
                                  ERRORS
