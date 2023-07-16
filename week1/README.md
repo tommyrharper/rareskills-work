@@ -64,6 +64,13 @@ The way it works is the contract has 3 main parts:
 
 This is a bit strange admittedly and the use of `ERC1363` is unnecessary in this instance, but I used it just to get it feel for how it works for my own learning.
 
+I also wrote an ERC777 Bonding Curve just to learn the spec, this one sells an ERC20 token for an arbitrary ERC777 token. I just did this as a learning exercise, it was not done thoroughly.
+
+## Issue with the contract I haven't dealt with
+
+- I have not dealt with overflows potentially caused by `newTotalSupply ** 2` in the `_sell` function.
+  - This could be mitigated by setting a limit on how much of the token can be minted.
+
 ### Assumptions
 
 - I have followed a very simple linear model where `token_price = total_supply`
