@@ -18,4 +18,12 @@ contract RoyaltyNFTTest is Test {
     function test_Follows_ERC165() public {
         assertTrue(royalty.supportsInterface(0x01ffc9a7));
     }
+
+    function test_Correct_Royalty_Info_Set() public {
+        for (uint256 i = 0; i <= 20; i++) {
+            (address recipient, uint256 value) = royalty.royaltyInfo(i, 1000);
+            assertEq(recipient, address(this));
+            assertEq(value, 25);
+        }
+    }
 }
