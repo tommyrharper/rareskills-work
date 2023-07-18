@@ -4,11 +4,16 @@ pragma solidity ^0.8.20;
 import "forge-std/Test.sol";
 import {TestHelpers} from "./TestHelpers.t.sol";
 import "../src/RoyaltyNFT.sol";
+import "../src/NFTRewards.sol";
+import "../src/NFTStaking.sol";
 import "murky/Merkle.sol";
 
 contract RoyaltyNFTTest is TestHelpers {
     RoyaltyNFT public royalty;
     Merkle public tree;
+
+    NFTStaking public nftStaking;
+    NFTRewards public nftRewards;
 
     address internal user1;
     address internal user2;
@@ -31,6 +36,10 @@ contract RoyaltyNFTTest is TestHelpers {
         leaves[3] = keccak256(bytes(abi.encode(user4, 3)));
         bytes32 root = tree.getRoot(leaves);
         royalty = new RoyaltyNFT(root, 4);
+
+        nftRewards = new NFTRewards();
+        nftStaking = new NFTStaking(address(nftRewards), royalty);
+        nftRewards.setNFTStaking(address(nftStaking));
     }
 
     function test_Ownership() public {
