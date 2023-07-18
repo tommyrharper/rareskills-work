@@ -3,7 +3,11 @@ pragma solidity ^0.8.20;
 
 import "openzeppelin/token/ERC721/extensions/ERC721Royalty.sol";
 import "openzeppelin/access/Ownable2Step.sol";
+import "openzeppelin/utils/structs/BitMaps.sol";
+import "openzeppelin/utils/cryptography/MerkleProof.sol";
+import "openzeppelin/utils/cryptography/ECDSA.sol";
 
+// add max supply 20
 // merkle tree mint discount;
 // use bitmap for mint discount
 // ERC20 for staking rewards
@@ -12,12 +16,50 @@ import "openzeppelin/access/Ownable2Step.sol";
 // funds withdrawable by Ownable2Step
 
 contract RoyaltyNFT is ERC721Royalty, Ownable2Step {
-    uint256 public number;
+    using ECDSA for bytes32;
+    using BitMaps for BitMaps.BitMap;
 
-    constructor() ERC721("RoyaltyNFT", "RNFT") Ownable2Step() {
+    bytes32 public immutable merkleRoot;
+    BitMaps.BitMap internal bitMap;
+    uint256 public totalSupply;
+
+    constructor(
+        bytes32 _merkleRoot
+    ) ERC721("RoyaltyNFT", "RNFT") Ownable2Step() {
+        merkleRoot = _merkleRoot;
         _setDefaultRoyalty(msg.sender, 250);
         for (uint256 i = 0; i <= 20; i++) {
             _mint(msg.sender, i);
         }
     }
+
+    function isClaimed(uint256 index) public view returns (bool) {
+        return bitMap.get(index);
+    }
+
+    function _setClaimed(uint256 index) private {
+        bitMap.setTo(index, true);
+    }
+
+    function purchaseWithDiscount(
+        uint256 index,
+        bytes32[] calldata merkleProof
+    ) external {
+        if (isClaimed(index)) revert AlreadyClaimed();
+
+        bytes32 node = keccak256(abi.encodePacked(index, msg.sender));
+        if (!MerkleProof.verify(merkleProof, merkleRoot, node))
+            revert InvalidProof();
+
+        _setClaimed(index);
+        _mint(msg.sender, totalSupply);
+        totalSupply++;
+
+        emit Claimed(index, msg.sender);
+    }
+
+    error InvalidProof();
+    error AlreadyClaimed();
+    // This event is triggered whenever a call to #claim succeeds.
+    event Claimed(uint256 index, address account);
 }

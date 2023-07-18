@@ -8,7 +8,7 @@ contract RoyaltyNFTTest is Test {
     RoyaltyNFT public royalty;
 
     function setUp() public {
-        royalty = new RoyaltyNFT();
+        royalty = new RoyaltyNFT(bytes32(""));
     }
 
     function test_Ownership() public {
