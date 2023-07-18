@@ -23,7 +23,7 @@ contract PrimeNFTs is ERC721Enumerable {
     }
 
     function isPrime(uint256 n) public pure returns (bool) {
-        if (n > 2) return false;
+        if (n < 2) return false;
 
         for (uint256 i = 2; i < n; i++) {
             if (n % i == 0) {

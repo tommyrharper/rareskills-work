@@ -46,4 +46,29 @@ contract PrimeNFTsTest is TestHelpers {
 
         assertEq(prime.getNumOfPrimes(address(this)), 3);
     }
+
+    function test_Primes_2() public {
+        prime.mint(address(this), 0);
+        prime.mint(address(this), 1);
+        prime.mint(address(this), 3);
+        prime.mint(address(this), 4);
+        prime.mint(address(this), 5);
+
+        assertEq(prime.getNumOfPrimes(address(this)), 2);
+    }
+
+    function test_Primes_3() public {
+        prime.mint(address(this), 0);
+        prime.mint(address(this), 1);
+        prime.mint(address(this), 3);
+        prime.mint(address(this), 4);
+        prime.mint(address(this), 5);
+        prime.mint(address(this), 6);
+        prime.mint(address(this), 7);
+        prime.mint(address(this), 8);
+        prime.mint(address(this), 9);
+        prime.mint(address(this), 11);
+
+        assertEq(prime.getNumOfPrimes(address(this)), 4);
+    }
 }
