@@ -210,4 +210,22 @@ contract RoyaltyNFTTest is TestHelpers {
         vm.expectRevert();
         nftStaking.claimRewards(4);
     }
+
+    function test_Stake_NFT_Edge_Cases() public {
+        vm.prank(user1);
+        royalty.purchase{value: 10 ether}();
+
+        vm.prank(user1);
+        royalty.safeTransferFrom(user1, address(nftStaking), 4);
+        assertEq(royalty.balanceOf(address(nftStaking)), 1);
+        assertEq(nftStaking.ownerOf(4), user1);
+        assertEq(nftStaking.stakedAt(4), block.timestamp);
+
+        vm.prank(user1);
+        vm.expectRevert();
+        nftStaking.claimRewards(5);
+        vm.prank(user2);
+        vm.expectRevert();
+        nftStaking.unstake(4);
+    }
 }
