@@ -57,6 +57,29 @@ contract RoyaltyNFTTest is TestHelpers {
         royalty.purchaseWithDiscount{value: 1 ether}(0, proof);
     }
 
+    function test_Merkle_Multiple_Users() public {
+        vm.startPrank(user1);
+        royalty.purchaseWithDiscount{value: 1 ether}(
+            0,
+            tree.getProof(leaves, 0)
+        );
+        vm.startPrank(user2);
+        royalty.purchaseWithDiscount{value: 1 ether}(
+            1,
+            tree.getProof(leaves, 1)
+        );
+        vm.startPrank(user3);
+        royalty.purchaseWithDiscount{value: 1 ether}(
+            2,
+            tree.getProof(leaves, 2)
+        );
+        vm.startPrank(user4);
+        royalty.purchaseWithDiscount{value: 1 ether}(
+            3,
+            tree.getProof(leaves, 3)
+        );
+    }
+
     function test_Merkle_Insufficient_Funds() public {
         bytes32[] memory proof = tree.getProof(leaves, 0);
         vm.prank(user1);
