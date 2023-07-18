@@ -31,7 +31,7 @@ contract NFTStaking is IERC721Receiver {
         nftRewards.mint(msg.sender, rewards);
     }
 
-    function claimNFT(uint256 tokenId) external {
+    function unstake(uint256 tokenId) external {
         require(
             ownerOf[tokenId] == msg.sender,
             "Only owner can claim NFT."

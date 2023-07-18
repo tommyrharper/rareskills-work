@@ -7,9 +7,6 @@ import "openzeppelin/utils/structs/BitMaps.sol";
 import "openzeppelin/utils/cryptography/MerkleProof.sol";
 import "openzeppelin/utils/cryptography/ECDSA.sol";
 
-// NFT staking contract that pays out staking rewards (10 ERC20 per day)
-// // staked via safeTransfer
-
 contract RoyaltyNFT is ERC721Royalty, Ownable2Step {
     using ECDSA for bytes32;
     using BitMaps for BitMaps.BitMap;

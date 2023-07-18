@@ -169,4 +169,45 @@ contract RoyaltyNFTTest is TestHelpers {
     /*//////////////////////////////////////////////////////////////
                              STAKING TESTS
     //////////////////////////////////////////////////////////////*/
+
+    function test_Stake_NFT() public {
+        vm.prank(user1);
+        royalty.purchase{value: 10 ether}();
+
+        vm.prank(user1);
+        royalty.safeTransferFrom(user1, address(nftStaking), 4);
+        assertEq(royalty.balanceOf(address(nftStaking)), 1);
+        assertEq(nftStaking.ownerOf(4), user1);
+        assertEq(nftStaking.stakedAt(4), block.timestamp);
+
+        vm.prank(user1);
+        nftStaking.claimRewards(4);
+        assertEq(nftRewards.balanceOf(user1), 0);
+
+        vm.warp(block.timestamp + 1 days);
+        vm.prank(user1);
+        nftStaking.claimRewards(4);
+        assertEq(nftRewards.balanceOf(user1), 10 ether);
+
+        vm.warp(block.timestamp + 1 days);
+        vm.prank(user1);
+        nftStaking.claimRewards(4);
+        assertEq(nftRewards.balanceOf(user1), 20 ether);
+
+        vm.warp(block.timestamp + 2.5 days);
+        vm.prank(user1);
+        nftStaking.claimRewards(4);
+        assertEq(nftRewards.balanceOf(user1), 45 ether);
+
+        vm.prank(user1);
+        nftStaking.unstake(4);
+        assertEq(royalty.balanceOf(address(nftStaking)), 0);
+        assertEq(royalty.balanceOf(user1), 1);
+        assertEq(nftStaking.ownerOf(4), address(0));
+        assertEq(nftStaking.stakedAt(4), 0);
+
+        vm.prank(user1);
+        vm.expectRevert();
+        nftStaking.claimRewards(4);
+    }
 }
