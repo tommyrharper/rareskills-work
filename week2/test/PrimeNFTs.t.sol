@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import "forge-std/Test.sol";
 import {TestHelpers} from "./TestHelpers.t.sol";
 import "../src/primes/PrimeNFTs.sol";
+import "../src/primes/PrimeNFTChecker.sol";
 
 contract PrimeNFTsTest is TestHelpers {
     /*//////////////////////////////////////////////////////////////
@@ -11,6 +12,7 @@ contract PrimeNFTsTest is TestHelpers {
     //////////////////////////////////////////////////////////////*/
 
     PrimeNFTs public prime;
+    PrimeNFTChecker public primeChecker;
 
     address internal user1;
     address internal user2;
@@ -30,6 +32,7 @@ contract PrimeNFTsTest is TestHelpers {
         user5 = createUser();
 
         prime = new PrimeNFTs();
+        primeChecker = new PrimeNFTChecker(address(prime));
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -37,37 +40,37 @@ contract PrimeNFTsTest is TestHelpers {
     //////////////////////////////////////////////////////////////*/
 
     function test_isPrime() public {
-        assertEq(prime.isPrime(0), false);
-        assertEq(prime.isPrime(1), false);
-        assertEq(prime.isPrime(2), true);
-        assertEq(prime.isPrime(3), true);
-        assertEq(prime.isPrime(4), false);
-        assertEq(prime.isPrime(5), true);
-        assertEq(prime.isPrime(6), false);
-        assertEq(prime.isPrime(7), true);
-        assertEq(prime.isPrime(8), false);
-        assertEq(prime.isPrime(9), false);
-        assertEq(prime.isPrime(10), false);
-        assertEq(prime.isPrime(11), true);
-        assertEq(prime.isPrime(12), false);
-        assertEq(prime.isPrime(13), true);
-        assertEq(prime.isPrime(14), false);
-        assertEq(prime.isPrime(15), false);
-        assertEq(prime.isPrime(16), false);
-        assertEq(prime.isPrime(17), true);
-        assertEq(prime.isPrime(18), false);
-        assertEq(prime.isPrime(19), true);
-        assertEq(prime.isPrime(20), false);
-        assertEq(prime.isPrime(21), false);
-        assertEq(prime.isPrime(22), false);
-        assertEq(prime.isPrime(23), true);
-        assertEq(prime.isPrime(24), false);
-        assertEq(prime.isPrime(25), false);
-        assertEq(prime.isPrime(26), false);
-        assertEq(prime.isPrime(27), false);
-        assertEq(prime.isPrime(28), false);
-        assertEq(prime.isPrime(29), true);
-        assertEq(prime.isPrime(30), false);
+        assertEq(primeChecker.isPrime(0), false);
+        assertEq(primeChecker.isPrime(1), false);
+        assertEq(primeChecker.isPrime(2), true);
+        assertEq(primeChecker.isPrime(3), true);
+        assertEq(primeChecker.isPrime(4), false);
+        assertEq(primeChecker.isPrime(5), true);
+        assertEq(primeChecker.isPrime(6), false);
+        assertEq(primeChecker.isPrime(7), true);
+        assertEq(primeChecker.isPrime(8), false);
+        assertEq(primeChecker.isPrime(9), false);
+        assertEq(primeChecker.isPrime(10), false);
+        assertEq(primeChecker.isPrime(11), true);
+        assertEq(primeChecker.isPrime(12), false);
+        assertEq(primeChecker.isPrime(13), true);
+        assertEq(primeChecker.isPrime(14), false);
+        assertEq(primeChecker.isPrime(15), false);
+        assertEq(primeChecker.isPrime(16), false);
+        assertEq(primeChecker.isPrime(17), true);
+        assertEq(primeChecker.isPrime(18), false);
+        assertEq(primeChecker.isPrime(19), true);
+        assertEq(primeChecker.isPrime(20), false);
+        assertEq(primeChecker.isPrime(21), false);
+        assertEq(primeChecker.isPrime(22), false);
+        assertEq(primeChecker.isPrime(23), true);
+        assertEq(primeChecker.isPrime(24), false);
+        assertEq(primeChecker.isPrime(25), false);
+        assertEq(primeChecker.isPrime(26), false);
+        assertEq(primeChecker.isPrime(27), false);
+        assertEq(primeChecker.isPrime(28), false);
+        assertEq(primeChecker.isPrime(29), true);
+        assertEq(primeChecker.isPrime(30), false);
     }
 
     function test_Primes() public {
@@ -78,7 +81,7 @@ contract PrimeNFTsTest is TestHelpers {
         prime.mint(address(this), 4);
         prime.mint(address(this), 5);
 
-        assertEq(prime.getNumOfPrimes(address(this)), 3);
+        assertEq(primeChecker.getNumOfPrimes(address(this)), 3);
     }
 
     function test_Primes_2() public {
@@ -88,7 +91,7 @@ contract PrimeNFTsTest is TestHelpers {
         prime.mint(address(this), 4);
         prime.mint(address(this), 5);
 
-        assertEq(prime.getNumOfPrimes(address(this)), 2);
+        assertEq(primeChecker.getNumOfPrimes(address(this)), 2);
     }
 
     function test_Primes_3() public {
@@ -103,6 +106,6 @@ contract PrimeNFTsTest is TestHelpers {
         prime.mint(address(this), 9);
         prime.mint(address(this), 11);
 
-        assertEq(prime.getNumOfPrimes(address(this)), 4);
+        assertEq(primeChecker.getNumOfPrimes(address(this)), 4);
     }
 }
