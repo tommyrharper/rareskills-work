@@ -11,6 +11,10 @@ contract RoyaltyNFTTest is Test {
         royalty = new RoyaltyNFT();
     }
 
+    function test_Ownership() public {
+        assertEq(royalty.owner(), address(this));
+    }
+
     function test_Follows_ERC2918() public {
         assertTrue(royalty.supportsInterface(0x2a55205a));
     }
