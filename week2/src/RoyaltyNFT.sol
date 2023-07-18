@@ -7,13 +7,9 @@ import "openzeppelin/utils/structs/BitMaps.sol";
 import "openzeppelin/utils/cryptography/MerkleProof.sol";
 import "openzeppelin/utils/cryptography/ECDSA.sol";
 
-// add max supply 20
-// merkle tree mint discount;
-// use bitmap for mint discount
 // ERC20 for staking rewards
 // NFT staking contract that pays out staking rewards (10 ERC20 per day)
 // // staked via safeTransfer
-// funds withdrawable by Ownable2Step
 
 contract RoyaltyNFT is ERC721Royalty, Ownable2Step {
     using ECDSA for bytes32;
@@ -35,6 +31,11 @@ contract RoyaltyNFT is ERC721Royalty, Ownable2Step {
         reservedTokens = _reservedTokens;
         maxPublicMint = 20 - _reservedTokens;
         _setDefaultRoyalty(msg.sender, 250);
+    }
+
+    function withdrawFunds(address to) external onlyOwner {
+        (bool success, ) = payable(to).call{value: address(this).balance}("");
+        require(success, "Transfer failed.");
     }
 
     function isClaimed(uint256 index) public view returns (bool) {

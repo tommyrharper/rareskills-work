@@ -14,6 +14,7 @@ contract RoyaltyNFTTest is TestHelpers {
     address internal user2;
     address internal user3;
     address internal user4;
+    address internal user5;
     bytes32[] internal leaves = new bytes32[](4);
 
     function setUp() public {
@@ -21,6 +22,7 @@ contract RoyaltyNFTTest is TestHelpers {
         user2 = createAndDealUser(1000 ether);
         user3 = createAndDealUser(1000 ether);
         user4 = createAndDealUser(1000 ether);
+        user5 = createUser();
 
         tree = new Merkle();
         leaves[0] = keccak256(bytes(abi.encode(user1, 0)));
@@ -126,5 +128,12 @@ contract RoyaltyNFTTest is TestHelpers {
         vm.prank(user1);
         vm.expectRevert(RoyaltyNFT.InsufficientFunds.selector);
         royalty.purchase{value: 9 ether}();
+    }
+
+    function test_Reclaim_Funds() public {
+        vm.prank(user1);
+        royalty.purchase{value: 10 ether}();
+        royalty.withdrawFunds(user5);
+        assertEq(user5.balance, 10 ether);
     }
 }
