@@ -20,13 +20,20 @@ contract RoyaltyNFT is ERC721Royalty, Ownable2Step {
     using BitMaps for BitMaps.BitMap;
 
     bytes32 public immutable merkleRoot;
+    uint256 public immutable reservedTokens;
+    uint256 public immutable maxPublicMint;
+
     BitMaps.BitMap internal bitMap;
-    uint256 public totalSupply;
+    uint256 mintedByPublic;
 
     constructor(
-        bytes32 _merkleRoot
+        bytes32 _merkleRoot,
+        uint256 _reservedTokens
     ) ERC721("RoyaltyNFT", "RNFT") Ownable2Step() {
         merkleRoot = _merkleRoot;
+        assert(_reservedTokens < 20);
+        reservedTokens = _reservedTokens;
+        maxPublicMint = 20 - _reservedTokens;
         _setDefaultRoyalty(msg.sender, 250);
     }
 
@@ -36,6 +43,15 @@ contract RoyaltyNFT is ERC721Royalty, Ownable2Step {
 
     function _setClaimed(uint256 index) private {
         bitMap.setTo(index, true);
+    }
+
+    function purchase() external payable {
+        if (msg.value < 10 ether) revert InsufficientFunds();
+        if (mintedByPublic == maxPublicMint) revert MaxMinted();
+        uint256 index = reservedTokens + mintedByPublic;
+        _mint(msg.sender, index);
+        emit Claimed(index, msg.sender);
+        mintedByPublic++;
     }
 
     function purchaseWithDiscount(
@@ -50,8 +66,7 @@ contract RoyaltyNFT is ERC721Royalty, Ownable2Step {
             revert InvalidProof();
 
         _setClaimed(index);
-        _mint(msg.sender, totalSupply);
-        totalSupply++;
+        _mint(msg.sender, index);
 
         emit Claimed(index, msg.sender);
     }
@@ -59,6 +74,7 @@ contract RoyaltyNFT is ERC721Royalty, Ownable2Step {
     error InsufficientFunds();
     error InvalidProof();
     error AlreadyClaimed();
+    error MaxMinted();
     // This event is triggered whenever a call to #claim succeeds.
     event Claimed(uint256 index, address account);
 }

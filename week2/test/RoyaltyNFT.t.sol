@@ -17,10 +17,10 @@ contract RoyaltyNFTTest is TestHelpers {
     bytes32[] internal leaves = new bytes32[](4);
 
     function setUp() public {
-        user1 = createAndDealUser();
-        user2 = createAndDealUser();
-        user3 = createAndDealUser();
-        user4 = createAndDealUser();
+        user1 = createAndDealUser(1000 ether);
+        user2 = createAndDealUser(1000 ether);
+        user3 = createAndDealUser(1000 ether);
+        user4 = createAndDealUser(1000 ether);
 
         tree = new Merkle();
         leaves[0] = keccak256(bytes(abi.encode(user1, 0)));
@@ -28,7 +28,7 @@ contract RoyaltyNFTTest is TestHelpers {
         leaves[2] = keccak256(bytes(abi.encode(user3, 2)));
         leaves[3] = keccak256(bytes(abi.encode(user4, 3)));
         bytes32 root = tree.getRoot(leaves);
-        royalty = new RoyaltyNFT(root);
+        royalty = new RoyaltyNFT(root, 4);
     }
 
     function test_Ownership() public {
@@ -105,5 +105,26 @@ contract RoyaltyNFTTest is TestHelpers {
         bytes32[] memory proof = tree.getProof(leaves, 0);
         vm.expectRevert(RoyaltyNFT.InvalidProof.selector);
         royalty.purchaseWithDiscount{value: 1 ether}(1, proof);
+    }
+
+    function test_Purchase() public {
+        vm.prank(user1);
+        royalty.purchase{value: 10 ether}();
+    }
+
+    function test_Max_Purchases() public {
+        for (uint256 i = 0; i < 16; i++) {
+            vm.prank(user1);
+            royalty.purchase{value: 10 ether}();
+        }
+        vm.prank(user1);
+        vm.expectRevert(RoyaltyNFT.MaxMinted.selector);
+        royalty.purchase{value: 10 ether}();
+    }
+
+    function test_Purchase_Insufficient_Funds() public {
+        vm.prank(user1);
+        vm.expectRevert(RoyaltyNFT.InsufficientFunds.selector);
+        royalty.purchase{value: 9 ether}();
     }
 }
