@@ -17,10 +17,10 @@ contract RoyaltyNFTTest is TestHelpers {
     bytes32[] internal leaves = new bytes32[](4);
 
     function setUp() public {
-        user1 = createUser();
-        user2 = createUser();
-        user3 = createUser();
-        user4 = createUser();
+        user1 = createAndDealUser();
+        user2 = createAndDealUser();
+        user3 = createAndDealUser();
+        user4 = createAndDealUser();
 
         tree = new Merkle();
         leaves[0] = keccak256(bytes(abi.encode(user1, 0)));
@@ -29,7 +29,6 @@ contract RoyaltyNFTTest is TestHelpers {
         leaves[3] = keccak256(bytes(abi.encode(user4, 3)));
         bytes32 root = tree.getRoot(leaves);
         royalty = new RoyaltyNFT(root);
-        // royalty = new RoyaltyNFT(bytes32(""));
     }
 
     function test_Ownership() public {
@@ -55,6 +54,33 @@ contract RoyaltyNFTTest is TestHelpers {
     function test_Merkle() public {
         bytes32[] memory proof = tree.getProof(leaves, 0);
         vm.prank(user1);
-        royalty.purchaseWithDiscount(0, proof);
+        royalty.purchaseWithDiscount{value: 1 ether}(0, proof);
+    }
+
+    function test_Merkle_Insufficient_Funds() public {
+        bytes32[] memory proof = tree.getProof(leaves, 0);
+        vm.prank(user1);
+        vm.expectRevert(RoyaltyNFT.InsufficientFunds.selector);
+        royalty.purchaseWithDiscount{value: 0.9 ether}(0, proof);
+    }
+
+    function test_Merkle_Cannot_Claim_Twice() public {
+        bytes32[] memory proof = tree.getProof(leaves, 0);
+        vm.prank(user1);
+        royalty.purchaseWithDiscount{value: 1 ether}(0, proof);
+        vm.expectRevert(RoyaltyNFT.AlreadyClaimed.selector);
+        royalty.purchaseWithDiscount{value: 1 ether}(0, proof);
+    }
+
+    function test_Merkle_Cannot_Claim_Someone_Elses() public {
+        bytes32[] memory proof = tree.getProof(leaves, 0);
+        vm.expectRevert(RoyaltyNFT.InvalidProof.selector);
+        royalty.purchaseWithDiscount{value: 1 ether}(0, proof);
+    }
+
+    function test_Merkle_Cannot_Claim_Wrong_Index() public {
+        bytes32[] memory proof = tree.getProof(leaves, 0);
+        vm.expectRevert(RoyaltyNFT.InvalidProof.selector);
+        royalty.purchaseWithDiscount{value: 1 ether}(1, proof);
     }
 }

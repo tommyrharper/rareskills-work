@@ -28,9 +28,6 @@ contract RoyaltyNFT is ERC721Royalty, Ownable2Step {
     ) ERC721("RoyaltyNFT", "RNFT") Ownable2Step() {
         merkleRoot = _merkleRoot;
         _setDefaultRoyalty(msg.sender, 250);
-        // for (uint256 i = 0; i <= 20; i++) {
-        //     _mint(msg.sender, i);
-        // }
     }
 
     function isClaimed(uint256 index) public view returns (bool) {
@@ -44,7 +41,8 @@ contract RoyaltyNFT is ERC721Royalty, Ownable2Step {
     function purchaseWithDiscount(
         uint256 index,
         bytes32[] calldata merkleProof
-    ) external {
+    ) external payable {
+        if (msg.value < 1 ether) revert InsufficientFunds();
         if (isClaimed(index)) revert AlreadyClaimed();
 
         bytes32 node = keccak256(bytes(abi.encode(msg.sender, index)));
@@ -58,6 +56,7 @@ contract RoyaltyNFT is ERC721Royalty, Ownable2Step {
         emit Claimed(index, msg.sender);
     }
 
+    error InsufficientFunds();
     error InvalidProof();
     error AlreadyClaimed();
     // This event is triggered whenever a call to #claim succeeds.
