@@ -4,8 +4,9 @@ pragma solidity ^0.8.20;
 import "openzeppelin/token/ERC20/ERC20.sol";
 import "openzeppelin/access/Ownable2Step.sol";
 import "openzeppelin/token/ERC721/IERC721.sol";
+import "./INFTRewards.sol";
 
-contract NFTRewards is ERC20, Ownable2Step {
+contract NFTRewards is ERC20, Ownable2Step, INFTRewards {
     IERC721 public nftStaking;
 
     constructor() ERC20("NFTRewards", "NFTR") {}
@@ -19,7 +20,7 @@ contract NFTRewards is ERC20, Ownable2Step {
         nftStaking = IERC721(_nftStaking);
     }
 
-    function mint(uint256 amount, address to) external onlyNFTStaking {
+    function mint(address to, uint256 amount) external onlyNFTStaking {
         _mint(to, amount);
     }
 }

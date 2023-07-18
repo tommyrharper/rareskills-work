@@ -7,7 +7,6 @@ import "openzeppelin/utils/structs/BitMaps.sol";
 import "openzeppelin/utils/cryptography/MerkleProof.sol";
 import "openzeppelin/utils/cryptography/ECDSA.sol";
 
-// ERC20 for staking rewards
 // NFT staking contract that pays out staking rewards (10 ERC20 per day)
 // // staked via safeTransfer
 

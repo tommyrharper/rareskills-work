@@ -9,6 +9,10 @@ import "../src/NFTStaking.sol";
 import "murky/Merkle.sol";
 
 contract RoyaltyNFTTest is TestHelpers {
+    /*//////////////////////////////////////////////////////////////
+                                 STATE
+    //////////////////////////////////////////////////////////////*/
+
     RoyaltyNFT public royalty;
     Merkle public tree;
 
@@ -21,6 +25,10 @@ contract RoyaltyNFTTest is TestHelpers {
     address internal user4;
     address internal user5;
     bytes32[] internal leaves = new bytes32[](4);
+
+    /*//////////////////////////////////////////////////////////////
+                                 SETUP
+    //////////////////////////////////////////////////////////////*/
 
     function setUp() public {
         user1 = createAndDealUser(1000 ether);
@@ -38,9 +46,13 @@ contract RoyaltyNFTTest is TestHelpers {
         royalty = new RoyaltyNFT(root, 4);
 
         nftRewards = new NFTRewards();
-        nftStaking = new NFTStaking(address(nftRewards), royalty);
+        nftStaking = new NFTStaking(address(nftRewards), address(royalty));
         nftRewards.setNFTStaking(address(nftStaking));
     }
+
+    /*//////////////////////////////////////////////////////////////
+                              BASIC TESTS
+    //////////////////////////////////////////////////////////////*/
 
     function test_Ownership() public {
         assertEq(royalty.owner(), address(this));
@@ -61,6 +73,10 @@ contract RoyaltyNFTTest is TestHelpers {
             assertEq(value, 25);
         }
     }
+
+    /*//////////////////////////////////////////////////////////////
+                              MERKLE TESTS
+    //////////////////////////////////////////////////////////////*/
 
     function test_Merkle() public {
         bytes32[] memory proof = tree.getProof(leaves, 0);
@@ -118,6 +134,10 @@ contract RoyaltyNFTTest is TestHelpers {
         royalty.purchaseWithDiscount{value: 1 ether}(1, proof);
     }
 
+    /*//////////////////////////////////////////////////////////////
+                             PURCHASE TESTS
+    //////////////////////////////////////////////////////////////*/
+
     function test_Purchase() public {
         vm.prank(user1);
         royalty.purchase{value: 10 ether}();
@@ -145,4 +165,8 @@ contract RoyaltyNFTTest is TestHelpers {
         royalty.withdrawFunds(user5);
         assertEq(user5.balance, 10 ether);
     }
+
+    /*//////////////////////////////////////////////////////////////
+                             STAKING TESTS
+    //////////////////////////////////////////////////////////////*/
 }
