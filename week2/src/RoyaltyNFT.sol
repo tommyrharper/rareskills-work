@@ -28,9 +28,9 @@ contract RoyaltyNFT is ERC721Royalty, Ownable2Step {
     ) ERC721("RoyaltyNFT", "RNFT") Ownable2Step() {
         merkleRoot = _merkleRoot;
         _setDefaultRoyalty(msg.sender, 250);
-        for (uint256 i = 0; i <= 20; i++) {
-            _mint(msg.sender, i);
-        }
+        // for (uint256 i = 0; i <= 20; i++) {
+        //     _mint(msg.sender, i);
+        // }
     }
 
     function isClaimed(uint256 index) public view returns (bool) {
@@ -47,7 +47,7 @@ contract RoyaltyNFT is ERC721Royalty, Ownable2Step {
     ) external {
         if (isClaimed(index)) revert AlreadyClaimed();
 
-        bytes32 node = keccak256(abi.encodePacked(index, msg.sender));
+        bytes32 node = keccak256(bytes(abi.encode(msg.sender, index)));
         if (!MerkleProof.verify(merkleProof, merkleRoot, node))
             revert InvalidProof();
 
