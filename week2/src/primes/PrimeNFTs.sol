@@ -12,38 +12,33 @@ contract PrimeNFTs is ERC721Enumerable {
     }
 
     function getNumOfPrimes(address account) external view returns (uint256) {
-        uint256 numPrimes;
-        uint256 balance = balanceOf(account);
-        for (uint256 i = 0; i < balance; i++) {
-            uint256 tokenId = tokenOfOwnerByIndex(account, i);
-            if (isPrime(tokenId)) {
-                numPrimes++;
+        unchecked {
+            uint256 numPrimes;
+            uint256 balance = balanceOf(account);
+            for (uint256 i = 0; i < balance; i++) {
+                uint256 tokenId = tokenOfOwnerByIndex(account, i);
+                if (isPrime(tokenId)) {
+                    numPrimes++;
+                }
             }
+            return numPrimes;
         }
-        return numPrimes;
     }
 
-    function isPrime(uint256 n) public view returns (bool) {
-        if (n < 2) return false;
+    function isPrime(uint256 n) public pure returns (bool) {
+        unchecked {
+            if (n < 2) return false;
+            if (n == 2) return true;
+            if (n % 2 == 0) return false;
 
-        uint256 sqrt = Math.sqrt(n);
-        for (uint256 i = 2; i <= sqrt; ) {
-            if (n % i == 0) {
-                return false;
+            uint256 sqrt = Math.sqrt(n);
+            for (uint256 i = 3; i <= sqrt; ) {
+                if (n % i == 0) {
+                    return false;
+                }
+                i += 2;
             }
-            unchecked {
-                i++;
-            }
+            return true;
         }
-        return true;
     }
-
-    // function isPrime(uint256 num, uint256 count) public pure returns (bool) {
-    //     if (num == 1) return false;
-    //     if (num == 2) return true;
-    //     if (num % 2 == 0) return false;
-    //     if (count * count >= num) return true;
-    //     if (num % count == 0) return false;
-    //     return isPrime(num, count + 2);
-    // }
 }
