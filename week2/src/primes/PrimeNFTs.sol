@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "openzeppelin/token/ERC721/extensions/ERC721Enumerable.sol";
+import "openzeppelin/utils/math/Math.sol";
 
 contract PrimeNFTs is ERC721Enumerable {
     constructor() ERC721("PrimeNFTs", "PNFTs") {}
@@ -22,12 +23,16 @@ contract PrimeNFTs is ERC721Enumerable {
         return numPrimes;
     }
 
-    function isPrime(uint256 n) public pure returns (bool) {
+    function isPrime(uint256 n) public view returns (bool) {
         if (n < 2) return false;
 
-        for (uint256 i = 2; i < n; i++) {
+        uint256 sqrt = Math.sqrt(n);
+        for (uint256 i = 2; i <= sqrt; ) {
             if (n % i == 0) {
                 return false;
+            }
+            unchecked {
+                i++;
             }
         }
         return true;
