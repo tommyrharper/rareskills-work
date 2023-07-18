@@ -35,5 +35,5 @@ Luckily we are able to prevent the exploit at work as it was detected internally
 ## CTFs
 
 - CTFs
-  - Overmint1 - [Overmint1Attacker.sol]([./src/ctfs/Overmint1.sol](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/attackers/Overmint1Attacker.sol))
-  - Overmint2 - [Overmint1Attacker.sol]([./src/ctfs/Overmint1.sol](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/attackers/Overmint2Attacker.sol))
+  - Overmint1 - [Overmint1Attacker.sol](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/attackers/Overmint1Attacker.sol)
+  - Overmint2 - [Overmint1Attacker.sol](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/attackers/Overmint2Attacker.sol)
