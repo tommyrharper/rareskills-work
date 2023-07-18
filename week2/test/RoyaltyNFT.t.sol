@@ -3,9 +3,9 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
 import {TestHelpers} from "./TestHelpers.t.sol";
-import "../src/RoyaltyNFT.sol";
-import "../src/NFTRewards.sol";
-import "../src/NFTStaking.sol";
+import "../src/trio/RoyaltyNFT.sol";
+import "../src/trio/NFTRewards.sol";
+import "../src/trio/NFTStaking.sol";
 import "murky/Merkle.sol";
 
 contract RoyaltyNFTTest is TestHelpers {
