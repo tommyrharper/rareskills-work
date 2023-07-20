@@ -2,7 +2,7 @@
 pragma solidity 0.8.19;
 
 import "openzeppelin/token/ERC20/ERC20.sol";
-import "./erc777/IERC777Recipient.sol";
+import "./IERC777Recipient.sol";
 import "openzeppelin/utils/math/Math.sol";
 import "openzeppelin/utils/introspection/IERC1820Registry.sol";
 

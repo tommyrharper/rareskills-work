@@ -2,7 +2,7 @@
 pragma solidity 0.8.19;
 
 import "./TestHelpers.t.sol";
-import "../src/ERC777TokenBuyerBondingCurve.sol";
+import "../src/erc777/ERC777TokenBuyerBondingCurve.sol";
 import "../src/erc777/ERC777Token.sol";
 
 contract ERC777TokenBuyerBondingCurveTest is TestHelpers {
