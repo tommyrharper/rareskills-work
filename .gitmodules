@@ -16,3 +16,6 @@
 [submodule "week2/lib/murky"]
 	path = week2/lib/murky
 	url = https://github.com/dmfxyz/murky
+[submodule "week3/lib/forge-std"]
+	path = week3/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
