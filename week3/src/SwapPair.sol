@@ -42,11 +42,6 @@ contract SwapPair is ISwapPair, LPToken {
         _blockTimestampLast = blockTimestampLast;
     }
 
-    function _safeTransfer(address token, address to, uint value) private {
-        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(SELECTOR, to, value));
-        require(success && (data.length == 0 || abi.decode(data, (bool))), 'UniswapV2: TRANSFER_FAILED');
-    }
-
     constructor() {
         factory = msg.sender;
     }
@@ -134,8 +129,8 @@ contract SwapPair is ISwapPair, LPToken {
         amount1 = liquidity * balance1 / _totalSupply; // using balances ensures pro-rata distribution
         require(amount0 > 0 && amount1 > 0, 'UniswapV2: INSUFFICIENT_LIQUIDITY_BURNED');
         _burn(address(this), liquidity);
-        _safeTransfer(_token0, to, amount0);
-        _safeTransfer(_token1, to, amount1);
+        IERC20(_token0).safeTransfer(to, amount0);
+        IERC20(_token1).safeTransfer(to, amount1);
         balance0 = IERC20(_token0).balanceOf(address(this));
         balance1 = IERC20(_token1).balanceOf(address(this));
 
@@ -156,8 +151,8 @@ contract SwapPair is ISwapPair, LPToken {
         address _token0 = token0;
         address _token1 = token1;
         require(to != _token0 && to != _token1, 'UniswapV2: INVALID_TO');
-        if (amount0Out > 0) _safeTransfer(_token0, to, amount0Out); // optimistically transfer tokens
-        if (amount1Out > 0) _safeTransfer(_token1, to, amount1Out); // optimistically transfer tokens
+        if (amount0Out > 0) IERC20(_token0).safeTransfer(to, amount0Out); // optimistically transfer tokens
+        if (amount1Out > 0) IERC20(_token1).safeTransfer(to, amount1Out); // optimistically transfer tokens
         if (data.length > 0) ISwapCallee(to).uniswapV2Call(msg.sender, amount0Out, amount1Out, data);
         balance0 = IERC20(_token0).balanceOf(address(this));
         balance1 = IERC20(_token1).balanceOf(address(this));
@@ -179,8 +174,8 @@ contract SwapPair is ISwapPair, LPToken {
     function skim(address to) external lock {
         address _token0 = token0; // gas savings
         address _token1 = token1; // gas savings
-        _safeTransfer(_token0, to, IERC20(_token0).balanceOf(address(this)) -reserve0);
-        _safeTransfer(_token1, to, IERC20(_token1).balanceOf(address(this)) -reserve1);
+        IERC20(_token0).safeTransfer(to, IERC20(_token0).balanceOf(address(this)) - reserve0);
+        IERC20(_token1).safeTransfer(to, IERC20(_token1).balanceOf(address(this)) - reserve1);
     }
 
     // force reserves to match balances
