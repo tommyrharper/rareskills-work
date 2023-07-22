@@ -36,14 +36,14 @@ contract SwapPair is ISwapPair, LPToken {
     }
 
     function getReserves() public view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast) {
-        // _reserve0 = reserve0;
-        // _reserve1 = reserve1;
-        // _blockTimestampLast = blockTimestampLast;
+        _reserve0 = reserve0;
+        _reserve1 = reserve1;
+        _blockTimestampLast = blockTimestampLast;
     }
 
     function _safeTransfer(address token, address to, uint value) private {
-        // (bool success, bytes memory data) = token.call(abi.encodeWithSelector(SELECTOR, to, value));
-        // require(success && (data.length == 0 || abi.decode(data, (bool))), 'UniswapV2: TRANSFER_FAILED');
+        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(SELECTOR, to, value));
+        require(success && (data.length == 0 || abi.decode(data, (bool))), 'UniswapV2: TRANSFER_FAILED');
     }
 
     constructor() {
@@ -52,9 +52,9 @@ contract SwapPair is ISwapPair, LPToken {
 
     // called once by the factory at time of deployment
     function initialize(address _token0, address _token1) external {
-        // require(msg.sender == factory, 'UniswapV2: FORBIDDEN'); // sufficient check
-        // token0 = _token0;
-        // token1 = _token1;
+        require(msg.sender == factory, 'UniswapV2: FORBIDDEN'); // sufficient check
+        token0 = _token0;
+        token1 = _token1;
     }
 
     // update reserves and, on the first call per block, price accumulators
