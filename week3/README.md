@@ -21,4 +21,5 @@ Corner cases to watch out for:
 
 ## Questions
 
-- Why does `kLast` only update if `feeOn` is `true` in the `mint` and `burn` functions?
+- [x] Why does `kLast` only update if `feeOn` is `true` in the `mint` and `burn` functions?
+  - Because it is only used to calculate uniswap protocol fees
