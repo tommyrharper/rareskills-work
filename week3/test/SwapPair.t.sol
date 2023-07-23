@@ -99,6 +99,20 @@ contract SwapPairTest is Test {
     }
 
     /*//////////////////////////////////////////////////////////////
+                                  BURN
+    //////////////////////////////////////////////////////////////*/
+
+    function test_Burn() public {
+        sendAndMint(10_000);
+        assertEq(swapPair.balanceOf(address(this)), 9_000);
+        swapPair.transfer(address(swapPair), 1_000);
+        swapPair.burn(address(this));
+        assertEq(swapPair.balanceOf(address(this)), 8_000);
+        assertEq(tokenA.balanceOf(address(this)), 1_000);
+        assertEq(tokenB.balanceOf(address(this)), 1_000);
+    }
+
+    /*//////////////////////////////////////////////////////////////
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
 
