@@ -112,22 +112,30 @@ contract SwapPairTest is Test {
         assertEq(tokenB.balanceOf(address(this)), 1_000);
     }
 
-    function test_Burn_Fuzz(uint64 _tokenADeposit, uint64 _tokenBDeposit) public {
+    function test_Burn_Fuzz(
+        uint64 _tokenADeposit,
+        uint64 _tokenBDeposit,
+        uint8 _proportionToBurn
+    ) public {
         uint256 tokenADeposit = _tokenADeposit;
         uint256 tokenBDeposit = _tokenBDeposit;
+        uint256 proportionToBurn = _proportionToBurn;
         vm.assume(tokenADeposit > 1000 && tokenBDeposit > 1000);
+        vm.assume(proportionToBurn > 0 && proportionToBurn <= 100);
 
         sendAndMint(tokenADeposit, tokenBDeposit);
         uint256 lpTokens = swapPair.balanceOf(address(this));
         uint256 totalSupply = swapPair.totalSupply();
+        uint256 toBurn = (lpTokens * proportionToBurn) / 100;
+        vm.assume(toBurn > 0);
 
-        swapPair.transfer(address(swapPair), lpTokens);
+        swapPair.transfer(address(swapPair), toBurn);
         swapPair.burn(address(this));
 
-        assertEq(swapPair.balanceOf(address(this)), 0);
+        assertEq(swapPair.balanceOf(address(this)), lpTokens - toBurn);
 
-        uint256 proportionARedeemed = lpTokens * tokenADeposit / totalSupply;
-        uint256 proportionBRedeemed = lpTokens * tokenBDeposit / totalSupply;
+        uint256 proportionARedeemed = (toBurn * tokenADeposit) / totalSupply;
+        uint256 proportionBRedeemed = (toBurn * tokenBDeposit) / totalSupply;
         assertEq(tokenA.balanceOf(address(this)), proportionARedeemed);
         assertEq(tokenB.balanceOf(address(this)), proportionBRedeemed);
     }
