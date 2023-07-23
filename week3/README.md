@@ -10,9 +10,15 @@ The following changes must be made:
 
 Your unit tests should cover the following cases:
 - [ ] Adding liquidity
+  - [x] With fee off
+  - [ ] With fee on
 - [ ] Swapping
 - [ ] Withdrawing liquidity
 - [ ] Taking a flashloan
 
 Corner cases to watch out for:
 - [ ] What considerations do you need in your fixed point library? How much of a token with 18 decimals can your contract store?
+
+## Questions
+
+- Why does `kLast` only update if `feeOn` is `true` in the `mint` and `burn` functions?
