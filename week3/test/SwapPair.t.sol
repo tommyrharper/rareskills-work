@@ -26,4 +26,17 @@ contract SwapPairTest is Test {
         swapPair.mint(address(this));
         assertEq(swapPair.balanceOf(address(this)), 9_000);
     }
+
+    function test_Equal_First_Mint_Fuzz(uint64 amount) public {
+        uint256 minLiquidity = swapPair.MINIMUM_LIQUIDITY();
+        tokenA.mint(address(swapPair), amount);
+        tokenB.mint(address(swapPair), amount);
+        if (amount <= minLiquidity) {
+            vm.expectRevert();
+            swapPair.mint(address(this));
+        } else {
+            swapPair.mint(address(this));
+            assertEq(swapPair.balanceOf(address(this)), amount - minLiquidity);
+        }
+    }
 }
