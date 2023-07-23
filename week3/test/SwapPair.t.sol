@@ -61,9 +61,11 @@ contract SwapPairTest is Test {
     }
 
     function test_Unequal_First_Mint_Fuzz(
-        uint64 amountA,
-        uint64 amountB
+        uint64 _amountA,
+        uint64 _amountB
     ) public {
+        uint256 amountA = _amountA;
+        uint256 amountB = _amountB;
         uint256 minLiquidity = swapPair.MINIMUM_LIQUIDITY();
         uint256 sqrt = Math.sqrt(amountA * amountB);
         tokenA.mint(address(swapPair), amountA);
@@ -107,5 +109,19 @@ contract SwapPairTest is Test {
             swapPair.mint(address(this));
             assertEq(swapPair.balanceOf(address(this)), 9_000 + amount);
         }
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                                HELPERS
+    //////////////////////////////////////////////////////////////*/
+
+    function initialMint(uint256 amount) public {
+        sendTokensToSwapPair(amount);
+        swapPair.mint(address(this));
+    }
+
+    function sendTokensToSwapPair(uint256 amount) public {
+        tokenA.mint(address(swapPair), amount);
+        tokenB.mint(address(swapPair), amount);
     }
 }
