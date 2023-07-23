@@ -94,7 +94,6 @@ contract SwapPairTest is Test {
 
     function test_Equal_Second_Mint_Fuzz(uint64 _amount) public {
         uint256 amount = _amount;
-        uint256 minLiquidity = swapPair.MINIMUM_LIQUIDITY();
         tokenA.mint(address(swapPair), 10_000);
         tokenB.mint(address(swapPair), 10_000);
         swapPair.mint(address(this));
@@ -102,7 +101,7 @@ contract SwapPairTest is Test {
         tokenA.mint(address(swapPair), amount);
         tokenB.mint(address(swapPair), amount);
         if (amount <= 0) {
-            vm.expectRevert();
+            vm.expectRevert("UniswapV2: INSUFFICIENT_LIQUIDITY_MINTED");
             swapPair.mint(address(this));
         } else {
             swapPair.mint(address(this));
