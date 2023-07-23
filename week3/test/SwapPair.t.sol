@@ -141,6 +141,20 @@ contract SwapPairTest is Test {
     }
 
     /*//////////////////////////////////////////////////////////////
+                                  SWAP
+    //////////////////////////////////////////////////////////////*/
+
+    function test_Swap() public {
+        sendAndMint(10_000);
+
+        tokenA.mint(address(swapPair), 1_000);
+        swapPair.swap(900, 0, address(this), new bytes(0));
+
+        assertEq(tokenA.balanceOf(address(this)), 0);
+        assertEq(tokenB.balanceOf(address(this)), 900);
+    }
+
+    /*//////////////////////////////////////////////////////////////
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
 
