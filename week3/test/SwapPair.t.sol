@@ -112,6 +112,26 @@ contract SwapPairTest is Test {
         assertEq(tokenB.balanceOf(address(this)), 1_000);
     }
 
+    function test_Burn_Fuzz(uint64 _tokenADeposit, uint64 _tokenBDeposit) public {
+        uint256 tokenADeposit = _tokenADeposit;
+        uint256 tokenBDeposit = _tokenBDeposit;
+        vm.assume(tokenADeposit > 1000 && tokenBDeposit > 1000);
+
+        sendAndMint(tokenADeposit, tokenBDeposit);
+        uint256 lpTokens = swapPair.balanceOf(address(this));
+        uint256 totalSupply = swapPair.totalSupply();
+
+        swapPair.transfer(address(swapPair), lpTokens);
+        swapPair.burn(address(this));
+
+        assertEq(swapPair.balanceOf(address(this)), 0);
+
+        uint256 proportionARedeemed = lpTokens * tokenADeposit / totalSupply;
+        uint256 proportionBRedeemed = lpTokens * tokenBDeposit / totalSupply;
+        assertEq(tokenA.balanceOf(address(this)), proportionARedeemed);
+        assertEq(tokenB.balanceOf(address(this)), proportionBRedeemed);
+    }
+
     /*//////////////////////////////////////////////////////////////
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
