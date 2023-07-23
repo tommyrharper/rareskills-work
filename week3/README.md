@@ -9,11 +9,10 @@ The following changes must be made:
 - [ ] Instead of implementing a flash swap the way Uniswap does, use EIP 3156. **Be very careful at which point you update the reserves!**
 
 Your unit tests should cover the following cases:
-- [ ] Adding liquidity
+- [x] Adding liquidity
   - [x] First mint
   - [x] Second mint
-  - [ ] With fee off
-- [ ] Swapping
+- [x] Swapping
 - [x] Withdrawing liquidity
 - [ ] Taking a flashloan
 
