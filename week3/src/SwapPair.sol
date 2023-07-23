@@ -76,14 +76,14 @@ contract SwapPair is ISwapPair, LPToken {
         uint _kLast = kLast; // gas savings
         if (feeOn) {
             if (_kLast != 0) {
-                // uint rootK = Math.sqrt(uint(_reserve0).mul(_reserve1));
-                // uint rootKLast = Math.sqrt(_kLast);
-                // if (rootK > rootKLast) {
-                //     uint numerator = totalSupply.mul(rootK.sub(rootKLast));
-                //     uint denominator = rootK.mul(5).add(rootKLast);
-                //     uint liquidity = numerator / denominator;
-                //     if (liquidity > 0) _mint(feeTo, liquidity);
-                // }
+                uint rootK = Math.sqrt(_reserve0 * _reserve1);
+                uint rootKLast = Math.sqrt(_kLast);
+                if (rootK > rootKLast) {
+                    uint numerator = totalSupply * (rootK - rootKLast);
+                    uint denominator = (rootK * 5) + rootKLast;
+                    uint liquidity = numerator / denominator;
+                    if (liquidity > 0) _mint(feeTo, liquidity);
+                }
             }
         } else if (_kLast != 0) {
             kLast = 0;
@@ -101,10 +101,10 @@ contract SwapPair is ISwapPair, LPToken {
         bool feeOn = _mintFee(_reserve0, _reserve1);
         uint _totalSupply = totalSupply; // gas savings, must be defined here since totalSupply can update in _mintFee
         if (_totalSupply == 0) {
-            // liquidity = Math.sqrt(amount0.mul(amount1)).sub(MINIMUM_LIQUIDITY);
+            liquidity = Math.sqrt(amount0 * amount1) - MINIMUM_LIQUIDITY;
            _mint(address(0), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
         } else {
-            // liquidity = Math.min(amount0.mul(_totalSupply) / _reserve0, amount1.mul(_totalSupply) / _reserve1);
+            liquidity = Math.min((amount0 * _totalSupply) / _reserve0, (amount1 * _totalSupply) / _reserve1);
         }
         require(liquidity > 0, 'UniswapV2: INSUFFICIENT_LIQUIDITY_MINTED');
         _mint(to, liquidity);
