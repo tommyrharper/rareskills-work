@@ -10,8 +10,9 @@ The following changes must be made:
 
 Your unit tests should cover the following cases:
 - [ ] Adding liquidity
-  - [x] With fee off
-  - [ ] With fee on
+  - [x] First mint
+  - [x] Second mint
+  - [ ] With fee off
 - [ ] Swapping
 - [ ] Withdrawing liquidity
 - [ ] Taking a flashloan

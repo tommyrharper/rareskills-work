@@ -8,10 +8,18 @@ import "./MintableERC20.t.sol";
 import "lib/openzeppelin-contracts/contracts/utils/math/Math.sol";
 
 contract SwapPairTest is Test {
+    /*//////////////////////////////////////////////////////////////
+                                 STATE
+    //////////////////////////////////////////////////////////////*/
+
     Factory public factory;
     SwapPair public swapPair;
     MintableERC20 public tokenA;
     MintableERC20 public tokenB;
+
+    /*//////////////////////////////////////////////////////////////
+                                 SETUP
+    //////////////////////////////////////////////////////////////*/
 
     function setUp() public {
         tokenA = new MintableERC20("TokenA", "TA");
@@ -20,6 +28,10 @@ contract SwapPairTest is Test {
         address pair = factory.createPair(address(tokenA), address(tokenB));
         swapPair = SwapPair(pair);
     }
+
+    /*//////////////////////////////////////////////////////////////
+                               FIRST MINT
+    //////////////////////////////////////////////////////////////*/
 
     function test_Equal_First_Mint() public {
         tokenA.mint(address(swapPair), 10_000);
@@ -62,6 +74,39 @@ contract SwapPairTest is Test {
         } else {
             swapPair.mint(address(this));
             assertEq(swapPair.balanceOf(address(this)), sqrt - minLiquidity);
+        }
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                              SECOND MINT
+    //////////////////////////////////////////////////////////////*/
+
+    function test_Equal_Second_Mint() public {
+        tokenA.mint(address(swapPair), 10_000);
+        tokenB.mint(address(swapPair), 10_000);
+        swapPair.mint(address(this));
+        assertEq(swapPair.balanceOf(address(this)), 9_000);
+        tokenA.mint(address(swapPair), 10_000);
+        tokenB.mint(address(swapPair), 10_000);
+        swapPair.mint(address(this));
+        assertEq(swapPair.balanceOf(address(this)), 19_000);
+    }
+
+    function test_Equal_Second_Mint_Fuzz(uint64 _amount) public {
+        uint256 amount = _amount;
+        uint256 minLiquidity = swapPair.MINIMUM_LIQUIDITY();
+        tokenA.mint(address(swapPair), 10_000);
+        tokenB.mint(address(swapPair), 10_000);
+        swapPair.mint(address(this));
+        assertEq(swapPair.balanceOf(address(this)), 9_000);
+        tokenA.mint(address(swapPair), amount);
+        tokenB.mint(address(swapPair), amount);
+        if (amount <= 0) {
+            vm.expectRevert();
+            swapPair.mint(address(this));
+        } else {
+            swapPair.mint(address(this));
+            assertEq(swapPair.balanceOf(address(this)), 9_000 + amount);
         }
     }
 }
