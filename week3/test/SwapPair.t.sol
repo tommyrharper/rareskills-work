@@ -5,6 +5,7 @@ import "forge-std/Test.sol";
 import "../src/SwapPair.sol";
 import "../src/Factory.sol";
 import "./MintableERC20.t.sol";
+import "lib/openzeppelin-contracts/contracts/utils/math/Math.sol";
 
 contract SwapPairTest is Test {
     Factory public factory;
@@ -45,5 +46,22 @@ contract SwapPairTest is Test {
         tokenB.mint(address(swapPair), 1_000);
         swapPair.mint(address(this));
         assertEq(swapPair.balanceOf(address(this)), 4_000);
+    }
+
+    function test_Unequal_First_Mint_Fuzz(
+        uint64 amountA,
+        uint64 amountB
+    ) public {
+        uint256 minLiquidity = swapPair.MINIMUM_LIQUIDITY();
+        uint256 sqrt = Math.sqrt(amountA * amountB);
+        tokenA.mint(address(swapPair), amountA);
+        tokenB.mint(address(swapPair), amountB);
+        if (sqrt <= minLiquidity) {
+            vm.expectRevert();
+            swapPair.mint(address(this));
+        } else {
+            swapPair.mint(address(this));
+            assertEq(swapPair.balanceOf(address(this)), sqrt - minLiquidity);
+        }
     }
 }
