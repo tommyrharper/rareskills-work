@@ -144,7 +144,7 @@ contract SwapPairTest is Test {
                                   SWAP
     //////////////////////////////////////////////////////////////*/
 
-    function test_Swap() public {
+    function test_Swap_A_For_B() public {
         sendAndMint(10_000);
 
         tokenA.mint(address(swapPair), 1_000);
@@ -152,6 +152,16 @@ contract SwapPairTest is Test {
 
         assertEq(tokenA.balanceOf(address(this)), 0);
         assertEq(tokenB.balanceOf(address(this)), 900);
+    }
+
+    function test_Swap_B_For_A() public {
+        sendAndMint(10_000);
+
+        tokenB.mint(address(swapPair), 1_000);
+        swapPair.swap(0, 900, address(this), new bytes(0));
+
+        assertEq(tokenA.balanceOf(address(this)), 900);
+        assertEq(tokenB.balanceOf(address(this)), 0);
     }
 
     /*//////////////////////////////////////////////////////////////
