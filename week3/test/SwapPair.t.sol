@@ -39,4 +39,11 @@ contract SwapPairTest is Test {
             assertEq(swapPair.balanceOf(address(this)), amount - minLiquidity);
         }
     }
+
+    function test_Unequal_First_Mint() public {
+        tokenA.mint(address(swapPair), 25_000);
+        tokenB.mint(address(swapPair), 1_000);
+        swapPair.mint(address(this));
+        assertEq(swapPair.balanceOf(address(this)), 4_000);
+    }
 }
