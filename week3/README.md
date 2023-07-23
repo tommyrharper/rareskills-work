@@ -14,7 +14,7 @@ Your unit tests should cover the following cases:
   - [x] Second mint
   - [ ] With fee off
 - [ ] Swapping
-- [ ] Withdrawing liquidity
+- [x] Withdrawing liquidity
 - [ ] Taking a flashloan
 
 Corner cases to watch out for:
