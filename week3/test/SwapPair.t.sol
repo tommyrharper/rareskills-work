@@ -20,7 +20,10 @@ contract SwapPairTest is Test {
         swapPair = SwapPair(pair);
     }
 
-    function test_Mint() public {
-        // swapPair.mint(address(this));
+    function test_Equal_First_Mint() public {
+        tokenA.mint(address(swapPair), 10_000);
+        tokenB.mint(address(swapPair), 10_000);
+        swapPair.mint(address(this));
+        assertEq(swapPair.balanceOf(address(this)), 9_000);
     }
 }
