@@ -7,10 +7,11 @@ import './interfaces/ISwapCallee.sol';
 import './LPToken.sol';
 import "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 import "lib/openzeppelin-contracts/contracts/utils/math/Math.sol";
+import {DecimalMath} from "./libraries/DecimalMath.sol";
 // import './libraries/UQ112x112.sol';
 
 contract SwapPair is ISwapPair, LPToken {
-    // using UQ112x112 for uint224;
+    using DecimalMath for uint256;
     using SafeERC20 for IERC20;
 
     uint public constant MINIMUM_LIQUIDITY = 10**3;
@@ -54,14 +55,14 @@ contract SwapPair is ISwapPair, LPToken {
     }
 
     // update reserves and, on the first call per block, price accumulators
-    function _update(uint balance0, uint balance1, uint112 _reserve0, uint112 _reserve1) private {
+    function _update(uint balance0, uint balance1, uint256 _reserve0, uint256 _reserve1) private {
         require(balance0 <= type(uint112).max && balance1 <= type(uint112).max, 'UniswapV2: OVERFLOW');
         uint32 blockTimestamp = uint32(block.timestamp % 2**32);
         uint32 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
         if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {
             // * never overflows, and + overflow is desired
-            // price0CumulativeLast += uint(UQ112x112.encode(_reserve1).uqdiv(_reserve0)) * timeElapsed;
-            // price1CumulativeLast += uint(UQ112x112.encode(_reserve0).uqdiv(_reserve1)) * timeElapsed;
+            price0CumulativeLast += _reserve1.upscale(18).divDecimal(_reserve0.upscale(18)) * timeElapsed;
+            price1CumulativeLast += _reserve0.upscale(18).divDecimal(_reserve1.upscale(18)) * timeElapsed;
         }
         reserve0 = uint112(balance0);
         reserve1 = uint112(balance1);
