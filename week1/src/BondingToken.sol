@@ -40,6 +40,8 @@ contract BondingToken is ERC1363, IERC1363Receiver {
 
         reserveBalance += msg.value;
 
+        /// @dev max reserveBalance is type(uint256).max / 2
+        /// As this is an unrealistic amount of eth, this should never be reached
         uint256 newSupply = Math.sqrt(2 * reserveBalance);
         uint256 supplyChange = newSupply - _totalSupply;
 

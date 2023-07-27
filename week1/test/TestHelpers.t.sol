@@ -13,6 +13,12 @@ contract TestHelpers is Test {
         return user;
     }
 
+    function createAndDealUser(uint256 amount) internal returns (address) {
+        address user = createUser();
+        vm.deal(user, amount);
+        return user;
+    }
+
     /// @dev create a new user address
     function createUser() internal returns (address) {
         userNonce++;

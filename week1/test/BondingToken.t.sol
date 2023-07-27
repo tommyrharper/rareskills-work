@@ -12,6 +12,7 @@ contract BondingTokenTest is TestHelpers {
     BondingToken public bondingToken;
     address public user1;
     address public user2;
+    address public user3;
 
     /*//////////////////////////////////////////////////////////////
                                  SETUP
@@ -21,6 +22,7 @@ contract BondingTokenTest is TestHelpers {
         bondingToken = new BondingToken();
         user1 = createAndDealUser();
         user2 = createAndDealUser();
+        user3 = createAndDealUser(type(uint256).max);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -33,6 +35,19 @@ contract BondingTokenTest is TestHelpers {
 
     function testSymbol() public {
         assertEq(bondingToken.symbol(), "BT");
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                              LIMIT TESTS
+    //////////////////////////////////////////////////////////////*/
+
+    function test_Max_Purchase_And_Sale() public {
+        vm.prank(user3);
+        bondingToken.purchase{value: type(uint256).max / 2}(user3, type(uint256).max);
+
+        uint256 balanceToSell = bondingToken.balanceOf(user3);
+        vm.prank(user3);
+        bondingToken.sell(user3, balanceToSell, 0);
     }
 
     /*//////////////////////////////////////////////////////////////
