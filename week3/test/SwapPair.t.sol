@@ -247,6 +247,22 @@ contract SwapPairTest is Test {
         assertEq(max, 0);
     }
 
+    function test_FlashFee() public {
+        // tokenA
+        tokenA.mint(address(swapPair), 1 ether);
+        uint256 fee = swapPair.flashFee(address(tokenA), 1 ether);
+        assertEq(fee, 0.003 ether);
+
+        // tokenB
+        tokenB.mint(address(swapPair), 2 ether);
+        fee = swapPair.flashFee(address(tokenB), 2 ether);
+        assertEq(fee, 0.006 ether);
+
+        // invalid token
+        vm.expectRevert("FlashLender: Unsupported currency");
+        swapPair.flashFee(address(0xA), 0);
+    }
+
     /*//////////////////////////////////////////////////////////////
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
