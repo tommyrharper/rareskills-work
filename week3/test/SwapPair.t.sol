@@ -181,6 +181,17 @@ contract SwapPairTest is Test {
         assertEq(swapPair.price1CumulativeLast(), 1 * timePassed * 1e18);
     }
 
+    function test_Different_Prices() public {
+        sendAndMint(10_000, 20_000);
+        uint256 timePassed = 100;
+
+        vm.warp(block.timestamp + timePassed);
+        sendAndMint(10_000, 20_000);
+
+        assertEq(swapPair.price0CumulativeLast(), 1 * timePassed * 1e18 / 2);
+        assertEq(swapPair.price1CumulativeLast(), 2 * timePassed * 1e18);
+    }
+
     /*//////////////////////////////////////////////////////////////
                                FLASH LOAN
     //////////////////////////////////////////////////////////////*/
