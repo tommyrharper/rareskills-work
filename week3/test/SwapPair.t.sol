@@ -191,7 +191,7 @@ contract SwapPairTest is Test {
         tokenA.mint(address(swapPair), 1 ether);
         tokenA.mint(address(borrower), 0.003 ether);
 
-        vm.expectRevert();
+        vm.expectRevert("FlashLender: Callback failed");
         swapPair.flashLoan(borrower, address(tokenA), 1 ether, new bytes(0));
     }
 
@@ -218,8 +218,17 @@ contract SwapPairTest is Test {
         tokenA.mint(address(swapPair), 1 ether);
         tokenA.mint(address(borrower), 0.003 ether);
 
-        vm.expectRevert();
+        vm.expectRevert("FlashLender: Unsupported currency");
         swapPair.flashLoan(borrower, address(0xA), 1 ether, new bytes(0));
+    }
+
+    function test_Loan_Amount_Must_Be_Greater_Than_Zero() public {
+        borrower = new ERC3156FlashBorrowerMock(true, true);
+        tokenA.mint(address(swapPair), 1 ether);
+        tokenA.mint(address(borrower), 0.003 ether);
+
+        vm.expectRevert("FlashLoan: Amount must be greater than 0");
+        swapPair.flashLoan(borrower, address(tokenA), 0, new bytes(0));
     }
 
     /*//////////////////////////////////////////////////////////////
