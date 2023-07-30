@@ -81,6 +81,7 @@ contract SwapPair is ISwapPair, LPToken, IERC3156FlashLender {
         }
         if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {
             // * never overflows, and + overflow is desired
+            /// @dev Multiply after dividing to avoid overflows
             price0CumulativeLast +=
                 _reserve1.upscale(18).divDecimal(_reserve0.upscale(18)) *
                 timeElapsed;
@@ -89,8 +90,8 @@ contract SwapPair is ISwapPair, LPToken, IERC3156FlashLender {
                 timeElapsed;
 
             // same effect could be achieved just like this:
-            // price0CumulativeLast += (timeElapsed * _reserve1 * 1e18) / _reserve0;
-            // price1CumulativeLast += (timeElapsed * _reserve0 * 1e18) / _reserve1;
+            // price0CumulativeLast += (_reserve1 * 1e18 / _reserve0) * timeElapsed;
+            // price1CumulativeLast += (_reserve0 * 1e18 / _reserve1) * timeElapsed;
         }
         reserve0 = uint112(balance0);
         reserve1 = uint112(balance1);
