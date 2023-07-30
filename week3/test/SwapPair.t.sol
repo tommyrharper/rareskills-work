@@ -167,6 +167,21 @@ contract SwapPairTest is Test {
     }
 
     /*//////////////////////////////////////////////////////////////
+                              PRICE TESTS
+    //////////////////////////////////////////////////////////////*/
+
+    function test_Equal_Price() public {
+        sendAndMint(10_000);
+        uint256 timePassed = 100;
+
+        vm.warp(block.timestamp + timePassed);
+        sendAndMint(10_000);
+
+        assertEq(swapPair.price0CumulativeLast(), 1 * timePassed * 1e18);
+        assertEq(swapPair.price1CumulativeLast(), 1 * timePassed * 1e18);
+    }
+
+    /*//////////////////////////////////////////////////////////////
                                FLASH LOAN
     //////////////////////////////////////////////////////////////*/
 
