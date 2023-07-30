@@ -26,7 +26,7 @@ Corner cases to watch out for:
     - My fixed point numbers are `uint256`
     - I multiple by the timeElapsed before dividing (which is a `uint32`)
     - My fixed point numbers are scaled by `10^18`
-- As my fixed point numbers are `uint256`, but my reserve values are `uint112` in storage, the fixed point arithmetic is not the limiting factor for overflows, the limiting factor is the integer reserve value itself, as `2^112 - 1 < (2^256 - 1) / (2^32 - 1) / 10^18` or `type(uint256).max / type(uint32).max / 1e18 < type(uint112).max`
+- As my fixed point numbers are `uint256`, but my reserve values are `uint112` in storage, the fixed point arithmetic is not the limiting factor for overflows, the limiting factor is the integer reserve value itself, as `2^112 - 1 < (2^256 - 1) / (2^32 - 1) / 10^18` or `type(uint256).max / type(uint32).max / 1e18 > type(uint112).max`
 ## Questions
 
 - [x] Why does `kLast` only update if `feeOn` is `true` in the `mint` and `burn` functions?

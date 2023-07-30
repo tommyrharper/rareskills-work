@@ -81,10 +81,10 @@ contract SwapPair is ISwapPair, LPToken, IERC3156FlashLender {
         }
         if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {
             // * never overflows, and + overflow is desired
-            price0CumulativeLast +=
-                (timeElapsed * _reserve1.upscale(18)).divDecimal(_reserve0.upscale(18));
-            price1CumulativeLast +=
-                (timeElapsed * _reserve0.upscale(18)).divDecimal(_reserve1.upscale(18));
+            price0CumulativeLast += (timeElapsed * _reserve1.upscale(18))
+                .divDecimal(_reserve0.upscale(18));
+            price1CumulativeLast += (timeElapsed * _reserve0.upscale(18))
+                .divDecimal(_reserve1.upscale(18));
 
             // same effect could be achieved just like this:
             // price0CumulativeLast += timeElapsed * _reserve1 * 1e18 / _reserve0;

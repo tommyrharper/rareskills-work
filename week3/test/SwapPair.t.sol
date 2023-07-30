@@ -211,11 +211,11 @@ contract SwapPairTest is Test {
 
         assertEq(
             swapPair.price0CumulativeLast(),
-            timePassed * tokenADeposit * 1e18 / tokenBDeposit
+            (timePassed * tokenADeposit * 1e18) / tokenBDeposit
         );
         assertEq(
             swapPair.price1CumulativeLast(),
-            timePassed * tokenBDeposit * 1e18 / tokenADeposit
+            (timePassed * tokenBDeposit * 1e18) / tokenADeposit
         );
     }
 
@@ -237,12 +237,24 @@ contract SwapPairTest is Test {
 
         assertEq(
             swapPair.price0CumulativeLast(),
-            timePassed * tokenADeposit * 1e18 / tokenBDeposit
+            (timePassed * tokenADeposit * 1e18) / tokenBDeposit
         );
         assertEq(
             swapPair.price1CumulativeLast(),
-            timePassed * tokenBDeposit * 1e18 / tokenADeposit
+            (timePassed * tokenBDeposit * 1e18) / tokenADeposit
         );
+    }
+
+    function test_Just_Beyond_Max_Deposit() public {
+        uint256 theoreticalMaxDeposit = uint256(type(uint112).max) + 1;
+
+        uint256 tokenADeposit = theoreticalMaxDeposit / 4;
+        uint256 tokenBDeposit = theoreticalMaxDeposit / 2;
+
+        sendAndMint(tokenADeposit, tokenBDeposit);
+        sendTokensToSwapPair(tokenADeposit, tokenBDeposit);
+        vm.expectRevert("UniswapV2: OVERFLOW");
+        swapPair.mint(address(this));
     }
 
     /*//////////////////////////////////////////////////////////////
