@@ -195,15 +195,12 @@ contract SwapPairTest is Test {
     function test_Price_Fuzz(
         uint64 _tokenADeposit,
         uint64 _tokenBDeposit,
-        uint64 _timePassed
+        uint32 _timePassed
     ) public {
-        // uint64 _tokenADeposit = 1001;
-        // uint64 _tokenBDeposit = 1001;
-        // uint64 _timePassed = 4294967295;
-
         uint256 tokenADeposit = _tokenADeposit;
         uint256 tokenBDeposit = _tokenBDeposit;
         uint256 timePassed = _timePassed;
+
         vm.assume(tokenADeposit > 1000 && tokenBDeposit > 1000);
         vm.assume(timePassed > 0);
 

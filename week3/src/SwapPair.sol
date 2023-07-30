@@ -74,8 +74,11 @@ contract SwapPair is ISwapPair, LPToken, IERC3156FlashLender {
             balance0 <= type(uint112).max && balance1 <= type(uint112).max,
             "UniswapV2: OVERFLOW"
         );
-        uint256 blockTimestamp = block.timestamp;
-        uint256 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
+        uint32 blockTimestamp = uint32(block.timestamp % 2 ** 32);
+        uint32 timeElapsed;
+        unchecked {
+            timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
+        }
         if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {
             // * never overflows, and + overflow is desired
             price0CumulativeLast += (timeElapsed * _reserve1.upscale(18))
@@ -89,8 +92,7 @@ contract SwapPair is ISwapPair, LPToken, IERC3156FlashLender {
         }
         reserve0 = uint112(balance0);
         reserve1 = uint112(balance1);
-        /// @dev WARNING - will break in 2106
-        blockTimestampLast = uint32(blockTimestamp);
+        blockTimestampLast = blockTimestamp;
         emit Sync(reserve0, reserve1);
     }
 
