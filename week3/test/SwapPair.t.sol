@@ -150,7 +150,7 @@ contract SwapPairTest is Test {
         sendAndMint(10_000);
 
         tokenA.mint(address(swapPair), 1_000);
-        swapPair.swap(900, 0, address(this), new bytes(0));
+        swapPair.swap(900, 0, address(this));
 
         assertEq(tokenA.balanceOf(address(this)), 0);
         assertEq(tokenB.balanceOf(address(this)), 900);
@@ -160,7 +160,7 @@ contract SwapPairTest is Test {
         sendAndMint(10_000);
 
         tokenB.mint(address(swapPair), 1_000);
-        swapPair.swap(0, 900, address(this), new bytes(0));
+        swapPair.swap(0, 900, address(this));
 
         assertEq(tokenA.balanceOf(address(this)), 900);
         assertEq(tokenB.balanceOf(address(this)), 0);

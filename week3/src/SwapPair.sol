@@ -176,8 +176,7 @@ contract SwapPair is ISwapPair, LPToken, IERC3156FlashLender {
     function swap(
         uint amount0Out,
         uint amount1Out,
-        address to,
-        bytes calldata data
+        address to
     ) external lock {
         require(
             amount0Out > 0 || amount1Out > 0,
