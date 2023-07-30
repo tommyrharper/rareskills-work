@@ -3,7 +3,6 @@ pragma solidity ^0.8.13;
 
 import "./interfaces/ISwapPair.sol";
 import "./interfaces/IFactory.sol";
-import "./interfaces/ISwapCallee.sol";
 import "./LPToken.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 import "lib/openzeppelin-contracts/contracts/utils/math/Math.sol";
@@ -199,13 +198,6 @@ contract SwapPair is ISwapPair, LPToken, IERC3156FlashLender {
             require(to != _token0 && to != _token1, "UniswapV2: INVALID_TO");
             if (amount0Out > 0) IERC20(_token0).safeTransfer(to, amount0Out); // optimistically transfer tokens
             if (amount1Out > 0) IERC20(_token1).safeTransfer(to, amount1Out); // optimistically transfer tokens
-            if (data.length > 0)
-                ISwapCallee(to).uniswapV2Call(
-                    msg.sender,
-                    amount0Out,
-                    amount1Out,
-                    data
-                );
             balance0 = IERC20(_token0).balanceOf(address(this));
             balance1 = IERC20(_token1).balanceOf(address(this));
         }
