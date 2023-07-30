@@ -32,6 +32,20 @@ contract SwapPairTest is Test {
     }
 
     /*//////////////////////////////////////////////////////////////
+                            MAX DEPOSIT TEST
+    //////////////////////////////////////////////////////////////*/
+
+    function test_Max_Deposit() public {
+        // sendTokensToSwapPair(999999999999999999999999999999999999 ether);
+        sendTokensToSwapPair(type(uint256).max / 2, 10_000);
+
+        vm.warp(block.timestamp + (type(uint32).max / 2));
+
+        sendTokensToSwapPair(type(uint256).max / 2, 10_000);
+        // sendTokensToSwapPair(type(uint256).max / 2);
+    }
+
+    /*//////////////////////////////////////////////////////////////
                                FIRST MINT
     //////////////////////////////////////////////////////////////*/
 
@@ -211,11 +225,11 @@ contract SwapPairTest is Test {
 
         assertEq(
             swapPair.price0CumulativeLast(),
-            (timePassed * tokenADeposit * 1e18) / tokenBDeposit
+            ((tokenADeposit * 1e18) / tokenBDeposit) * timePassed
         );
         assertEq(
             swapPair.price1CumulativeLast(),
-            (timePassed * tokenBDeposit * 1e18) / tokenADeposit
+            ((tokenBDeposit * 1e18) / tokenADeposit) * timePassed
         );
     }
 

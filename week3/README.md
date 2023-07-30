@@ -19,6 +19,14 @@ Your unit tests should cover the following cases:
 Corner cases to watch out for:
 - [ ] What considerations do you need in your fixed point library? How much of a token with 18 decimals can your contract store?
 
+## Max Deposit
+
+- Max value of reserve0 or reserve1 is 2^112 - 1 = 5192296858534827628530496329220095
+- Due to 18 decimal upscaling, max value of token is 
+  - (2^112 - 1) / 10 ** 18 = 5192296858534827
+    - 5_192_296_858_534_827
+    - Or just over 5 quadrillion
+
 ## Questions
 
 - [x] Why does `kLast` only update if `feeOn` is `true` in the `mint` and `burn` functions?
