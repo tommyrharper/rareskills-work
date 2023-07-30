@@ -6,6 +6,7 @@ import "../src/SwapPair.sol";
 import "../src/Factory.sol";
 import "./MintableERC20.t.sol";
 import "lib/openzeppelin-contracts/contracts/utils/math/Math.sol";
+import "./ERC3156FlashBorrowerMock.t.sol";
 
 contract SwapPairTest is Test {
     /*//////////////////////////////////////////////////////////////
@@ -16,6 +17,7 @@ contract SwapPairTest is Test {
     SwapPair public swapPair;
     MintableERC20 public tokenA;
     MintableERC20 public tokenB;
+    ERC3156FlashBorrowerMock public borrower;
 
     /*//////////////////////////////////////////////////////////////
                                  SETUP
@@ -162,6 +164,18 @@ contract SwapPairTest is Test {
 
         assertEq(tokenA.balanceOf(address(this)), 900);
         assertEq(tokenB.balanceOf(address(this)), 0);
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                               FLASH LOAN
+    //////////////////////////////////////////////////////////////*/
+
+    function test_Flash_Loan() public {
+        borrower = new ERC3156FlashBorrowerMock(true, true);
+        tokenA.mint(address(swapPair), 1 ether);
+        tokenA.mint(address(borrower), 0.003 ether);
+
+        swapPair.flashLoan(borrower, address(tokenA), 1 ether, new bytes(0));
     }
 
     /*//////////////////////////////////////////////////////////////
