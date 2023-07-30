@@ -173,11 +173,7 @@ contract SwapPair is ISwapPair, LPToken, IERC3156FlashLender {
     }
 
     // this low-level function should be called from a contract which performs important safety checks
-    function swap(
-        uint amount0Out,
-        uint amount1Out,
-        address to
-    ) external lock {
+    function swap(uint amount0Out, uint amount1Out, address to) external lock {
         require(
             amount0Out > 0 || amount1Out > 0,
             "UniswapV2: INSUFFICIENT_OUTPUT_AMOUNT"
@@ -314,7 +310,18 @@ contract SwapPair is ISwapPair, LPToken, IERC3156FlashLender {
             _amount + _fee
         );
 
-        assert(IERC20(_token).balanceOf(address(this)) > balanceAtStart);
+        // assert balance of borrowed token has increased by at least the fee
+        assert(
+            IERC20(_token).balanceOf(address(this)) >= balanceAtStart + _fee
+        );
+
+        // can safely update rewards here due to reentrancy lock
+        _update(
+            IERC20(token0).balanceOf(address(this)),
+            IERC20(token1).balanceOf(address(this)),
+            reserve0,
+            reserve1
+        );
 
         emit FlashLoan(address(_receiver), _token, _amount, _fee, _data);
 
