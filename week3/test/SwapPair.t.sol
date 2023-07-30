@@ -178,6 +178,24 @@ contract SwapPairTest is Test {
         swapPair.flashLoan(borrower, address(tokenA), 1 ether, new bytes(0));
     }
 
+    function test_Does_Not_Loan_If_No_Return_Val() public {
+        borrower = new ERC3156FlashBorrowerMock(false, true);
+        tokenA.mint(address(swapPair), 1 ether);
+        tokenA.mint(address(borrower), 0.003 ether);
+
+        vm.expectRevert();
+        swapPair.flashLoan(borrower, address(tokenA), 1 ether, new bytes(0));
+    }
+
+    function test_Does_Not_Loan_If_Not_Paid_Back() public {
+        borrower = new ERC3156FlashBorrowerMock(true, false);
+        tokenA.mint(address(swapPair), 1 ether);
+        tokenA.mint(address(borrower), 0.003 ether);
+
+        vm.expectRevert();
+        swapPair.flashLoan(borrower, address(tokenA), 1 ether, new bytes(0));
+    }
+
     /*//////////////////////////////////////////////////////////////
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
