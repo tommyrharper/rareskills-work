@@ -74,20 +74,23 @@ contract SwapPair is ISwapPair, LPToken, IERC3156FlashLender {
             balance0 <= type(uint112).max && balance1 <= type(uint112).max,
             "UniswapV2: OVERFLOW"
         );
-        uint32 blockTimestamp = uint32(block.timestamp % 2 ** 32);
-        uint32 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
+        uint256 blockTimestamp = block.timestamp;
+        uint256 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
         if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {
             // * never overflows, and + overflow is desired
-            price0CumulativeLast +=
-                _reserve1.upscale(18).divDecimal(_reserve0.upscale(18)) *
-                timeElapsed;
-            price1CumulativeLast +=
-                _reserve0.upscale(18).divDecimal(_reserve1.upscale(18)) *
-                timeElapsed;
+            price0CumulativeLast += (timeElapsed * _reserve1.upscale(18))
+                .divDecimal(_reserve0.upscale(18));
+            price1CumulativeLast += (timeElapsed * _reserve0.upscale(18))
+                .divDecimal(_reserve1.upscale(18));
+
+            // same effect could be achieved just like this:
+            // price0CumulativeLast += (timeElapsed * _reserve1 * 1e18) / _reserve0;
+            // price1CumulativeLast += (timeElapsed * _reserve0 * 1e18) / _reserve1;
         }
         reserve0 = uint112(balance0);
         reserve1 = uint112(balance1);
-        blockTimestampLast = blockTimestamp;
+        /// @dev WARNING - will break in 2106
+        blockTimestampLast = uint32(blockTimestamp);
         emit Sync(reserve0, reserve1);
     }
 

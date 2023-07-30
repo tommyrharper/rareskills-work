@@ -188,8 +188,38 @@ contract SwapPairTest is Test {
         vm.warp(block.timestamp + timePassed);
         sendAndMint(10_000, 20_000);
 
-        assertEq(swapPair.price0CumulativeLast(), 1 * timePassed * 1e18 / 2);
+        assertEq(swapPair.price0CumulativeLast(), (1 * timePassed * 1e18) / 2);
         assertEq(swapPair.price1CumulativeLast(), 2 * timePassed * 1e18);
+    }
+
+    function test_Price_Fuzz(
+        uint64 _tokenADeposit,
+        uint64 _tokenBDeposit,
+        uint64 _timePassed
+    ) public {
+        // uint64 _tokenADeposit = 1001;
+        // uint64 _tokenBDeposit = 1001;
+        // uint64 _timePassed = 4294967295;
+
+        uint256 tokenADeposit = _tokenADeposit;
+        uint256 tokenBDeposit = _tokenBDeposit;
+        uint256 timePassed = _timePassed;
+        vm.assume(tokenADeposit > 1000 && tokenBDeposit > 1000);
+        vm.assume(timePassed > 0);
+
+        sendAndMint(tokenADeposit, tokenBDeposit);
+
+        vm.warp(block.timestamp + timePassed);
+        sendAndMint(tokenADeposit, tokenBDeposit);
+
+        assertEq(
+            swapPair.price0CumulativeLast(),
+            (timePassed * tokenADeposit * 1e18) / tokenBDeposit
+        );
+        assertEq(
+            swapPair.price1CumulativeLast(),
+            (timePassed * tokenBDeposit * 1e18) / tokenADeposit
+        );
     }
 
     /*//////////////////////////////////////////////////////////////
