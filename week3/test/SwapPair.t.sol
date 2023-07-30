@@ -231,6 +231,22 @@ contract SwapPairTest is Test {
         swapPair.flashLoan(borrower, address(tokenA), 0, new bytes(0));
     }
 
+    function test_MaxFlashLoan() public {
+        // tokenA
+        tokenA.mint(address(swapPair), 1 ether);
+        uint256 max = swapPair.maxFlashLoan(address(tokenA));
+        assertEq(max, 1 ether);
+
+        // tokenB
+        tokenB.mint(address(swapPair), 2 ether);
+        max = swapPair.maxFlashLoan(address(tokenB));
+        assertEq(max, 2 ether);
+
+        // invalid token
+        max = swapPair.maxFlashLoan(address(0xA));
+        assertEq(max, 0);
+    }
+
     /*//////////////////////////////////////////////////////////////
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
