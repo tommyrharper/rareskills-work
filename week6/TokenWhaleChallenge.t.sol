@@ -14,7 +14,21 @@ contract TokenWhaleChallengeTest is TokenWhaleChallenge {
     function TokenWhaleChallengeTest() public TokenWhaleChallenge(msg.sender) {}
 
     function echidna_test_balance() public view returns (bool) {
-        // TODO: add the property
         return !isComplete();
     }
 }
+
+// Example failure:
+
+// 0x1000 = A
+// 0x3000 = B
+// 0x2ffffd = C
+
+// START B => balance = 1000
+
+// B => approve(A, 999)
+// A => transferFrom(B, C, 685)
+// A => transfer(B, 999_999)
+
+// Bug explained:
+// `transferFrom` doesn't send tokens using `from` address
