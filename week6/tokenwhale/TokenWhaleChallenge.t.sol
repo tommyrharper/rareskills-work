@@ -6,7 +6,7 @@ import "./TokenWhaleChallenge.sol";
 /// @dev Run the template with
 ///      ```
 ///      solc-select use 0.8.0
-///      echidna ./week6/TokenWhaleChallenge.t.sol --contract TokenWhaleChallengeTest
+///      echidna ./week6/tokenwhale/TokenWhaleChallenge.t.sol --contract TokenWhaleChallengeTest
 ///      ```
 contract TokenWhaleChallengeTest is TokenWhaleChallenge {
     address echidna = tx.origin;
