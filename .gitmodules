@@ -25,3 +25,6 @@
 [submodule "week6/lib/forge-std"]
 	path = week6/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "week6.1/lib/forge-std"]
+	path = week6.1/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
