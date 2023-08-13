@@ -1,2 +1,4 @@
 crytic-export
 crytic-export/*
+./crytic-export
+./crytic-export/*
