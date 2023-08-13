@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0
-pragma solidity ^0.8.0;
+pragma solidity ^0.4.21;
 
-// import "./token.sol";
 import "./TokenWhaleChallenge.sol";
 
 /// @dev Run the template with
@@ -12,12 +11,10 @@ import "./TokenWhaleChallenge.sol";
 contract TokenWhaleChallengeTest is TokenWhaleChallenge {
     address echidna = tx.origin;
 
-    constructor() {
-        balances[echidna] = 10_000;
-    }
+    function TokenWhaleChallengeTest() public TokenWhaleChallenge(msg.sender) {}
 
     function echidna_test_balance() public view returns (bool) {
         // TODO: add the property
-        return balances[echidna] <= 10000;
+        return !isComplete();
     }
 }
