@@ -46,3 +46,13 @@ But if I set it to a more reasonable value of less than 10, on my machine it cou
 - Limiting the caller to be only the deployer
 
 So this somewhat shows the limitations of fuzzing, you really need to constrain the inputs, and even then it is difficult to find bugs if there is any complex and calculated interaction necessary for the exploit.
+
+## Echidna Bonding Curve Invariants
+
+- [See here](../week1/test/EchidnaBodingToken.t.sol)
+
+### Notes
+
+Wasn't sure what level of precision to require in the invariants, I guess ideally I would mathematically calculate the exact level of mathematical precision expected based on the contract logic, and validate that that always holds.
+
+To make it simple I just set it to within roughly a 3% bound for the reserve balance and total supply.

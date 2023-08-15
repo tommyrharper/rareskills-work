@@ -29,7 +29,7 @@ contract EchidnaBodingToken is BondingToken {
             closeTo(
                 expectedReserves,
                 reserveBalance,
-                100 + (reserveBalance * 5) / 100
+                100 + (reserveBalance * 3) / 100
             );
     }
 
@@ -44,7 +44,7 @@ contract EchidnaBodingToken is BondingToken {
             closeTo(
                 expectedSupply,
                 _totalSupply,
-                100 + (_totalSupply * 5) / 100
+                100 + (_totalSupply * 3) / 100
             );
     }
 
