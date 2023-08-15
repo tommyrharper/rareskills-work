@@ -29,7 +29,7 @@ I found echidna was extremely effective in this scenario, but perhaps it was mad
 
 ## Problem 22: DEX 1 from Capture The Ether
 
-- [My Echidna Test](./dex/Dex.t.sol)
+- [My Echidna Test](./dex/test/Dex.t.sol)
 
 ### Notes
 
