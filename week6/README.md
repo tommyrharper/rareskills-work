@@ -29,7 +29,7 @@ I found echidna was extremely effective in this scenario, but perhaps it was mad
 
 ## Problem 22: DEX 1 from Capture The Ether
 
-- [My Echidna Test](./dex1/Dex1Challenge.t.sol)
+- [My Echidna Test](./dex/Dex.t.sol)
 
 ### Notes
 
@@ -49,7 +49,7 @@ So this somewhat shows the limitations of fuzzing, you really need to constrain 
 
 ## Echidna Bonding Curve Invariants
 
-- [See here](../week1/test/EchidnaBodingToken.t.sol)
+- [My bonding curve echidna tests](../week1/test/EchidnaBodingToken.t.sol)
 
 ### Notes
 
