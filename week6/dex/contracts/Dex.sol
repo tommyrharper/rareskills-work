@@ -6,21 +6,21 @@ import "../node_modules/openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "../node_modules/openzeppelin-solidity/contracts/access/Ownable.sol";
 
 contract Dex is Ownable {
-    address public token1;
-    address public token2;
+    address internal token1;
+    address internal token2;
 
     constructor() Ownable(msg.sender) {}
 
-    function setTokens(address _token1, address _token2) public onlyOwner {
+    function setTokens(address _token1, address _token2) internal onlyOwner {
         token1 = _token1;
         token2 = _token2;
     }
 
-    function addLiquidity(address token_address, uint amount) public onlyOwner {
+    function addLiquidity(address token_address, uint amount) internal onlyOwner {
         IERC20(token_address).transferFrom(msg.sender, address(this), amount);
     }
 
-    function swap(address from, address to, uint amount) public {
+    function swap(address from, address to, uint amount) internal {
         require(
             (from == token1 && to == token2) ||
                 (from == token2 && to == token1),
@@ -40,7 +40,7 @@ contract Dex is Ownable {
         address from,
         address to,
         uint amount
-    ) public view returns (uint) {
+    ) internal view returns (uint) {
         return ((amount * IERC20(to).balanceOf(address(this))) /
             IERC20(from).balanceOf(address(this)));
     }
@@ -53,7 +53,7 @@ contract Dex is Ownable {
     function balanceOf(
         address token,
         address account
-    ) public view returns (uint) {
+    ) internal view returns (uint) {
         return IERC20(token).balanceOf(account);
     }
 }
