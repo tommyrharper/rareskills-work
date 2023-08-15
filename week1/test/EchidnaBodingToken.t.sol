@@ -20,7 +20,11 @@ contract EchidnaBodingToken is BondingToken {
         return reserveBalance >= address(this).balance;
     }
 
-    function test_correct_total_supply() public view returns (bool) {
+    function echidna_test_correct_total_supply() public view returns (bool) {
         return reserveBalance == totalSupply();
     }
+
+    // function test_correct_price() public view returns (bool) {
+
+    // }
 }
