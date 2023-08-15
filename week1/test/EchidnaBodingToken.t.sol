@@ -24,22 +24,42 @@ contract EchidnaBodingToken is BondingToken {
         view
         returns (bool)
     {
-        uint256 _totalSupply = totalSupply();
-
-        uint expectedReserves = (_totalSupply ** 2) / 2;
-
-        // add acceptable range/deviance
-        uint256 minReserves = (expectedReserves * 90) / 100;
-        uint256 maxReserves = ((expectedReserves * 110) / 100) + 10;
-
-        // allow small rounding errors
-        if (minReserves > 10) minReserves -= 10;
-        else minReserves = 0;
-
-        return reserveBalance <= maxReserves && reserveBalance >= minReserves;
+        uint expectedReserves = (totalSupply() ** 2) / 2;
+        return
+            closeTo(
+                expectedReserves,
+                reserveBalance,
+                100 + (reserveBalance * 5) / 100
+            );
     }
 
-    // function echidna_correct_price() public view returns (bool) {
-    //     return reserveBalance / totalSupply() == price;
-    // }
+    function echidna_total_supply_sqrt_2x_reserve_balance()
+        public
+        view
+        returns (bool)
+    {
+        uint256 expectedSupply = Math.sqrt(2 * reserveBalance);
+        uint256 _totalSupply = totalSupply();
+        return
+            closeTo(
+                expectedSupply,
+                _totalSupply,
+                100 + (_totalSupply * 5) / 100
+            );
+    }
+
+    /// @dev check if two numbers are close to each other
+    /// @param _a first number
+    /// @param _b second number
+    /// @param _tolerance maximum difference between a and b allowed
+    /// @return result true if a and b are close to each other within the tolerance
+    function closeTo(
+        uint256 _a,
+        uint256 _b,
+        uint256 _tolerance
+    ) internal pure returns (bool) {
+        if (_a == _b) return true;
+        if (_a > _b) return _a - _b <= _tolerance;
+        else return _b - _a <= _tolerance;
+    }
 }
