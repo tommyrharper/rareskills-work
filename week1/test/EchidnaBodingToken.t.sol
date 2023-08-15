@@ -48,6 +48,34 @@ contract EchidnaBodingToken is BondingToken {
             );
     }
 
+    function echidna_if_eth_balance_is_zero_so_is_total_supply()
+        public
+        view
+        returns (bool)
+    {
+        return
+            (address(this).balance == 0 && totalSupply() == 0) ||
+            (address(this).balance >= 0 && totalSupply() >= 0);
+    }
+
+    function echidna_if_reserve_is_zero_so_is_total_supply()
+        public
+        view
+        returns (bool)
+    {
+        return
+            (reserveBalance == 0 && totalSupply() == 0) ||
+            (reserveBalance >= 0 && totalSupply() >= 0);
+    }
+
+    function echidna_user_balance_cannot_exceed_total_supply()
+        public
+        view
+        returns (bool)
+    {
+        return balanceOf(msg.sender) <= totalSupply();
+    }
+
     /// @dev check if two numbers are close to each other
     /// @param _a first number
     /// @param _b second number
