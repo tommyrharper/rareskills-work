@@ -2,8 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "../src/BondingToken.sol";
-
-// import "../node_modules/openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "openzeppelin/utils/math/Math.sol";
 
 /// @dev Run the template with
 ///      ```
@@ -20,11 +19,27 @@ contract EchidnaBodingToken is BondingToken {
         return reserveBalance >= address(this).balance;
     }
 
-    function echidna_test_correct_total_supply() public view returns (bool) {
-        return reserveBalance == totalSupply();
+    function echidna_reserve_balance_close_to_square_of_total_supply_div_2()
+        public
+        view
+        returns (bool)
+    {
+        uint256 _totalSupply = totalSupply();
+
+        uint expectedReserves = (_totalSupply ** 2) / 2;
+
+        // add acceptable range/deviance
+        uint256 minReserves = (expectedReserves * 90) / 100;
+        uint256 maxReserves = ((expectedReserves * 110) / 100) + 10;
+
+        // allow small rounding errors
+        if (minReserves > 10) minReserves -= 10;
+        else minReserves = 0;
+
+        return reserveBalance <= maxReserves && reserveBalance >= minReserves;
     }
 
-    // function test_correct_price() public view returns (bool) {
-
+    // function echidna_correct_price() public view returns (bool) {
+    //     return reserveBalance / totalSupply() == price;
     // }
 }
