@@ -19,19 +19,58 @@ contract MintableERC20 is ERC20 {
 ///      echidna ./week6/dex/test/Dex.t.sol --contract DexTest
 ///      ```
 contract DexTest is Dex {
+    event Debug(uint num);
+
     address echidna = tx.origin;
 
     constructor() {
-        MintableERC20 _token1 = new MintableERC20("Token1", "T1");
-        MintableERC20 _token2 = new MintableERC20("Token2", "T2");
+        assert(echidna == msg.sender);
+
+        uint totalSupply = 100 ether;
+        SwappableToken _token1 = new SwappableToken(
+            address(this),
+            "Token1",
+            "T1",
+            totalSupply
+        );
+        SwappableToken _token2 = new SwappableToken(
+            address(this),
+            "Token2",
+            "T2",
+            totalSupply
+        );
+        assert(_token1.balanceOf(address(this)) == totalSupply);
+        assert(_token2.balanceOf(address(this)) == totalSupply);
+
         setTokens(address(_token1), address(_token2));
 
-        _token1.mint(address(this), 100 ether);
-        _token2.mint(address(this), 100 ether);
-        _token1.mint(msg.sender, 1 ether);
-        _token2.mint(msg.sender, 1 ether);
+        uint amountToGiveToEchidna = 10 ether;
+        _token1.transfer(msg.sender, amountToGiveToEchidna);
+        _token2.transfer(msg.sender, amountToGiveToEchidna);
+        assert(_token1.balanceOf(address(this)) == totalSupply - amountToGiveToEchidna);
+        assert(_token2.balanceOf(address(this)) == totalSupply - amountToGiveToEchidna);
+        assert(_token1.balanceOf(msg.sender) == amountToGiveToEchidna);
+        assert(_token2.balanceOf(msg.sender) == amountToGiveToEchidna);
 
         renounceOwnership();
+    }
+
+    function manualHack() public {
+        swapAForB(5 ether);
+        uint price = getSwapPrice(token1, token2, 1);
+        swapAForB(1);
+    }
+
+    function swapAForB(uint amount) public {
+        swap(token1, token2, amount);
+    }
+
+    function swap(uint amount) public {
+        swap(token1, token2, amount);
+    }
+
+    function echidna_test_getSwapPrice() public view returns (bool) {
+        return getSwapPrice(token1, token2, 1) > 0;
     }
 
     function echidna_test_dex() public view returns (bool) {
@@ -39,4 +78,8 @@ contract DexTest is Dex {
             ERC20(token1).balanceOf(address(this)) > 10 ether &&
             ERC20(token2).balanceOf(address(this)) > 10 ether;
     }
+
+    // function echidna_test_dex() public view returns (bool) {
+    //     return ERC20(token1).balanceOf(echidna) == 10 ether || ERC20(token1).balanceOf(echidna) == 0;
+    // }
 }
