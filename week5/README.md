@@ -30,4 +30,4 @@ With MythX it is harder to give a fair assessment, as I have only used it once. 
 
 ## Markdown Document 2 - Mutation Testing the NFT Staking System
 
-- [Markdown Document 2](./mythx.md)
+- [Markdown Document 2](./vertigo.md)
