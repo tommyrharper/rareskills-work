@@ -250,4 +250,13 @@ contract RoyaltyNFTTest is TestHelpers {
         vm.expectRevert();
         nftStaking.unstake(4);
     }
+
+    function test_Cannot_Stake_Via_Calling_onERC721Received() public {
+        vm.prank(user1);
+        royalty.purchase{value: 10 ether}();
+
+        vm.prank(user1);
+        vm.expectRevert("Only RoyaltyNFT can stake.");
+        nftStaking.onERC721Received(address(0), user1, 4, "");
+    }
 }
