@@ -106,6 +106,44 @@ contract RoyaltyNFTTest is TestHelpers {
         nftRewards.mint(address(this), 1);
     }
 
+    function test_transferOwnership_onlyOwner() public {
+        vm.prank(user1);
+        vm.expectRevert("Ownable: caller is not the owner");
+        royalty.transferOwnership(user1);
+    }
+
+    function test_renounceOwnership_onlyOwner() public {
+        vm.prank(user1);
+        vm.expectRevert("Ownable: caller is not the owner");
+        royalty.renounceOwnership();
+    }
+
+    function test_transferOwnership() public {
+        assertEq(royalty.pendingOwner(), address(0));
+        assertEq(royalty.owner(), address(this));
+
+        royalty.transferOwnership(user1);
+
+        assertEq(royalty.pendingOwner(), user1);
+        assertEq(royalty.owner(), address(this));
+
+        vm.prank(user1);
+        royalty.acceptOwnership();
+
+        assertEq(royalty.pendingOwner(), address(0));
+        assertEq(royalty.owner(), user1);
+    }
+
+    function test_renounceOwnership() public {
+        assertEq(royalty.pendingOwner(), address(0));
+        assertEq(royalty.owner(), address(this));
+
+        royalty.renounceOwnership();
+
+        assertEq(royalty.pendingOwner(), address(0));
+        assertEq(royalty.owner(), address(0));
+    }
+
     /*//////////////////////////////////////////////////////////////
                             IS CLAIMED TEST
     //////////////////////////////////////////////////////////////*/
@@ -128,6 +166,9 @@ contract RoyaltyNFTTest is TestHelpers {
         bytes32[] memory proof = tree.getProof(leaves, 0);
         vm.prank(user1);
         royalty.purchaseWithDiscount{value: 1 ether}(0, proof);
+
+        assertEq(royalty.ownerOf(0), user1);
+        assertEq(royalty.balanceOf(user1), 1);
     }
 
     function test_Merkle_Multiple_Users() public {
@@ -210,6 +251,15 @@ contract RoyaltyNFTTest is TestHelpers {
         royalty.purchase{value: 10 ether}();
         royalty.withdrawFunds(user5);
         assertEq(user5.balance, 10 ether);
+    }
+
+    function test_Reclaim_Funds_Only_Owner() public {
+        vm.prank(user1);
+        royalty.purchase{value: 10 ether}();
+
+        vm.prank(user1);
+        vm.expectRevert("Ownable: caller is not the owner");
+        royalty.withdrawFunds(user5);
     }
 
     function test_Reclaim_Funds_Reverts_On_Failure() public {
