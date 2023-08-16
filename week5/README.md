@@ -4,11 +4,11 @@
 
 ### Markdown document 1.1 - Run Slither on a Codebase
 
-- [Exercise 1.1](./slither.md)
+- [Markdown Document 1.1](./slither.md)
 
 ### Markdown document 1.2 - Run MythX on a Codebase
 
-- [Exercise1.2](./mythx.md)
+- [Markdown Document 1.2](./mythx.md)
 
 ### Notes
 
@@ -28,13 +28,6 @@ Perhaps if I used slither earlier in the process, it might be more useful. For m
 
 With MythX it is harder to give a fair assessment, as I have only used it once. However in this instance it didn't find anything useful.
 
-## Mutation Testing NFT Staking System
+## Markdown Document 2 - Mutation Testing the NFT Staking System
 
-Smart contracts I am testing:
-- [NFTStaking](../week2/src/trio/NFTStaking.sol)
-- [RoyaltyNFT](../week2/src/trio/RoyaltyNFT.sol)
-- [NFTRewards](../week2/src/trio/NFTRewards.sol)
-
-I have ensured the tests for these contracts have 100% line and branch coverage.
-
-
+- [Markdown Document 2](./mythx.md)
