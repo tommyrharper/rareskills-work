@@ -27,3 +27,14 @@ I think this reflects my approach to smart contract development - I am reasonabl
 Perhaps if I used slither earlier in the process, it might be more useful. For me it is just a sanity check, and hasn't been a massively useful tool.
 
 With MythX it is harder to give a fair assessment, as I have only used it once. However in this instance it didn't find anything useful.
+
+## Mutation Testing NFT Staking System
+
+Smart contracts I am testing:
+- [NFTStaking](../week2/src/trio/NFTStaking.sol)
+- [RoyaltyNFT](../week2/src/trio/RoyaltyNFT.sol)
+- [NFTRewards](../week2/src/trio/NFTRewards.sol)
+
+I have ensured the tests for these contracts have 100% line and branch coverage.
+
+
