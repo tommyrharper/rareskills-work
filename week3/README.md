@@ -17,7 +17,7 @@ Your unit tests should cover the following cases:
 - [x] Taking a flashloan
 
 Corner cases to watch out for:
-- [ ] What considerations do you need in your fixed point library? How much of a token with 18 decimals can your contract store?
+- [x] What considerations do you need in your fixed point library? How much of a token with 18 decimals can your contract store?
 
 ## Max Deposit
 
