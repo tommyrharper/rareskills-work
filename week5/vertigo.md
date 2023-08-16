@@ -134,4 +134,4 @@ That might mean isolating smaller parts of the codebase and testing just those i
 
 One other thing to note is that I didn't put much work into thoroughly testing the NFT Staking system, whereas at work, as real money is on the line, there is much more thorough testing done, so it would be interesting to see if it still produces useful results on a more thoroughly tested codebase.
 
-Either way, I am very impressed by mutation testing amd vertigo-rs, and think this is a very valuable approach to use.
+Either way, I am very impressed by mutation testing amd `vertigo-rs`, and think this is a very valuable approach to use.
