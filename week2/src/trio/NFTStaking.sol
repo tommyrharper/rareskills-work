@@ -25,7 +25,6 @@ contract NFTStaking is IERC721Receiver {
             "Only owner can claim rewards."
         );
         uint256 stakedAt_ = stakedAt[tokenId];
-        require(stakedAt_ > 0, "Token not staked.");
         uint256 rewards = ((block.timestamp - stakedAt_) * 10 ether) / 1 days;
         stakedAt[tokenId] = block.timestamp;
         nftRewards.mint(msg.sender, rewards);
