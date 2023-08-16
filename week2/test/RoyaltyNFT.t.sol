@@ -74,6 +74,14 @@ contract RoyaltyNFTTest is TestHelpers {
         }
     }
 
+    function test_setNFTStaking() public {
+        assertEq(address(nftRewards.nftStaking()), address(nftStaking));
+
+        nftRewards.setNFTStaking(address(0xF));
+
+        assertEq(address(nftRewards.nftStaking()), address(0xF));
+    }
+
     /*//////////////////////////////////////////////////////////////
                             IS CLAIMED TEST
     //////////////////////////////////////////////////////////////*/
