@@ -75,6 +75,20 @@ contract RoyaltyNFTTest is TestHelpers {
     }
 
     /*//////////////////////////////////////////////////////////////
+                            IS CLAIMED TEST
+    //////////////////////////////////////////////////////////////*/
+
+    function test_isClaimed() public {
+        assertEq(royalty.isClaimed(0), false);
+
+        bytes32[] memory proof = tree.getProof(leaves, 0);
+        vm.prank(user1);
+        royalty.purchaseWithDiscount{value: 1 ether}(0, proof);
+
+        assertEq(royalty.isClaimed(0), true);
+    }
+
+    /*//////////////////////////////////////////////////////////////
                               MERKLE TESTS
     //////////////////////////////////////////////////////////////*/
 
