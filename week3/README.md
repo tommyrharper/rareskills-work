@@ -4,7 +4,7 @@
 
 The following changes must be made:
 - [x] You must use solidity 0.8.0 or higher, don’t use SafeMath
-- [ ] Use an existing fixed point library, but don’t use the Uniswap one.
+- [x] Use an existing fixed point library, but don’t use the Uniswap one.
 - [x] Use Openzeppelin’s or Solmate’s safeTransfer instead of building it from scratch like Unisawp does
 - [x] Instead of implementing a flash swap the way Uniswap does, use EIP 3156. **Be very careful at which point you update the reserves!**
 
