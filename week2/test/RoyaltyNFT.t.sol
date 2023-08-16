@@ -180,6 +180,14 @@ contract RoyaltyNFTTest is TestHelpers {
         assertEq(user5.balance, 10 ether);
     }
 
+    function test_Reclaim_Funds_Reverts_On_Failure() public {
+        vm.prank(user1);
+        royalty.purchase{value: 10 ether}();
+
+        vm.expectRevert("Transfer failed.");
+        royalty.withdrawFunds(address(this));
+    }
+
     /*//////////////////////////////////////////////////////////////
                              STAKING TESTS
     //////////////////////////////////////////////////////////////*/
