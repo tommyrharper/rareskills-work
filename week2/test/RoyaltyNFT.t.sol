@@ -82,6 +82,30 @@ contract RoyaltyNFTTest is TestHelpers {
         assertEq(address(nftRewards.nftStaking()), address(0xF));
     }
 
+    function test_Cannot_Create_RoyaltyNFT_With_21_Reserved_Tokens() public {
+        // doesn't revert
+        new RoyaltyNFT("", 20);
+
+        // does revert
+        vm.expectRevert();
+        new RoyaltyNFT("", 21);
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                             ACCESS CONTROL
+    //////////////////////////////////////////////////////////////*/
+
+    function test_setNFTStaking_onlyOwner() public {
+        vm.prank(user1);
+        vm.expectRevert("Ownable: caller is not the owner");
+        nftRewards.setNFTStaking(address(0xF));
+    }
+
+    function test_mint_onlyNFTStaking() public {
+        vm.expectRevert("Only NFTStaking can mint.");
+        nftRewards.mint(address(this), 1);
+    }
+
     /*//////////////////////////////////////////////////////////////
                             IS CLAIMED TEST
     //////////////////////////////////////////////////////////////*/

@@ -23,7 +23,7 @@ contract RoyaltyNFT is ERC721Royalty, Ownable2Step {
         uint256 _reservedTokens
     ) ERC721("RoyaltyNFT", "RNFT") Ownable2Step() {
         merkleRoot = _merkleRoot;
-        assert(_reservedTokens < 20);
+        assert(_reservedTokens <= 20);
         reservedTokens = _reservedTokens;
         maxPublicMint = 20 - _reservedTokens;
         _setDefaultRoyalty(msg.sender, 250);
