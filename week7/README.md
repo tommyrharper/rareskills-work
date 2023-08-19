@@ -15,7 +15,7 @@
 
 - [x]  [Capture the Ether Token Sale (this one is more challenging)](https://github.com/tommyrharper/capture-the-ether-foundry/blob/master/TokenSale/src/TokenSale.sol)
 - [x]  [Capture the Ether Retirement fund](https://github.com/tommyrharper/capture-the-ether-foundry/blob/master/RetirementFund/src/RetirementFund.sol)
-- [ ]  Damn Vulnerable Defi #4 Side Entrance (Most vulnerabilities are application specific)
+- [x]  [Damn Vulnerable Defi #4 Side Entrance (Most vulnerabilities are application specific)](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/contracts/side-entrance/SideEntranceLenderPool.sol)
 - [ ]  Damn Vulnerable Defi #1 Unstoppable (this is challenging)
 - [ ]  Ethernaut #20 Denial
 - [ ]  Ethernaut #15 Naught Coin
