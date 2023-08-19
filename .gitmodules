@@ -31,3 +31,6 @@
 [submodule "week7/ethernaut-20-denial/lib/forge-std"]
 	path = week7/ethernaut-20-denial/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "week7/ethernaut-15-naught-coin/lib/forge-std"]
+	path = week7/ethernaut-15-naught-coin/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
