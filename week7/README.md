@@ -24,6 +24,15 @@
   - [Solution in tests - no attacking contract needed](./ethernaut-15-naught-coin/test/NaughtCoin.t.sol)
   - [Link to instructions](https://ethernaut.openzeppelin.com/level/15)
 
+## Week 9
+
+- [x]  [RareSkills Riddles: Forwarder (abi encoding)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/Forwarder.sol)
+  - [Solution in tests - no attacking contract needed](https://github.com/tommyrharper/solidity-riddles/blob/main/test/Forwarder.js)
+- [ ]  Damn Vulnerable Defi #3 Truster (this is challenging)
+- [ ]  RareSkills Riddles: Overmint3 (Double voting or msg.sender spoofing)
+- [ ]  RareSkills Riddles: Democracy (Double voting or msg.sender spoofing)
+- [ ]  Ethernaut #13 Gatekeeper 1
+
 ### Questions
 
 #### Damn Vulnerable Defi #1 Unstoppable
