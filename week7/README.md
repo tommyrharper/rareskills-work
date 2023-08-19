@@ -7,5 +7,5 @@
 - [x]  [Capture the Ether predict the future](https://github.com/tommyrharper/capture-the-ether-foundry/blob/master/PredictTheFuture/src/PredictTheFuture.sol)
 - [x]  [RareSkills Riddles: ERC1155](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/attackers/Overmint1_ERC1155_Attacker.sol)
 - [x]  [Capture the Ether Token Bank](https://github.com/tommyrharper/capture-the-ether-foundry/blob/master/TokenBank/src/TokenBank.sol)
-- [ ]  Capture the Ether Predict the block hash
+- [x]  [Capture the Ether Predict the block hash](https://github.com/tommyrharper/capture-the-ether-foundry/blob/master/PredictTheBlockhash/src/PredictTheBlockhash.sol)
 - [ ]  Capture the Ether Token Whale Challenge
