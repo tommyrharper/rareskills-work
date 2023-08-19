@@ -20,7 +20,8 @@
   - [Solution in tests - no attacking contract needed](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/test/unstoppable/unstoppable.challenge.js)
 - [x]  [Ethernaut #20 Denial](./ethernaut-20-denial/src/Denial.sol)
   - [Link to instructions](https://ethernaut.openzeppelin.com/level/20)
-- [ ]  Ethernaut #15 Naught Coin
+- [x]  [Ethernaut #15 Naught Coin](./ethernaut-15-naught-coin/src/NaughtCoin.sol)
+  - [Solution in tests - no attacking contract needed](./ethernaut-15-naught-coin/test/NaughtCoin.t.sol)
   - [Link to instructions](https://ethernaut.openzeppelin.com/level/15)
 
 ### Questions
