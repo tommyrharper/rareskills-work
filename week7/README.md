@@ -57,5 +57,6 @@
 
 #### RareSkills Riddles: Overmint3 (Double voting or msg.sender spoofing)
 
-- Is this really what I was supposed to do? Seems to easy
+- Is this really what I was supposed to do (just buy from a bunch of addresses and transfer)? Seems to easy.
+  - There is reentrancy if the `require(!msg.sender.isContract(), "no contracts");` check can be bypassed, is this possible? - I tried using the constructor, but then `IERC721Receiver` couldn't be invoked.
   - [See the code here](https://github.com/tommyrharper/solidity-riddles/blob/main/test/Overmint3.js)
