@@ -19,8 +19,9 @@
 - [x]  [Damn Vulnerable Defi #1 Unstoppable (this is challenging)](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/contracts/unstoppable/UnstoppableVault.sol)
   - [Solution in tests - no attacking contract needed](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/test/unstoppable/unstoppable.challenge.js)
 - [x]  [Ethernaut #20 Denial](./ethernaut-20-denial/src/Denial.sol)
+  - [Link to instructions](https://ethernaut.openzeppelin.com/level/20)
 - [ ]  Ethernaut #15 Naught Coin
-
+  - [Link to instructions](https://ethernaut.openzeppelin.com/level/15)
 
 ### Questions
 

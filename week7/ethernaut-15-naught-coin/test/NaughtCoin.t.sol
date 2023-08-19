@@ -11,5 +11,15 @@ contract NaughtCoinTest is Test {
         naughtCoin = new NaughtCoin(address(this));
     }
 
-    function testIncrement() public {}
+    function testSpendTokens() public {
+        address buddy = address(0x1);
+        naughtCoin.approve(buddy, type(uint256).max);
+
+        uint256 allTokens = naughtCoin.totalSupply();
+
+        vm.prank(buddy);
+        naughtCoin.transferFrom(address(this), buddy, allTokens);
+
+        assertEq(naughtCoin.balanceOf(address(this)), 0);
+    }
 }

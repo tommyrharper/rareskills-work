@@ -4,6 +4,8 @@ pragma solidity ^0.8.13;
 import {Test, console2} from "forge-std/Test.sol";
 import {Denial, DenialAttacker} from "../src/Denial.sol";
 
+// https://ethernaut.openzeppelin.com/level/20
+
 contract DenialTest is Test {
     Denial public denial;
     address owner = address(0x1);
