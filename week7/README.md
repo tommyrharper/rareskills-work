@@ -18,7 +18,7 @@
 - [x]  [Damn Vulnerable Defi #4 Side Entrance (Most vulnerabilities are application specific)](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/contracts/side-entrance/SideEntranceLenderPool.sol)
 - [x]  [Damn Vulnerable Defi #1 Unstoppable (this is challenging)](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/contracts/unstoppable/UnstoppableVault.sol)
   - [Solution in tests - no attacking contract needed](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/test/unstoppable/unstoppable.challenge.js)
-- [ ]  Ethernaut #20 Denial
+- [x]  [Ethernaut #20 Denial](./ethernaut-20-denial/src/Denial.sol)
 - [ ]  Ethernaut #15 Naught Coin
 
 
