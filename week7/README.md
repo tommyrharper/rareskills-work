@@ -28,7 +28,8 @@
 
 - [x]  [RareSkills Riddles: Forwarder (abi encoding)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/Forwarder.sol)
   - [Solution in tests - no attacking contract needed](https://github.com/tommyrharper/solidity-riddles/blob/main/test/Forwarder.js)
-- [ ]  Damn Vulnerable Defi #3 Truster (this is challenging)
+- [x]  [Damn Vulnerable Defi #3 Truster (this is challenging)](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/contracts/truster/TrusterLenderPool.sol)
+  - [Solution in tests - no attacking contract needed](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/test/truster/truster.challenge.js)
 - [ ]  RareSkills Riddles: Overmint3 (Double voting or msg.sender spoofing)
 - [ ]  RareSkills Riddles: Democracy (Double voting or msg.sender spoofing)
 - [ ]  Ethernaut #13 Gatekeeper 1
