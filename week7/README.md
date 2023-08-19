@@ -13,3 +13,9 @@
 
 ## Week 8
 
+- [x]  [Capture the Ether Token Sale (this one is more challenging)](https://github.com/tommyrharper/capture-the-ether-foundry/blob/master/TokenSale/src/TokenSale.sol)
+- [ ]  Capture the Ether Retirement fund
+- [ ]  Damn Vulnerable Defi #4 Side Entrance (Most vulnerabilities are application specific)
+- [ ]  Damn Vulnerable Defi #1 Unstoppable (this is challenging)
+- [ ]  Ethernaut #20 Denial
+- [ ]  Ethernaut #15 Naught Coin
