@@ -32,12 +32,12 @@
   - [Solution in tests - no attacking contract needed](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/test/truster/truster.challenge.js)
 - [x]  [RareSkills Riddles: Overmint3 (Double voting or msg.sender spoofing)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/Overmint3.sol)
   - [Solution in tests - no attacking contract needed](https://github.com/tommyrharper/solidity-riddles/blob/main/test/Overmint3.js)
-- [ ]  RareSkills Riddles: Democracy (Double voting or msg.sender spoofing)
+- [x]  [RareSkills Riddles: Democracy (Double voting or msg.sender spoofing)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/Democracy.sol)
 - [ ]  Ethernaut #13 Gatekeeper 1
 
-### Questions
+## Questions
 
-#### Damn Vulnerable Defi #1 Unstoppable
+### Damn Vulnerable Defi #1 Unstoppable
 
 - What is the assembly doing here? It doesn't make much sense to me.
   - [See the code here](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/contracts/unstoppable/UnstoppableVault.sol)
@@ -55,8 +55,15 @@
     }
 ```
 
-#### RareSkills Riddles: Overmint3 (Double voting or msg.sender spoofing)
+### RareSkills Riddles: Overmint3 (Double voting or msg.sender spoofing)
 
 - Is this really what I was supposed to do (just buy from a bunch of addresses and transfer)? Seems to easy.
   - There is reentrancy if the `require(!msg.sender.isContract(), "no contracts");` check can be bypassed, is this possible? - I tried using the constructor, but then `IERC721Receiver` couldn't be invoked.
   - [See the code here](https://github.com/tommyrharper/solidity-riddles/blob/main/test/Overmint3.js)
+
+### RareSkills Riddles: Democracy (Double voting or msg.sender spoofing)
+
+- Not sure if I over complicated this one:
+  - I had a contract that produces replicas of itself in the `receive` function
+  - [See the code here](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/Democracy.sol)
+  - Also why doesn't `await victimContract.connect(attackerWallet).safeTransferFrom(attackerWallet.address, attackerContract.address, 0);` in [the tests](https://github.com/tommyrharper/solidity-riddles/blob/main/test/Democracy.js).
