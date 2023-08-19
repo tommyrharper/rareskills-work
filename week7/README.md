@@ -33,7 +33,7 @@
 - [x]  [RareSkills Riddles: Overmint3 (Double voting or msg.sender spoofing)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/Overmint3.sol)
   - [Solution in tests - no attacking contract needed](https://github.com/tommyrharper/solidity-riddles/blob/main/test/Overmint3.js)
 - [x]  [RareSkills Riddles: Democracy (Double voting or msg.sender spoofing)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/Democracy.sol)
-- [ ]  Ethernaut #13 Gatekeeper 1
+- [x]  [Ethernaut #13 Gatekeeper 1](./ethernaut-13-gatekeeper/src/GatekeeperOne.sol)
 
 ## Questions
 
@@ -67,3 +67,9 @@
   - I had a contract that produces replicas of itself in the `receive` function
   - [See the code here](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/Democracy.sol)
   - Also why doesn't `await victimContract.connect(attackerWallet).safeTransferFrom(attackerWallet.address, attackerContract.address, 0);` in [the tests](https://github.com/tommyrharper/solidity-riddles/blob/main/test/Democracy.js).
+
+### Ethernaut #13 Gatekeeper 1
+
+- In terms of the gas calculation I used some trial and error
+  - How would I calculate it precisely?
+  - [See the code here](./ethernaut-13-gatekeeper/src/GatekeeperOne.sol)
