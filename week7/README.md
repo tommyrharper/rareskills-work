@@ -30,7 +30,8 @@
   - [Solution in tests - no attacking contract needed](https://github.com/tommyrharper/solidity-riddles/blob/main/test/Forwarder.js)
 - [x]  [Damn Vulnerable Defi #3 Truster (this is challenging)](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/contracts/truster/TrusterLenderPool.sol)
   - [Solution in tests - no attacking contract needed](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/test/truster/truster.challenge.js)
-- [ ]  RareSkills Riddles: Overmint3 (Double voting or msg.sender spoofing)
+- [x]  [RareSkills Riddles: Overmint3 (Double voting or msg.sender spoofing)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/Overmint3.sol)
+  - [Solution in tests - no attacking contract needed](https://github.com/tommyrharper/solidity-riddles/blob/main/test/Overmint3.js)
 - [ ]  RareSkills Riddles: Democracy (Double voting or msg.sender spoofing)
 - [ ]  Ethernaut #13 Gatekeeper 1
 
@@ -53,3 +54,8 @@
         return asset.balanceOf(address(this));
     }
 ```
+
+#### RareSkills Riddles: Overmint3 (Double voting or msg.sender spoofing)
+
+- Is this really what I was supposed to do? Seems to easy
+  - [See the code here](https://github.com/tommyrharper/solidity-riddles/blob/main/test/Overmint3.js)
