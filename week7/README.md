@@ -35,6 +35,17 @@
 - [x]  [RareSkills Riddles: Democracy (Double voting or msg.sender spoofing)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/Democracy.sol)
 - [x]  [Ethernaut #13 Gatekeeper 1](./ethernaut-13-gatekeeper/src/GatekeeperOne.sol)
 
+## Week 10
+
+- [x]  [RareSkills Riddles: Delete user (understanding storage pointers)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/DeleteUser.sol)
+- [ ]  RareSkills Riddles: Viceroy (understanding the delete keyword)
+- [ ]  Ethernaut #23 Dex2 (access control / input validation)
+- [ ]  Damn Vulnerable DeFi #2 Naive Receiver (access control / input validation)
+- [ ]  RareSkills Riddles: RewardToken (cross function reentrancy)
+- [ ]  RareSkills Riddles: Read-only reentrancy (read-only reentrancy)
+- [ ]  Damn Vulnerable DeFi #5 (flash loan attack)
+- [ ]  Damn Vulnerable DeFi #6 (flash loan attack)
+
 ## Questions
 
 ### Damn Vulnerable Defi #1 Unstoppable
