@@ -39,7 +39,8 @@
 
 - [x]  [RareSkills Riddles: Delete user (understanding storage pointers)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/DeleteUser.sol)
 - [x]  [RareSkills Riddles: Viceroy (understanding the delete keyword)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/Viceroy.sol)
-- [ ]  Ethernaut #23 Dex2 (access control / input validation)
+- [x]  [Ethernaut #23 Dex2 (access control / input validation)](./ethernaut-23-dex2/src/DexTwo.sol)
+  - [Solution in tests](./ethernaut-23-dex2/test/DexTwo.t.sol)
 - [ ]  Damn Vulnerable DeFi #2 Naive Receiver (access control / input validation)
 - [ ]  RareSkills Riddles: RewardToken (cross function reentrancy)
 - [ ]  RareSkills Riddles: Read-only reentrancy (read-only reentrancy)
