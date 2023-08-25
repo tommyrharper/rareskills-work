@@ -34,16 +34,22 @@ contract DexTwoTest is Test {
 
         dex.setTokens(address(token1), address(token2));
 
+        token1.transfer(address(dex), 100);
+        token2.transfer(address(dex), 100);
         token1.transfer(address(this), 10);
         token2.transfer(address(this), 10);
 
-        assert(token2.balanceOf(owner) == 100);
-        assert(token1.balanceOf(owner) == 100);
-        assert(token2.balanceOf(address(this)) == 10);
+        assert(token1.balanceOf(owner) == 0);
+        assert(token2.balanceOf(owner) == 0);
+        assert(token1.balanceOf(address(dex)) == 100);
+        assert(token2.balanceOf(address(dex)) == 100);
         assert(token1.balanceOf(address(this)) == 10);
+        assert(token2.balanceOf(address(this)) == 10);
 
         vm.stopPrank();
     }
 
-    function test_Attack_Dex() public {}
+    function test_Attack_Dex() public {
+        dex.approve(address(this), type(uint256).max);
+    }
 }
