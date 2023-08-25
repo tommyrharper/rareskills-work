@@ -38,7 +38,7 @@
 ## Week 10
 
 - [x]  [RareSkills Riddles: Delete user (understanding storage pointers)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/DeleteUser.sol)
-- [ ]  RareSkills Riddles: Viceroy (understanding the delete keyword)
+- [x]  [RareSkills Riddles: Viceroy (understanding the delete keyword)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/Viceroy.sol)
 - [ ]  Ethernaut #23 Dex2 (access control / input validation)
 - [ ]  Damn Vulnerable DeFi #2 Naive Receiver (access control / input validation)
 - [ ]  RareSkills Riddles: RewardToken (cross function reentrancy)
