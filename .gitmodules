@@ -40,3 +40,6 @@
 [submodule "week7/ethernaut-13-gatekeeper/lib/forge-std"]
 	path = week7/ethernaut-13-gatekeeper/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "week7/ethernaut-23-dex2/lib/forge-std"]
+	path = week7/ethernaut-23-dex2/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
