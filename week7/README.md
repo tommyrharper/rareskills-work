@@ -43,7 +43,7 @@
   - [Solution in tests](./ethernaut-23-dex2/test/DexTwo.t.sol)
 - [x]  [Damn Vulnerable DeFi #2 Naive Receiver (access control / input validation)](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/contracts/naive-receiver/NaiveReceiverLenderPool.sol)
 - [x]  [RareSkills Riddles: RewardToken (cross function reentrancy)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/RewardToken.sol)
-- [ ]  RareSkills Riddles: Read-only reentrancy (read-only reentrancy)
+- [x]  [RareSkills Riddles: Read-only reentrancy (read-only reentrancy)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/ReadOnly.sol)
 - [ ]  Damn Vulnerable DeFi #5 (flash loan attack)
 - [ ]  Damn Vulnerable DeFi #6 (flash loan attack)
 
