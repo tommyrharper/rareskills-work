@@ -45,7 +45,7 @@
 - [x]  [RareSkills Riddles: RewardToken (cross function reentrancy)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/RewardToken.sol)
 - [x]  [RareSkills Riddles: Read-only reentrancy (read-only reentrancy)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/ReadOnly.sol)
 - [x]  [Damn Vulnerable DeFi #5 (flash loan attack)](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/contracts/the-rewarder/TheRewarderPool.sol)
-- [ ]  Damn Vulnerable DeFi #6 (flash loan attack)
+- [x]  [Damn Vulnerable DeFi #6 (flash loan attack)](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/contracts/selfie/SelfiePool.sol)
 
 ## Questions
 
