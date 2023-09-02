@@ -41,7 +41,7 @@
 - [x]  [RareSkills Riddles: Viceroy (understanding the delete keyword)](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/Viceroy.sol)
 - [x]  [Ethernaut #23 Dex2 (access control / input validation)](./ethernaut-23-dex2/src/DexTwo.sol)
   - [Solution in tests](./ethernaut-23-dex2/test/DexTwo.t.sol)
-- [ ]  Damn Vulnerable DeFi #2 Naive Receiver (access control / input validation)
+- [x]  [Damn Vulnerable DeFi #2 Naive Receiver (access control / input validation)](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/contracts/naive-receiver/NaiveReceiverLenderPool.sol)
 - [ ]  RareSkills Riddles: RewardToken (cross function reentrancy)
 - [ ]  RareSkills Riddles: Read-only reentrancy (read-only reentrancy)
 - [ ]  Damn Vulnerable DeFi #5 (flash loan attack)
