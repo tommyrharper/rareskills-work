@@ -20,5 +20,6 @@
 
 https://github.com/RareSkills/gas-puzzles
 
-- [ ]  Array Sum
+- [x]  Array Sum
+  - [Solution here](https://github.com/tommyrharper/gas-puzzles/blob/main/contracts/ArraySum.sol)
 - [ ]  Require
