@@ -28,5 +28,4 @@ https://github.com/RareSkills/gas-puzzles
 
 ## Questions 
 
-- [ ] In `Array Sum` why does caching the length before the loop increase gas consumption?
 - [ ] In `Require` why does using `<=` reduce gas consumption over using `<`?
