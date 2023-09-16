@@ -13,7 +13,8 @@
 - [x]  Ethernaut 13 - Gatekeeper one
   - Did this one in the previous weeks:
   - [See the code here](../week7/ethernaut-13-gatekeeper/src/GatekeeperOne.sol)
-- [ ]  Ethernaut 18 - Magic Number
+- [x]  Ethernaut 18 - Magic Number
+  - See notes here: [Magic Number](./magic-number.md)
 
 ## Gas puzzles (suggested 1 day)
 
