@@ -9,7 +9,10 @@
 
 - [x]  Ethernaut 12 - Privacy
   - The trick here is reading private storage - I have left myself [a guide here](./reading-private-storage.md) for future reference.
-- [ ]  Ethernaut 13 - Gatekeeper one
+  - https://ethernaut.openzeppelin.com/level/0xcAac6e4994c2e21C5370528221c226D1076CfDAB
+- [x]  Ethernaut 13 - Gatekeeper one
+  - Did this one in the previous weeks:
+  - [See the code here](../week7/ethernaut-13-gatekeeper/src/GatekeeperOne.sol)
 - [ ]  Ethernaut 18 - Magic Number
 
 ## Gas puzzles (suggested 1 day)
