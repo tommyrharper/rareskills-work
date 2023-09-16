@@ -22,4 +22,11 @@ https://github.com/RareSkills/gas-puzzles
 
 - [x]  Array Sum
   - [Solution here](https://github.com/tommyrharper/gas-puzzles/blob/main/contracts/ArraySum.sol)
-- [ ]  Require
+- [x]  Require
+  - [Solution here](https://github.com/tommyrharper/gas-puzzles/blob/main/contracts/Require.sol)
+
+
+## Questions 
+
+- [ ] In `Array Sum` why does caching the length before the loop increase gas consumption?
+- [ ] In `Require` why does using `<=` reduce gas consumption over using `<`?
