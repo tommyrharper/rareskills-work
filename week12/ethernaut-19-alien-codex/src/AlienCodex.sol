@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.5.0;
 
-import "../helpers/Ownable-05.sol";
+import "./Ownable-05.sol";
 
 contract AlienCodex is Ownable {
     bool public contact;
@@ -12,19 +12,19 @@ contract AlienCodex is Ownable {
         _;
     }
 
-    function makeContact() public {
+    function makeContact() internal {
         contact = true;
     }
 
-    function record(bytes32 _content) public contacted {
+    function record(bytes32 _content) internal contacted {
         codex.push(_content);
     }
 
-    function retract() public contacted {
+    function retract() internal contacted {
         codex.length--;
     }
 
-    function revise(uint i, bytes32 _content) public contacted {
+    function revise(uint i, bytes32 _content) internal contacted {
         codex[i] = _content;
     }
 }
