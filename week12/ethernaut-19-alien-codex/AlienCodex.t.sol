@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.5.0;
 
-import "../src/AlienCodex.sol";
+import "./AlienCodex.sol";
 
 /// @dev Run the template with
 ///      ```
 ///      solc-select use 0.5.0
-///      echidna ./test/AlienCodexTest.sol --contract AlienCodexTest
+///      echidna ./week12/ethernaut-19-alien-codex/AlienCodex.t.sol --contract AlienCodexTest --config ./week12/ethernaut-19-alien-codex/config.yaml
 ///      ```
 contract AlienCodexTest is AlienCodex {
     address attackerAddress;
