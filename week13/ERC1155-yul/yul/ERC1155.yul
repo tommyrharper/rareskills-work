@@ -53,7 +53,7 @@ object "ERC1155" {
         function balanceOf(account, id) -> b {
           mstore(0, account)
           mstore(1, id)
-          b := sload(keccak256(0, 64))
+          b := sload(keccak256(0, 0x40))
         }
 
         /*//////////////////////////////////////////////////////////////
