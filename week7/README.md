@@ -51,7 +51,7 @@
 
 ### Damn Vulnerable Defi #1 Unstoppable
 
-- What is the assembly doing here? It doesn't make much sense to me.
+- [x] What is the assembly doing here? It doesn't make much sense to me.
   - [See the code here](https://github.com/tommyrharper/damn-vulnerable-defi/blob/master/contracts/unstoppable/UnstoppableVault.sol)
   - I thought perhaps it is an assembly `nonReentrant` modifier, but storage slot zero seems to refer to `string public name` for the `ERC20` inherited by `ERC4626`.
 
@@ -69,19 +69,20 @@
 
 ### RareSkills Riddles: Overmint3 (Double voting or msg.sender spoofing)
 
-- Is this really what I was supposed to do (just buy from a bunch of addresses and transfer)? Seems to easy.
+- [x] Is this really what I was supposed to do (just buy from a bunch of addresses and transfer)? Seems to easy.
   - There is reentrancy if the `require(!msg.sender.isContract(), "no contracts");` check can be bypassed, is this possible? - I tried using the constructor, but then `IERC721Receiver` couldn't be invoked.
   - [See the code here](https://github.com/tommyrharper/solidity-riddles/blob/main/test/Overmint3.js)
 
 ### RareSkills Riddles: Democracy (Double voting or msg.sender spoofing)
 
-- Not sure if I over complicated this one:
+- [x] Not sure if I over complicated this one:
   - I had a contract that produces replicas of itself in the `receive` function
   - [See the code here](https://github.com/tommyrharper/solidity-riddles/blob/main/contracts/Democracy.sol)
   - Also why doesn't `await victimContract.connect(attackerWallet).safeTransferFrom(attackerWallet.address, attackerContract.address, 0);` in [the tests](https://github.com/tommyrharper/solidity-riddles/blob/main/test/Democracy.js).
 
 ### Ethernaut #13 Gatekeeper 1
 
-- In terms of the gas calculation I used some trial and error
+- [x] In terms of the gas calculation I used some trial and error
   - How would I calculate it precisely?
   - [See the code here](./ethernaut-13-gatekeeper/src/GatekeeperOne.sol)
+  - [ ] What I did was okay - but try using a debugger/etherscan
