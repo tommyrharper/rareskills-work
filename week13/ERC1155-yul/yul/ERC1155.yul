@@ -15,16 +15,21 @@ object "ERC1155" {
       code {
         switch getSelector()
         case 0x731133e9 /* mint(address,uint256,uint256,bytes) */ {
-
+          mint(decodeAddress(0), decodeUint(1), decodeUint(2))
         }
         case 0x00fdd58e /* "balanceOf(address,uint256)" */ {
-          let account := decodeAddress(0)
-          let id := decodeUint(1)
-
           returnUint(balanceOf(decodeAddress(0), decodeUint(1)))
         }
         default {
           revert(0, 0)
+        }
+
+        /*//////////////////////////////////////////////////////////////
+                              MUTATIVE FUNCTIONS
+        //////////////////////////////////////////////////////////////*/
+
+        function mint(account, id, amount) {
+
         }
 
         /*//////////////////////////////////////////////////////////////
