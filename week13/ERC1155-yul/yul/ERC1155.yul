@@ -29,7 +29,10 @@ object "ERC1155" {
         //////////////////////////////////////////////////////////////*/
 
         function mint(account, id, amount) {
-
+          mstore(0, account)
+          mstore(1, id)
+          // storageLocation := keccak256(0, 64)
+          // sstore(storageLocation, amount)
         }
 
         /*//////////////////////////////////////////////////////////////
