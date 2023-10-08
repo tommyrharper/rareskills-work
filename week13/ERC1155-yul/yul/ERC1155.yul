@@ -15,7 +15,7 @@ object "ERC1155" {
       code {
         switch getSelector()
         case 0x731133e9 /* mint(address,uint256,uint256,bytes) */ {
-          mint(decodeAddress(0), decodeUint(1), decodeUint(2))
+          _mint(decodeAddress(0), decodeUint(1), decodeUint(2))
         }
         case 0x00fdd58e /* "balanceOf(address,uint256)" */ {
           returnUint(balanceOf(decodeAddress(0), decodeUint(1)))
@@ -28,11 +28,17 @@ object "ERC1155" {
                               MUTATIVE FUNCTIONS
         //////////////////////////////////////////////////////////////*/
 
-        function mint(account, id, amount) {
+        function _mint(account, id, amount) {
           mstore(0, account)
           mstore(1, id)
-          // storageLocation := keccak256(0, 64)
-          // sstore(storageLocation, amount)
+          let storageLocation := keccak256(0, 64)
+          sstore(storageLocation, amount)
+        }
+
+        function balanceStorageOffset(account, id) -> offset {
+          mstore(0, id)
+          mstore(0x20, account)
+          offset := keccak256(0, 0x40)
         }
 
         /*//////////////////////////////////////////////////////////////
