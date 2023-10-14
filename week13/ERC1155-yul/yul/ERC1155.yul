@@ -22,7 +22,7 @@ object "ERC1155" {
       // 0x60 - 0x7f (32 bytes): zero slot
 
       code {
-        mstore(0x40, 0x80)
+        initializeFreeMemoryPointer()
 
         switch getSelector()
         case 0x731133e9 /* mint(address,uint256,uint256,bytes) */ {
@@ -125,6 +125,10 @@ object "ERC1155" {
 
         function setFreeMemoryPointer(newPos) {
           mstore(0x40, newPos)
+        }
+
+        function initializeFreeMemoryPointer() {
+          mstore(0x40, 0x80)
         }
       }
     }
