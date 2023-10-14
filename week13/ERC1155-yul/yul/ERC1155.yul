@@ -40,9 +40,10 @@ object "ERC1155" {
         //////////////////////////////////////////////////////////////*/
 
         function _mint(account, id, amount) {
-          mstore(0, account)
-          mstore(1, id)
-          let storageLocation := keccak256(0, 0x40)
+          let offset := getFreeMemoryPointer()
+          storeInMemory(account)
+          storeInMemory(id)
+          let storageLocation := keccak256(offset, 0x40)
           sstore(storageLocation, amount)
         }
 
@@ -71,9 +72,10 @@ object "ERC1155" {
         //////////////////////////////////////////////////////////////*/
 
         function balanceOf(account, id) -> b {
-          mstore(0, account)
-          mstore(1, id)
-          b := sload(keccak256(0, 0x40))
+          let offset := getFreeMemoryPointer()
+          storeInMemory(account)
+          storeInMemory(id)
+          b := sload(keccak256(offset, 0x40))
         }
 
         /*//////////////////////////////////////////////////////////////
@@ -110,6 +112,12 @@ object "ERC1155" {
         /*//////////////////////////////////////////////////////////////
                               MEMORY MANAGEMENT
         //////////////////////////////////////////////////////////////*/
+
+        function storeInMemory(value) {
+          let offset := getFreeMemoryPointer()
+          mstore(offset, value)
+          setFreeMemoryPointer(add(offset, 0x20))
+        }
 
         function getFreeMemoryPointer() -> p {
           p := mload(0x40)
