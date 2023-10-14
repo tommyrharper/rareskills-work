@@ -46,6 +46,26 @@ object "ERC1155" {
           sstore(storageLocation, amount)
         }
 
+        function callReceiver(account) {
+          let size := extcodesize(account)
+          if gt(size, 0) {
+            // onERC1155Received(address,address,uint256,uint256,bytes)
+            let onERC1155ReceivedSelector := 0xf23a6e6100000000000000000000000000000000000000000000000000000000
+
+            // abi encode arguments
+
+
+            // call(g, a, v, in, insize, out, outsize)
+            let argsOffset := 0
+            let argsBytes := 0
+            let returnOffset := 0
+            let returnBytes := 0
+            let success := call(
+              gas(), account, 0, argsOffset, argsBytes, returnOffset, returnBytes
+            )
+          }
+        }
+
         /*//////////////////////////////////////////////////////////////
                                 VIEW FUNCTIONS
         //////////////////////////////////////////////////////////////*/
@@ -85,6 +105,18 @@ object "ERC1155" {
         function returnUint(v) {
           mstore(0, v)
           return(0, 0x20)
+        }
+
+        /*//////////////////////////////////////////////////////////////
+                              MEMORY MANAGEMENT
+        //////////////////////////////////////////////////////////////*/
+
+        function getFreeMemoryPointer() -> p {
+          p := mload(0x40)
+        }
+
+        function setFreeMemoryPointer(newPos) {
+          mstore(0x40, newPos)
         }
       }
     }
