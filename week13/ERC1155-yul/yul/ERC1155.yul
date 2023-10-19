@@ -75,12 +75,17 @@ object "ERC1155" {
           checkERC1155Received(caller(), 0x0, account, id, amount, dataOffset)
         }
 
-        function subBalance(account, id, amount) {
+        function getBalanceStorageLocation(account, id) -> loc {
           let currentBalance := balanceOf(account, id)
           let offset := getFreeMemoryPointer()
           storeInMemory(account)
           storeInMemory(id)
-          let storageLocation := keccak256(offset, 0x40)
+          loc := keccak256(offset, 0x40)
+        }
+
+        function subBalance(account, id, amount) {
+          let currentBalance := balanceOf(account, id)
+          let storageLocation := getBalanceStorageLocation(account, id)
           sstore(storageLocation, sub(currentBalance, amount))
         }
 
