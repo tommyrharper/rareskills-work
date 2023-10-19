@@ -31,6 +31,9 @@ object "ERC1155" {
         case 0x00fdd58e /* "balanceOf(address,uint256)" */ {
           returnUint(balanceOf(decodeAddress(0), decodeUint(1)))
         }
+        case 0xf5298aca /* burn(address,uint256,uint256) */ {
+          burn(decodeAddress(0), decodeUint(1), decodeUint(2))
+        }
         default {
           revert(0, 0)
         }
@@ -39,12 +42,23 @@ object "ERC1155" {
                               MUTATIVE FUNCTIONS
         //////////////////////////////////////////////////////////////*/
 
+        function burn(account, id, amount) {
+          // let balance := balanceOf(account, id)
+          // let offset := getFreeMemoryPointer()
+          // storeInMemory(account)
+          // storeInMemory(id)
+          // let storageLocation := keccak256(offset, 0x40)
+          // sstore(storageLocation, sub(balance, amount))
+          // checkERC1155Received(caller(), 0x0, account, id, amount, dataOffset)
+        }
+
         function _mint(account, id, amount, dataOffset) {
+          let currentBalance := balanceOf(account, id)
           let offset := getFreeMemoryPointer()
           storeInMemory(account)
           storeInMemory(id)
           let storageLocation := keccak256(offset, 0x40)
-          sstore(storageLocation, amount)
+          sstore(storageLocation, add(currentBalance, amount))
           checkERC1155Received(caller(), 0x0, account, id, amount, dataOffset)
         }
 
