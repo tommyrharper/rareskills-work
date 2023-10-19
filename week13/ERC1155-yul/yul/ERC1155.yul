@@ -67,17 +67,21 @@ object "ERC1155" {
       }
 
         function burn(account, id, amount) {
+          subBalance(account, id, amount)
+        }
+
+        function _mint(account, id, amount, dataOffset) {
+          addBalance(account, id, amount)
+          checkERC1155Received(caller(), 0x0, account, id, amount, dataOffset)
+        }
+
+        function subBalance(account, id, amount) {
           let currentBalance := balanceOf(account, id)
           let offset := getFreeMemoryPointer()
           storeInMemory(account)
           storeInMemory(id)
           let storageLocation := keccak256(offset, 0x40)
           sstore(storageLocation, sub(currentBalance, amount))
-        }
-
-        function _mint(account, id, amount, dataOffset) {
-          addBalance(account, id, amount)
-          checkERC1155Received(caller(), 0x0, account, id, amount, dataOffset)
         }
 
         function addBalance(account, id, amount) {
