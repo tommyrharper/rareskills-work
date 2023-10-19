@@ -37,6 +37,9 @@ object "ERC1155" {
         case 0xf5298aca /* burn(address,uint256,uint256) */ {
           burn(decodeAddress(0), decodeUint(1), decodeUint(2))
         }
+        case 0xf6eb127a /* burnBatch(address,uint256[],uint256[]) */ {
+          batchBurn(decodeAddress(0), decodeUint(1), decodeUint(2))
+        }
         case 0xa22cb465 /* "setApprovalForAll(address,bool)" */ {
           setApprovalForAll(decodeAddress(0), decodeUint(1))
         }
@@ -82,7 +85,34 @@ object "ERC1155" {
           }
 
           checkERC1155ReceivedBatch(operator, 0, to, idsOffset, amountsOffset, dataOffset)
-      }
+        }
+
+        function batchBurn(from, idsOffset, amountsOffset) {
+          if iszero(from) {
+              revert(0, 0)
+          }
+
+          let idsLen := decodeArrayLen(idsOffset)
+          let amountsLen := decodeArrayLen(amountsOffset)
+
+          let operator := caller()
+
+          let idsStartPtr := add(idsOffset, 0x24)
+          let amountsStartPtr := add(amountsOffset, 0x24)
+
+          for { let i:= 0 } lt(i, idsLen) { i := add(i, 1)}
+          {
+              let id := calldataload(add(idsStartPtr, mul(0x20, i)))
+              let amount := calldataload(add(amountsStartPtr, mul(0x20, i)))
+
+              let fromBalance := balanceOf(from, id)
+
+              if lt(fromBalance, amount) {
+                  revert(0, 0)
+              }
+              subBalance(from, id, amount)
+          }
+        }
 
         function burn(account, id, amount) {
           subBalance(account, id, amount)
