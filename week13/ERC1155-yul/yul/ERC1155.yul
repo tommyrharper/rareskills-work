@@ -26,7 +26,7 @@ object "ERC1155" {
 
         switch getSelector()
         case 0x731133e9 /* mint(address,uint256,uint256,bytes) */ {
-          _mint(decodeAddress(0), decodeUint(1), decodeUint(2))
+          _mint(decodeAddress(0), decodeUint(1), decodeUint(2), decodeUint(3))
         }
         case 0x00fdd58e /* "balanceOf(address,uint256)" */ {
           returnUint(balanceOf(decodeAddress(0), decodeUint(1)))
@@ -39,32 +39,60 @@ object "ERC1155" {
                               MUTATIVE FUNCTIONS
         //////////////////////////////////////////////////////////////*/
 
-        function _mint(account, id, amount) {
+        function _mint(account, id, amount, dataOffset) {
           let offset := getFreeMemoryPointer()
           storeInMemory(account)
           storeInMemory(id)
           let storageLocation := keccak256(offset, 0x40)
           sstore(storageLocation, amount)
+          checkERC1155Received(caller(), 0x0, account, id, amount, dataOffset)
         }
 
-        function callReceiver(account) {
-          let size := extcodesize(account)
+        function checkERC1155Received(operator, from, to, id, amount, dataOffset) {
+          let size := extcodesize(to)
           if gt(size, 0) {
             // onERC1155Received(address,address,uint256,uint256,bytes)
             let onERC1155ReceivedSelector := 0xf23a6e6100000000000000000000000000000000000000000000000000000000
 
             // abi encode arguments
+            let offset := getFreeMemoryPointer()
+            mstore(offset, onERC1155ReceivedSelector) // selector
+            mstore(add(offset, 0x04), operator)       // operator
+            mstore(add(offset, 0x24), from)           // from
+            mstore(add(offset, 0x44), id)             // id
+            mstore(add(offset, 0x64), amount)         // amount
+            mstore(add(offset, 0x84), 0xa0)           // data
 
+            let endPtr := copyBytesToMemory(add(offset, 0xa4), dataOffset) // Copies 'data' to memory
+            setFreeMemoryPointer(endPtr)
 
             // call(g, a, v, in, insize, out, outsize)
-            let argsOffset := 0
-            let argsBytes := 0
+            let argsOffset := offset
+            let argsBytes := 0xa4
             let returnOffset := 0
-            let returnBytes := 0
+            let returnBytes := 0x20
             let success := call(
-              gas(), account, 0, argsOffset, argsBytes, returnOffset, returnBytes
+              gas(), to, 0, offset, sub(endPtr, offset), 0x00, 0x04
             )
+            if iszero(success) {
+              revert(0, 0)
+            }
           }
+        }
+
+        // TODO: find out how/why this works
+        function copyBytesToMemory(mptr, dataOffset) -> newMptr {
+          let dataLenOffset := add(dataOffset, 4)
+          let dataLen := calldataload(dataLenOffset)
+
+          let totalLen := add(0x20, dataLen) // dataLen+data
+          let rem := mod(dataLen, 0x20)
+          if rem {
+              totalLen := add(totalLen, sub(0x20, rem))
+          }
+          calldatacopy(mptr, dataLenOffset, totalLen)
+
+          newMptr := add(mptr, totalLen)
         }
 
         /*//////////////////////////////////////////////////////////////
