@@ -28,6 +28,9 @@ object "ERC1155" {
         case 0x731133e9 /* mint(address,uint256,uint256,bytes) */ {
           _mint(decodeAddress(0), decodeUint(1), decodeUint(2), decodeUint(3))
         }
+        case 0xb48ab8b6 /* batchMint(address,uint256[],uint256[],bytes) */{
+          batchMint(decodeAddress(0), decodeUint(1), decodeUint(2), decodeUint(3))
+        }
         case 0x00fdd58e /* "balanceOf(address,uint256)" */ {
           returnUint(balanceOf(decodeAddress(0), decodeUint(1)))
         }
@@ -41,6 +44,27 @@ object "ERC1155" {
         /*//////////////////////////////////////////////////////////////
                               MUTATIVE FUNCTIONS
         //////////////////////////////////////////////////////////////*/
+
+        function batchMint(to, idsOffset, amountsOffset, dataOffset) {
+          if iszero(to) {
+              revert(0, 0)
+          }
+
+          let idsLen := decodeArrayLen(idsOffset)
+          let amountsLen := decodeArrayLen(amountsOffset)
+
+          let operator := caller()
+
+          let idsStartPtr := add(idsOffset, 0x24)
+          let amountsStartPtr := add(amountsOffset, 0x24)
+
+          for { let i := 0 } lt(i, idsLen) { i := add(i, 1)}
+          {
+              let id := calldataload(add(idsStartPtr, mul(0x20, i)))
+              let amount := calldataload(add(amountsStartPtr, mul(0x20, i)))
+              addBalance(to, id, amount)
+          }
+      }
 
         function burn(account, id, amount) {
           let currentBalance := balanceOf(account, id)
@@ -59,6 +83,15 @@ object "ERC1155" {
           let storageLocation := keccak256(offset, 0x40)
           sstore(storageLocation, add(currentBalance, amount))
           checkERC1155Received(caller(), 0x0, account, id, amount, dataOffset)
+        }
+
+        function addBalance(account, id, amount) {
+          let currentBalance := balanceOf(account, id)
+          let offset := getFreeMemoryPointer()
+          storeInMemory(account)
+          storeInMemory(id)
+          let storageLocation := keccak256(offset, 0x40)
+          sstore(storageLocation, add(currentBalance, amount))
         }
 
         function checkERC1155Received(operator, from, to, id, amount, dataOffset) {
@@ -122,6 +155,10 @@ object "ERC1155" {
         /*//////////////////////////////////////////////////////////////
                                   ABI DECODING
         //////////////////////////////////////////////////////////////*/
+
+        function decodeArrayLen(offset) -> len {
+          len := calldataload(add(4, offset)) // pos + selector
+        }
 
         function getSelector() -> s {
           // copy first 4 bytes from calldata
