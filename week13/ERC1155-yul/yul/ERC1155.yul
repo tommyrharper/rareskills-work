@@ -37,6 +37,12 @@ object "ERC1155" {
         case 0xf5298aca /* burn(address,uint256,uint256) */ {
           burn(decodeAddress(0), decodeUint(1), decodeUint(2))
         }
+        case 0xa22cb465 /* "setApprovalForAll(address,bool)" */ {
+          setApprovalForAll(decodeAddress(0), decodeUint(1))
+        }
+        case 0xe985e9c5 /* "isApprovedForAll(address,address)" */ {
+          returnUint(isApprovedForAll(decodeAddress(0), decodeAddress(1)))
+        }
         default {
           revert(0, 0)
         }
@@ -44,6 +50,16 @@ object "ERC1155" {
         /*//////////////////////////////////////////////////////////////
                               MUTATIVE FUNCTIONS
         //////////////////////////////////////////////////////////////*/
+
+        function isApprovedForAll(account, operator) -> approved {
+          let slot := getOperatorApprovedSlot(account, operator)
+          approved := sload(slot)
+        }
+
+        function setApprovalForAll(operator, approved) {
+          let slot := getOperatorApprovedSlot(caller(), operator)
+          sstore(slot, approved)
+        }
 
         function batchMint(to, idsOffset, amountsOffset, dataOffset) {
           if iszero(to) {
@@ -83,6 +99,13 @@ object "ERC1155" {
           storeInMemory(account)
           storeInMemory(id)
           loc := keccak256(offset, 0x40)
+        }
+
+        function getOperatorApprovedSlot(account, operator) -> slot {
+          let offset := getFreeMemoryPointer()
+          storeInMemory(account)
+          storeInMemory(operator)
+          slot := keccak256(offset, 0x40)
         }
 
         function subBalance(account, id, amount) {
