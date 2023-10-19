@@ -64,6 +64,8 @@ object "ERC1155" {
               let amount := calldataload(add(amountsStartPtr, mul(0x20, i)))
               addBalance(to, id, amount)
           }
+
+          checkERC1155ReceivedBatch(operator, 0, to, idsOffset, amountsOffset, dataOffset)
       }
 
         function burn(account, id, amount) {
@@ -124,6 +126,45 @@ object "ERC1155" {
             if iszero(success) {
               revert(0, 0)
             }
+          }
+        }
+
+        function checkERC1155ReceivedBatch(operator, from, to, idsOffset, amountsOffset, dataOffset) {
+          if gt(extcodesize(to), 0) {
+              /* onERC1155BatchReceived(address,address,uint256[],uint256[],bytes) */
+              let onERC1155BatchReceivedSelector := 0xbc197c8100000000000000000000000000000000000000000000000000000000
+
+              /* call onERC1155BatchReceived(operator, from, ids, amounts, data) */
+              let oldMptr := mload(0x40)
+              let mptr := oldMptr
+
+              mstore(mptr, onERC1155BatchReceivedSelector)
+              mstore(add(mptr, 0x04), operator)
+              mstore(add(mptr, 0x24), from)
+              mstore(add(mptr, 0x44), 0xa0)   // ids offset
+
+              // mptr+0x44: idsOffset
+              // mptr+0x64: amountsOffset
+              // mptr+0x84: dataOffset
+              // mptr+0xa4~: ids, amounts, data
+
+              let amountsPtr := copyArrayToMemory(add(mptr, 0xa4), idsOffset) // copy ids to memory
+
+              mstore(add(mptr, 0x64), sub(sub(amountsPtr, oldMptr), 4)) // amountsOffset
+              let dataPtr := copyArrayToMemory(amountsPtr, amountsOffset) // copy amounts to memory
+
+              mstore(add(mptr, 0x84), sub(sub(dataPtr, oldMptr), 4))       // dataOffset
+              let endPtr := copyBytesToMemory(dataPtr, dataOffset)  // copy data to memory
+              mstore(0x40, endPtr)
+
+              // reverts if call fails
+              mstore(0x00, 0) // clear memory
+              let success := call(
+                gas(), to, 0, oldMptr, sub(endPtr, oldMptr), 0x00, 0x04
+              )
+              if iszero(success) {
+                revert(0, 0)
+              }
           }
         }
 
@@ -191,6 +232,15 @@ object "ERC1155" {
         /*//////////////////////////////////////////////////////////////
                               MEMORY MANAGEMENT
         //////////////////////////////////////////////////////////////*/
+
+        function copyArrayToMemory(mptr, arrOffset) -> newMptr {
+          let arrLenOffset := add(arrOffset, 4)
+          let arrLen := calldataload(arrLenOffset)
+          let totalLen := add(0x20, mul(arrLen, 0x20)) // len+arrData
+          calldatacopy(mptr, arrLenOffset, totalLen) // copy len+data to mptr
+
+          newMptr := add(mptr, totalLen)
+        }
 
         function storeInMemory(value) {
           let offset := getFreeMemoryPointer()
