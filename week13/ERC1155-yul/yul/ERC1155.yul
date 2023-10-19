@@ -91,10 +91,7 @@ object "ERC1155" {
 
         function addBalance(account, id, amount) {
           let currentBalance := balanceOf(account, id)
-          let offset := getFreeMemoryPointer()
-          storeInMemory(account)
-          storeInMemory(id)
-          let storageLocation := keccak256(offset, 0x40)
+          let storageLocation := getBalanceStorageLocation(account, id)
           sstore(storageLocation, add(currentBalance, amount))
         }
 
