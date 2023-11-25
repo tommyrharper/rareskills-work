@@ -258,6 +258,11 @@ object "ERC1155" {
           let accountsLen := decodeArrayLen(accountsOffset)
           let idsLen := decodeArrayLen(idsOffset)
 
+          // array lengths must match
+          if iszero(eq(accountsLen, idsLen)) {
+            revert(0,0)
+          }
+
           storeInMemory(0x20) // array offset
           storeInMemory(accountsLen) // array length
 
