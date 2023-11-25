@@ -63,6 +63,7 @@ object "ERC1155" {
         function safeTransferFrom(from, to, id, amount, dataOffset) {
           subBalance(from, id, amount)
           addBalance(to, id, amount)
+          checkERC1155Received(caller(), from, to, id, amount, dataOffset) 
         }
 
         function setApprovalForAll(operator, approved) {
