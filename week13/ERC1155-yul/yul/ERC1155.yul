@@ -102,6 +102,11 @@ object "ERC1155" {
           let idsLen := decodeArrayLen(idsOffset)
           let amountsLen := decodeArrayLen(amountsOffset)
 
+          // array lenghts must match
+          if iszero(eq(idsLen, amountsLen)) {
+            revert(0, 0)
+          }
+
           let operator := caller()
 
           let idsStartPtr := add(idsOffset, 0x24)
