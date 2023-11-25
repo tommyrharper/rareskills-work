@@ -61,6 +61,11 @@ object "ERC1155" {
         //////////////////////////////////////////////////////////////*/
 
         function safeTransferFrom(from, to, id, amount, dataOffset) {
+          // don't allow sending to zero address
+          if iszero(to) {
+            revert(0, 0)
+          }
+
           let val := balanceOf(from, id)
           // revert if insufficient balance
           if gt(amount, val) {
