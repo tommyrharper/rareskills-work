@@ -285,6 +285,7 @@ object "ERC1155" {
           return(0, 0x20)
         }
 
+        // NOTE: unsure if this works yet
         function returnArray(mptr) {
           let len := mload(mptr)
           return(mptr, add(mul(len, 0x20), 0x20))
