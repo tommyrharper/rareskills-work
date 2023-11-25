@@ -49,6 +49,9 @@ object "ERC1155" {
         case 0xe985e9c5 /* "isApprovedForAll(address,address)" */ {
           returnUint(isApprovedForAll(decodeAddress(0), decodeAddress(1)))
         }
+        case 0xf242432a /* "function safeTransferFrom(address,address,uint256,uint256,bytes)" */ {
+          // safeTransferFrom
+        }
         default {
           revert(0, 0)
         }
@@ -56,11 +59,6 @@ object "ERC1155" {
         /*//////////////////////////////////////////////////////////////
                               MUTATIVE FUNCTIONS
         //////////////////////////////////////////////////////////////*/
-
-        function isApprovedForAll(account, operator) -> approved {
-          let slot := getOperatorApprovedSlot(account, operator)
-          approved := sload(slot)
-        }
 
         function setApprovalForAll(operator, approved) {
           let slot := getOperatorApprovedSlot(caller(), operator)
@@ -236,6 +234,11 @@ object "ERC1155" {
         /*//////////////////////////////////////////////////////////////
                                 VIEW FUNCTIONS
         //////////////////////////////////////////////////////////////*/
+
+        function isApprovedForAll(account, operator) -> approved {
+          let slot := getOperatorApprovedSlot(account, operator)
+          approved := sload(slot)
+        }
 
         function balanceOf(account, id) -> b {
           mstore(0x00, account)
