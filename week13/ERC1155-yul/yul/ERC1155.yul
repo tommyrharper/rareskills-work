@@ -118,12 +118,16 @@ object "ERC1155" {
         }
 
         function burn(account, id, amount) {
+          let val := balanceOf(account, id)
+          // revert if insufficient balance
+          if gt(amount, val) {
+            revert(0, 0)
+          }
           subBalance(account, id, amount)
         }
 
         function _mint(account, id, amount, dataOffset) {
           // revert if minting to zero address
-          // TODO: add actual error message
           if eq(account, 0) {
             revert(0, 0)
           }
