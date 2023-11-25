@@ -64,7 +64,24 @@ object "ERC1155" {
         //////////////////////////////////////////////////////////////*/
 
         function safeBatchTransferFrom(from, to, idsOffset, amountsOffset, dataOffset) {
-          
+          // don't allow sending to zero address
+          if iszero(to) {
+            revert(0, 0)
+          }
+
+          let idsLen := decodeArrayLen(idsOffset)
+          let amountsLen := decodeArrayLen(amountsOffset)
+
+          // check lengths are the same
+          if iszero(eq(idsLen, amountsLen)) {
+            revert(0, 0)
+          }
+
+          for { let i := 0 } lt(i, idsLen) { i := add(i, 1) } {
+            let id := decodeElementAtIndex(idsOffset, i)
+            let amount := decodeElementAtIndex(amountsOffset, i)
+            safeTransferFrom(from, to, id, amount, dataOffset)
+          }
         }
 
         function safeTransferFrom(from, to, id, amount, dataOffset) {
