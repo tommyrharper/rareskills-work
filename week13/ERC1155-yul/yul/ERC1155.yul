@@ -34,6 +34,9 @@ object "ERC1155" {
         case 0x00fdd58e /* "balanceOf(address,uint256)" */ {
           returnUint(balanceOf(decodeAddress(0), decodeUint(1)))
         }
+        case 0x4e1273f4 /* "balanceOfBatch(address[],uint256[])" */ {
+          // returnArray(balanceOfBatch(decodeUint(0), decodeUint(1)))
+        }
         case 0xf5298aca /* burn(address,uint256,uint256) */ {
           burn(decodeAddress(0), decodeUint(1), decodeUint(2))
         }
@@ -280,6 +283,11 @@ object "ERC1155" {
         function returnUint(v) {
           mstore(0, v)
           return(0, 0x20)
+        }
+
+        function returnArray(mptr) {
+          let len := mload(mptr)
+          return(mptr, add(mul(len, 0x20), 0x20))
         }
 
         /*//////////////////////////////////////////////////////////////
