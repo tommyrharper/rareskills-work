@@ -80,8 +80,17 @@ object "ERC1155" {
           for { let i := 0 } lt(i, idsLen) { i := add(i, 1) } {
             let id := decodeElementAtIndex(idsOffset, i)
             let amount := decodeElementAtIndex(amountsOffset, i)
-            safeTransferFrom(from, to, id, amount, dataOffset)
+
+            let val := balanceOf(from, id)
+            // revert if insufficient balance
+            if gt(amount, val) {
+              revert(0, 0)
+            }
+            subBalance(from, id, amount)
+            addBalance(to, id, amount)
           }
+
+          checkERC1155ReceivedBatch(caller(), from, to, idsOffset, amountsOffset, dataOffset)
         }
 
         function safeTransferFrom(from, to, id, amount, dataOffset) {
