@@ -229,10 +229,9 @@ object "ERC1155" {
         //////////////////////////////////////////////////////////////*/
 
         function balanceOf(account, id) -> b {
-          let offset := getFreeMemoryPointer()
-          storeInMemory(account)
-          storeInMemory(id)
-          b := sload(keccak256(offset, 0x40))
+          mstore(0x00, account)
+          mstore(0x20, id)
+          b := sload(keccak256(0x00, 0x40))
         }
 
         function balanceOfBatch(accountsOffset, idsOffset) -> balancesPtr {
@@ -248,8 +247,7 @@ object "ERC1155" {
             let account := decodeElementAtIndex(accountsOffset, i)
             let id := decodeElementAtIndex(idsOffset, i)
             let val := balanceOf(account, id)
-            // logNumber(0, val)
-            // storeInMemory(val)
+            storeInMemory(val)
           }
         }
 
