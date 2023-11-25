@@ -122,6 +122,11 @@ object "ERC1155" {
         }
 
         function _mint(account, id, amount, dataOffset) {
+          // revert if minting to zero address
+          // TODO: add actual error message
+          if eq(account, 0) {
+            revert(0, 0)
+          }
           addBalance(account, id, amount)
           checkERC1155Received(caller(), 0x0, account, id, amount, dataOffset)
         }
