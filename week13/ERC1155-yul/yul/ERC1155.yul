@@ -211,14 +211,7 @@ object "ERC1155" {
               revert(0, 0)
             }
 
-            let mptr := getFreeMemoryPointer()
-            returndatacopy(mptr, 0x00, returndatasize())
-            setFreeMemoryPointer(add(mptr, calldatasize()))
-            let returnVal := mload(mptr)
-            // check correct val is returned
-            if iszero(eq(onERC1155ReceivedSelector, returnVal)) {
-              revert(0, 0)
-            }
+            checkReturnValueIs(onERC1155ReceivedSelector)
           }
         }
 
@@ -259,14 +252,7 @@ object "ERC1155" {
                 revert(0, 0)
               }
 
-              mptr := getFreeMemoryPointer()
-              returndatacopy(mptr, 0x00, returndatasize())
-              setFreeMemoryPointer(add(mptr, returndatasize()))
-              let returnVal := mload(mptr)
-              // check correct val is returned
-              if iszero(eq(onERC1155BatchReceivedSelector, returnVal)) {
-                revert(0,0)
-              }
+              checkReturnValueIs(onERC1155BatchReceivedSelector)
           }
         }
 
@@ -399,6 +385,21 @@ object "ERC1155" {
 
         function initializeFreeMemoryPointer() {
           mstore(0x40, 0x80)
+        }
+
+        /*//////////////////////////////////////////////////////////////
+                                    HELPERS
+        //////////////////////////////////////////////////////////////*/
+
+        function checkReturnValueIs(expected) {
+          let mptr := getFreeMemoryPointer()
+          returndatacopy(mptr, 0x00, returndatasize())
+          setFreeMemoryPointer(add(mptr, calldatasize()))
+          let returnVal := mload(mptr)
+          // revert if incorrect value is returned
+          if iszero(eq(expected, returnVal)) {
+            revert(0, 0)
+          }
         }
 
         /*//////////////////////////////////////////////////////////////
