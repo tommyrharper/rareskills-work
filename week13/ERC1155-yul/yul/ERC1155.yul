@@ -61,6 +61,11 @@ object "ERC1155" {
         //////////////////////////////////////////////////////////////*/
 
         function safeTransferFrom(from, to, id, amount, dataOffset) {
+          let val := balanceOf(from, id)
+          // revert if insufficient balance
+          if gt(amount, val) {
+            revert(0, 0)
+          }
           subBalance(from, id, amount)
           addBalance(to, id, amount)
           checkERC1155Received(caller(), from, to, id, amount, dataOffset) 
