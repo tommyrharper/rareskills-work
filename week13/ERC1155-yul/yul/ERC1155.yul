@@ -49,8 +49,11 @@ object "ERC1155" {
         case 0xe985e9c5 /* "isApprovedForAll(address,address)" */ {
           returnUint(isApprovedForAll(decodeAddress(0), decodeAddress(1)))
         }
-        case 0xf242432a /* "function safeTransferFrom(address,address,uint256,uint256,bytes)" */ {
+        case 0xf242432a /* "safeTransferFrom(address,address,uint256,uint256,bytes)" */ {
           safeTransferFrom(decodeAddress(0), decodeAddress(1), decodeUint(2), decodeUint(3), decodeUint(4))
+        }
+        case 0x2eb2c2d6 /* "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)" */ {
+          safeBatchTransferFrom(decodeAddress(0), decodeAddress(1), decodeUint(2), decodeUint(3), decodeUint(4))
         }
         default {
           revert(0, 0)
@@ -59,6 +62,10 @@ object "ERC1155" {
         /*//////////////////////////////////////////////////////////////
                               MUTATIVE FUNCTIONS
         //////////////////////////////////////////////////////////////*/
+
+        function safeBatchTransferFrom(from, to, idsOffset, amountsOffset, dataOffset) {
+          
+        }
 
         function safeTransferFrom(from, to, id, amount, dataOffset) {
           // don't allow sending to zero address
