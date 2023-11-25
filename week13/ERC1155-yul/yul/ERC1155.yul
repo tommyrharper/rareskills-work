@@ -35,7 +35,7 @@ object "ERC1155" {
           returnUint(balanceOf(decodeAddress(0), decodeUint(1)))
         }
         case 0x4e1273f4 /* "balanceOfBatch(address[],uint256[])" */ {
-          // returnArray(balanceOfBatch(decodeUint(0), decodeUint(1)))
+          returnArray(balanceOfBatch(decodeUint(0), decodeUint(1)))
         }
         case 0xf5298aca /* burn(address,uint256,uint256) */ {
           burn(decodeAddress(0), decodeUint(1), decodeUint(2))
@@ -224,21 +224,6 @@ object "ERC1155" {
           }
         }
 
-        // TODO: find out how/why this works
-        function copyBytesToMemory(mptr, dataOffset) -> newMptr {
-          let dataLenOffset := add(dataOffset, 4)
-          let dataLen := calldataload(dataLenOffset)
-
-          let totalLen := add(0x20, dataLen) // dataLen+data
-          let rem := mod(dataLen, 0x20)
-          if rem {
-              totalLen := add(totalLen, sub(0x20, rem))
-          }
-          calldatacopy(mptr, dataLenOffset, totalLen)
-
-          newMptr := add(mptr, totalLen)
-        }
-
         /*//////////////////////////////////////////////////////////////
                                 VIEW FUNCTIONS
         //////////////////////////////////////////////////////////////*/
@@ -248,6 +233,22 @@ object "ERC1155" {
           storeInMemory(account)
           storeInMemory(id)
           b := sload(keccak256(offset, 0x40))
+        }
+
+        function balanceOfBatch(accountsOffset, idsOffset) -> balancesPtr {
+          balancesPtr := getFreeMemoryPointer()
+
+          let accountsLen := decodeArrayLen(accountsOffset)
+          let idsLen := decodeArrayLen(idsOffset)
+
+          storeInMemory(accountsLen)
+
+          for { let i := 0 } lt(i, accountsLen) { i := add(i, 1) } {
+            let account := calldataload(add(accountsOffset, mul(i, 0x20)))
+            let id := calldataload(add(idsOffset, mul(i, 0x20)))
+            let val := balanceOf(account, id)
+            storeInMemory(val)
+          }
         }
 
         /*//////////////////////////////////////////////////////////////
@@ -294,6 +295,20 @@ object "ERC1155" {
         /*//////////////////////////////////////////////////////////////
                               MEMORY MANAGEMENT
         //////////////////////////////////////////////////////////////*/
+
+        function copyBytesToMemory(mptr, dataOffset) -> newMptr {
+          let dataLenOffset := add(dataOffset, 4)
+          let dataLen := calldataload(dataLenOffset)
+
+          let totalLen := add(0x20, dataLen) // dataLen+data
+          let rem := mod(dataLen, 0x20)
+          if rem {
+              totalLen := add(totalLen, sub(0x20, rem))
+          }
+          calldatacopy(mptr, dataLenOffset, totalLen)
+
+          newMptr := add(mptr, totalLen)
+        }
 
         function copyArrayToMemory(mptr, arrOffset) -> newMptr {
           let arrLenOffset := add(arrOffset, 4)
