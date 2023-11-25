@@ -210,6 +210,15 @@ object "ERC1155" {
             if iszero(success) {
               revert(0, 0)
             }
+
+            let mptr := getFreeMemoryPointer()
+            returndatacopy(mptr, 0x00, returndatasize())
+            setFreeMemoryPointer(add(mptr, calldatasize()))
+            let returnVal := mload(mptr)
+            // check correct val is returned
+            if iszero(eq(onERC1155ReceivedSelector, returnVal)) {
+              revert(0, 0)
+            }
           }
         }
 
@@ -254,6 +263,7 @@ object "ERC1155" {
               returndatacopy(mptr, 0x00, returndatasize())
               setFreeMemoryPointer(add(mptr, returndatasize()))
               let returnVal := mload(mptr)
+              // check correct val is returned
               if iszero(eq(onERC1155BatchReceivedSelector, returnVal)) {
                 revert(0,0)
               }
