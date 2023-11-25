@@ -50,7 +50,7 @@ object "ERC1155" {
           returnUint(isApprovedForAll(decodeAddress(0), decodeAddress(1)))
         }
         case 0xf242432a /* "function safeTransferFrom(address,address,uint256,uint256,bytes)" */ {
-          // safeTransferFrom
+          safeTransferFrom(decodeAddress(0), decodeAddress(1), decodeUint(2), decodeUint(3), decodeUint(4))
         }
         default {
           revert(0, 0)
@@ -59,6 +59,10 @@ object "ERC1155" {
         /*//////////////////////////////////////////////////////////////
                               MUTATIVE FUNCTIONS
         //////////////////////////////////////////////////////////////*/
+
+        function safeTransferFrom(from, to, id, amount, dataOffset) {
+
+        }
 
         function setApprovalForAll(operator, approved) {
           let slot := getOperatorApprovedSlot(caller(), operator)
