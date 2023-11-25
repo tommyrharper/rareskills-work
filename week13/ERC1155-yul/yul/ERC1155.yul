@@ -246,9 +246,8 @@ object "ERC1155" {
 
           for { let i := 0 } lt(i, accountsLen) { i := add(i, 1) } {
             let account := decodeElementAtIndex(accountsOffset, i)
-            logAddress(0, account)
-            // let id := calldataload(add(idsOffset, mul(i, 0x20)))
-            // let val := balanceOf(account, id)
+            let id := decodeElementAtIndex(idsOffset, i)
+            let val := balanceOf(account, id)
             // logNumber(0, val)
             // storeInMemory(val)
           }
