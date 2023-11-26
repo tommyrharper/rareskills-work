@@ -8,4 +8,4 @@ The challenge this week is to gas optimize the following real world contracts:
 
 As reference I will be using [The RareSkills Book of Solidity Gas Optimization: 80+ Tips](https://www.rareskills.io/post/gas-optimization).
 
-To start with I will summarize all the tips in the book in my [optimization-tips.md](./optimization-tips.md) doc.
+To start with I will summarize all the tips in the book in my [Optimization Tips](./optimization-tips.md) document.
