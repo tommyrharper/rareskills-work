@@ -52,3 +52,6 @@
 [submodule "week15/synthetix-staking-rewards/lib/forge-std"]
 	path = week15/synthetix-staking-rewards/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "week15/synthetix-staking-rewards/lib/openzeppelin-contracts"]
+	path = week15/synthetix-staking-rewards/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
