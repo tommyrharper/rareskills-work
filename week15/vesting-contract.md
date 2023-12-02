@@ -511,3 +511,71 @@ After:
 
 So if we average the extra call costs - `(355 + 257 + 389) / 3 = ~334`, then we run `260_427 / 334 = ~780`, we can see if expect there to be at least 780 or so calls to the contract, it may be worth bumping up the optimizer to this level.
 
+## [G-09] Cache values that are calculated multiple times
+
+The contract calculates the `finalTime` in the constructor and in the `_vestedAmount` function. This could just be calculated once and stored as an immutable.
+
+Before:
+```solidity
+    constructor(
+        ...
+    ) public {
+        ...
+        require(start.add(duration) > block.timestamp, "TokenVesting: final time is before current time");
+        ...
+    }
+
+    function _vestedAmount(IERC20 token) private view returns (uint256) {
+        ...
+        } else if (block.timestamp >= _start.add(_duration) || _revoked[address(token)]) {
+        ...
+    }
+```
+
+After:
+```solidity
+    uint256 immutable private finalTime;
+
+    constructor(
+        ...
+    ) public {
+        ...
+        uint256 _finalTime = start.add(duration);
+        finalTime = _finalTime;
+        // note must use stack variable as immutables can't be used in the constructor
+        require(_finalTime > block.timestamp, "TokenVesting: final time is before current time");
+        ...
+    }
+
+    function _vestedAmount(IERC20 token) private view returns (uint256) {
+        ...
+        } else if (block.timestamp >= _start.add(_duration) || _revoked[address(token)]) {
+        ...
+    }
+```
+
+One thing to note here, is beyond caching the calculation, we have an immutable savings, because we don't have to read from storage. But we have already mentioned that in `[G-01]`, so lets compare it to the gas usage on that optimization, adding this one on top
+
+```
+Untouched:
+|  TokenVesting  ·  release          ·      69505  ·      91919  ·      81944  ·            3  ·       0.88  │
+·················|···················|·············|·············|·············|···············|··············
+|  TokenVesting  ·  revoke           ·      85286  ·      95116  ·      90201  ·            2  ·       0.97  │
+
+
+Before with immutables:
+|  TokenVesting  ·  release          ·      61093  ·      83292  ·      73460  ·            3  ·       0.79  │
+·················|···················|·············|·············|·············|···············|··············
+|  TokenVesting  ·  revoke           ·      81080  ·      86492  ·      83786  ·            2  ·       0.90  │
+
+
+After (immutables and caching this calculation):
+|  TokenVesting  ·  release          ·      61021  ·      83220  ·      73388  ·            3  ·       0.79  │
+·················|···················|·············|·············|·············|···············|··············
+|  TokenVesting  ·  revoke           ·      81080  ·      86420  ·      83750  ·            2  ·       0.90  │
+```
+
+So here is the gas improvement, compared to the version that already had switched to immutables:
+
+- release: `73460 - 73388 = 72` gas saved on average
+- revoke: `83786 - 83750 = 36` gas saved on average
