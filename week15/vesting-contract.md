@@ -406,5 +406,20 @@ So we can do some simple math to see if this is worth it - `54_615 / 63 = ~867`.
 For most use cases of this kind of contract, it seems unlikely the admin will revoke packages `867` times, so in normal usage this optimization can be safely recommended.
 
 
+## [G-06] Make constructors payable
+
+The deployment can be reduced by making the constructor payable
+```
+Before:
+|  Deployments                       ·                                         ·  % of limit   ·             │
+·····································|·············|·············|·············|···············|··············
+|  TokenVesting                      ·          -  ·          -  ·     995026  ·        3.3 %  ·      10.65  │
+After:
+|  Deployments                       ·                                         ·  % of limit   ·             │
+·····································|·············|·············|·············|···············|··············
+|  TokenVesting                      ·          -  ·          -  ·     994802  ·        3.3 %  ·      10.74  │
+```
+
+Gas saved is `995026 - 994802 = 224` gas.
 
 
