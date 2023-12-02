@@ -24,7 +24,7 @@ Before:
 |  StakingRewards       ·  withdraw                          ·       99038  ·     175723  ·           137381  ·            2  ·       5.79  │
 ```
 
-## [G-01] Use immutable variables
+## [G-01] Variables that are never updated should be immutable or constant
 
 The following variables could be immutable:
 ```solidity
@@ -125,4 +125,52 @@ Before:
 |  StakingRewards       ·  notifyRewardAmount                ·       67293  ·     119112  ·           109610  ·           18  ·       4.61  │
 After:
 |  StakingRewards       ·  notifyRewardAmount                ·       67019  ·     118938  ·           109430  ·           18  ·       4.61  │
+```
+
+## [G-04] Pack related variables
+
+The variables `periodFinish` and `lastUpdateTime` are almost always used together all across the codebase. As they are time lengths they can safely fit in a `uint128` rather than a `uint256`. Hence the following change works:
+
+
+Before:
+```solidity
+    uint256 public periodFinish = 0;
+    uint256 public lastUpdateTime;
+```
+
+After:
+```solidity
+    uint128 public periodFinish = 0;
+    uint128 public lastUpdateTime;
+```
+
+This leads to the following average gas savings:
+- exit: 208375 - 207133 = 1_242 gas
+- getRewards: 167652 - 166197 = 1_455 gas
+- notifyRewardAmount: 109610 - 92264 = 17_346 gas
+- stake: 146866 - 145053 = 1_813 gas
+- withdraw: 137381 - 135957 = 1_424 gas
+
+
+```
+Before:
+|  StakingRewards       ·  exit                              ·      172775  ·     243975  ·           208375  ·            2  ·       8.78  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  getReward                         ·      138477  ·     189444  ·           167652  ·            4  ·       7.06  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  notifyRewardAmount                ·       67293  ·     119112  ·           109610  ·           18  ·       4.62  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  stake                             ·           -  ·          -  ·           146866  ·           12  ·       6.19  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  withdraw                          ·       99038  ·     175723  ·           137381  ·            2  ·       5.79  │
+After:
+|  StakingRewards       ·  exit                              ·      171533  ·     242733  ·           207133  ·            2  ·       8.72  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  getReward                         ·      137116  ·     187957  ·           166197  ·            4  ·       7.00  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  notifyRewardAmount                ·       63078  ·      98073  ·            92264  ·           18  ·       3.88  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  stake                             ·           -  ·          -  ·           145053  ·           12  ·       6.11  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  withdraw                          ·       97677  ·     174236  ·           135957  ·            2  ·       5.72  │
 ```
