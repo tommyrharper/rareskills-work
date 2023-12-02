@@ -408,7 +408,7 @@ For most use cases of this kind of contract, it seems unlikely the admin will re
 
 ## [G-06] Make constructors payable
 
-The deployment can be reduced by making the constructor payable
+The deployment can be reduced by making the constructor payable.
 ```
 Before:
 |  Deployments                       ·                                         ·  % of limit   ·             │
@@ -421,5 +421,42 @@ After:
 ```
 
 Gas saved is `995026 - 994802 = 224` gas.
+
+## [G-07] Admin functions can be payable
+
+We can also make `revoke` and `revokeEmergency` payable.
+
+```
+Before:
+|  Methods                           ·               5 gwei/gas                ·       2139.75 usd/eth       │
+·················|···················|·············|·············|·············|···············|··············
+|  Contract      ·  Method           ·  Min        ·  Max        ·  Avg        ·  # calls      ·  usd (avg)  │
+·················|···················|·············|·············|·············|···············|··············
+|  TokenVesting  ·  emergencyRevoke  ·          -  ·          -  ·      79522  ·            1  ·       0.85  │
+·················|···················|·············|·············|·············|···············|··············
+|  TokenVesting  ·  revoke           ·      85286  ·      95116  ·      90201  ·            2  ·       0.97  │
+·················|···················|·············|·············|·············|···············|··············
+|  Deployments                       ·                                         ·  % of limit   ·             │
+·····································|·············|·············|·············|···············|··············
+|  TokenVesting                      ·          -  ·          -  ·     995026  ·        3.3 %  ·      10.65  │
+After:
+|  Methods                           ·               5 gwei/gas                ·       2160.38 usd/eth       │
+·················|···················|·············|·············|·············|···············|··············
+|  Contract      ·  Method           ·  Min        ·  Max        ·  Avg        ·  # calls      ·  usd (avg)  │
+·················|···················|·············|·············|·············|···············|··············
+|  TokenVesting  ·  emergencyRevoke  ·          -  ·          -  ·      79498  ·            1  ·       0.86  │
+·················|···················|·············|·············|·············|···············|··············
+|  TokenVesting  ·  revoke           ·      85262  ·      95092  ·      90177  ·            2  ·       0.97  │
+·················|···················|·············|·············|·············|···············|··············
+|  Deployments                       ·                                         ·  % of limit   ·             │
+·····································|·············|·············|·············|···············|··············
+|  TokenVesting                      ·          -  ·          -  ·    1023012  ·        3.4 %  ·      11.05  │
+```
+
+As we can see, we have the following runtime gas savings now:
+- emergencyRevoke: `79522 - 79498 = 24` gas saved
+- revoke: `90201 - 90177 = 24` gas saved
+
+Curiously our deployment gas cost has gone up by `1023012 - 995026 = 27_986` gas. How strange!
 
 
