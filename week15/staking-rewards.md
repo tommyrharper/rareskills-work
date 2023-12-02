@@ -152,25 +152,43 @@ This leads to the following average gas savings:
 - withdraw: 137381 - 135957 = 1_424 gas
 
 
+## [G-05] Avoid having ERC20 token balances go to zero, always keep a small amount
+
+If you force the `withdraw` function to always allow users to leave at least 1 wei in the contract, then you can save gas in many cases.
+
+Before:
+```solidity
+    // average gas used = 137381
+    function withdraw(uint256 amount) public nonReentrant updateReward(msg.sender) {
+        require(amount > 0, "Cannot withdraw 0");
+        _totalSupply = _totalSupply.sub(amount);
+        _balances[msg.sender] = _balances[msg.sender].sub(amount);
+        stakingToken.safeTransfer(msg.sender, amount);
+        emit Withdrawn(msg.sender, amount);
+    }
+```
+
+After:
+```solidity
+    // average gas used = 134354
+    function withdraw(uint256 amount) public nonReentrant updateReward(msg.sender) {
+        require(amount > 0, "Cannot withdraw 0");
+        uint256 __totalSupply = _totalSupply;
+        if (__totalSupply - amount == 0) {
+            amount -= 1;
+        }
+        _totalSupply = _totalSupply.sub(amount);
+        _balances[msg.sender] = _balances[msg.sender].sub(amount);
+        stakingToken.safeTransfer(msg.sender, amount);
+        emit Withdrawn(msg.sender, amount);
+    }
+```
+
+You can see this on average saves `137381 - 134354 = 3_027` gas. However the minimum gas used has increased, and the maximum gas used. This is due to the extra logic required to support this. However on average it is saving gas.
+
 ```
 Before:
-|  StakingRewards       ·  exit                              ·      172775  ·     243975  ·           208375  ·            2  ·       8.78  │
-························|····································|··············|·············|···················|···············|··············
-|  StakingRewards       ·  getReward                         ·      138477  ·     189444  ·           167652  ·            4  ·       7.06  │
-························|····································|··············|·············|···················|···············|··············
-|  StakingRewards       ·  notifyRewardAmount                ·       67293  ·     119112  ·           109610  ·           18  ·       4.62  │
-························|····································|··············|·············|···················|···············|··············
-|  StakingRewards       ·  stake                             ·           -  ·          -  ·           146866  ·           12  ·       6.19  │
-························|····································|··············|·············|···················|···············|··············
 |  StakingRewards       ·  withdraw                          ·       99038  ·     175723  ·           137381  ·            2  ·       5.79  │
 After:
-|  StakingRewards       ·  exit                              ·      171533  ·     242733  ·           207133  ·            2  ·       8.72  │
-························|····································|··············|·············|···················|···············|··············
-|  StakingRewards       ·  getReward                         ·      137116  ·     187957  ·           166197  ·            4  ·       7.00  │
-························|····································|··············|·············|···················|···············|··············
-|  StakingRewards       ·  notifyRewardAmount                ·       63078  ·      98073  ·            92264  ·           18  ·       3.88  │
-························|····································|··············|·············|···················|···············|··············
-|  StakingRewards       ·  stake                             ·           -  ·          -  ·           145053  ·           12  ·       6.11  │
-························|····································|··············|·············|···················|···············|··············
-|  StakingRewards       ·  withdraw                          ·       97677  ·     174236  ·           135957  ·            2  ·       5.72  │
+|  StakingRewards       ·  withdraw                          ·      113597  ·     175868  ·           134354  ·            3  ·       5.65  │
 ```
