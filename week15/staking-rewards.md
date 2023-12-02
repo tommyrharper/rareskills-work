@@ -1,4 +1,4 @@
-# StakingRewards Gas Optimizations
+# Synthetix StakingRewards Gas Optimizations
 
 Note - I didn't write my own tests for this, I just reused the ones in the `synthetix` repo, and turned the `gas-reporter` on.
 
