@@ -1,5 +1,7 @@
 # StakingRewards Gas Optimizations
 
+Note - I didn't write my own tests for this, I just reused the ones in the `synthetix` repo, and turned the `gas-reporter` on.
+
 ## Gas useage before changes are made
 
 
@@ -280,4 +282,38 @@ After:
 |  StakingRewards       ·  stake                             ·           -  ·          -  ·           146864  ·           12  ·       6.19  │
 ························|····································|··············|·············|···················|···············|··············
 |  StakingRewards       ·  withdraw                          ·       99036  ·     175721  ·           137379  ·            2  ·       5.79  │
+```
+
+## [G-08] Use unchecked math where appropriate
+
+In `notifyRewardAmount` we do not need to use checked math to calculate `remaining`:
+```solidity
+    function notifyRewardAmount(uint256 reward) external onlyRewardsDistribution updateReward(address(0)) {
+        if (block.timestamp >= periodFinish) {
+            rewardRate = reward.div(rewardsDuration);
+        } else {
+            uint256 remaining = periodFinish.sub(block.timestamp);
+            uint256 leftover = remaining.mul(rewardRate);
+            rewardRate = reward.add(leftover).div(rewardsDuration);
+        }
+        ...
+    }
+```
+
+Because we check `if (block.timestamp >= periodFinish)`, we know that in the `else` block, `periodFinish > block.timestamp`.
+
+Hence we can safely do the following:
+```solidity
+uint256 remaining = periodFinish - block.timestamp;
+```
+
+As this is solidity version `^0.5.16;`, we don't need to add an `unchecked` block, there is no default underflow checking. Instead we just stop using the `SafeMath` library.
+
+You can see the minimum gas usage for `notifyRewardAmount` dropped by `67293 - 67191 = 102 gas`, and the average gas usage by `6` gas.
+
+```
+Before:
+|  StakingRewards       ·  notifyRewardAmount                ·       67293  ·     119112  ·           109610  ·           18  ·       4.62  │
+After:
+|  StakingRewards       ·  notifyRewardAmount                ·       67191  ·     119112  ·           109604  ·           18  ·       4.62  │
 ```
