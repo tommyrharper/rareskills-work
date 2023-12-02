@@ -287,3 +287,124 @@ After:
 ```
 
 As we can see, on average for `revoke`, `90201 - 89238 = 963` gas saved.
+
+## [G-05] Use internal functions to reduce deployed bytecode size
+
+There is a bunch of code that repeats itself in the contract that can be extracted into `internal` helper function to save deployed bytecode cost. Of course this comes at some extra expense in terms of `JUMP` opcodes at runtime, however, as we will see with further analysis, in this instance the tradeoff is likely worth it.
+
+Before:
+```solidity
+    function release(IERC20 token) public {
+        uint256 unreleased = _releasableAmount(token);
+
+        require(unreleased > 0, "TokenVesting: no tokens are due");
+
+        _released[address(token)] = _released[address(token)].add(unreleased);
+
+        token.safeTransfer(_beneficiary, unreleased);
+
+        emit TokensReleased(address(token), unreleased);
+    }
+
+    function revoke(IERC20 token) public onlyOwner {
+        require(_revocable, "TokenVesting: cannot revoke");
+        require(!_revoked[address(token)], "TokenVesting: token already revoked");
+
+        uint256 balance = token.balanceOf(address(this));
+
+        uint256 unreleased = _releasableAmount(token);
+        uint256 refund = balance.sub(unreleased);
+
+        _revoked[address(token)] = true;
+
+        token.safeTransfer(owner(), refund);
+
+        emit TokenVestingRevoked(address(token));
+    }
+```
+
+After:
+```solidity
+    function canRevoke(IERC20 token) internal {
+        require(_revocable, "TokenVesting: cannot revoke");
+        require(!_revoked[address(token)], "TokenVesting: token already revoked");
+    }
+
+    function applyRevoke(IERC20 token, uint256 refund) internal {
+        _revoked[address(token)] = true;
+
+        token.safeTransfer(owner(), refund);
+
+        emit TokenVestingRevoked(address(token));
+    }
+
+    function revoke(IERC20 token) public onlyOwner {
+        canRevoke(token);
+
+        uint256 balance = token.balanceOf(address(this));
+
+        uint256 unreleased = _releasableAmount(token);
+        uint256 refund = balance.sub(unreleased);
+
+        applyRevoke(token, refund);
+    }
+
+    function emergencyRevoke(IERC20 token) public onlyOwner {
+        canRevoke(token);
+
+        uint256 balance = token.balanceOf(address(this));
+
+        applyRevoke(token, balance);
+    }
+```
+
+```
+Before:
+·------------------------------------|---------------------------|-------------|-----------------------------·
+|        Solc version: 0.6.12        ·  Optimizer enabled: true  ·  Runs: 200  ·  Block limit: 30000000 gas  │
+·····································|···························|·············|······························
+|  Methods                           ·               5 gwei/gas                ·       2139.75 usd/eth       │
+·················|···················|·············|·············|·············|···············|··············
+|  Contract      ·  Method           ·  Min        ·  Max        ·  Avg        ·  # calls      ·  usd (avg)  │
+·················|···················|·············|·············|·············|···············|··············
+|  TokenVesting  ·  emergencyRevoke  ·          -  ·          -  ·      79522  ·            1  ·       0.85  │
+·················|···················|·············|·············|·············|···············|··············
+|  TokenVesting  ·  revoke           ·      85286  ·      95116  ·      90201  ·            2  ·       0.97  │
+·················|···················|·············|·············|·············|···············|··············
+|  Deployments                       ·                                         ·  % of limit   ·             │
+·····································|·············|·············|·············|···············|··············
+|  TokenVesting                      ·          -  ·          -  ·     995026  ·        3.3 %  ·      10.65  │
+·------------------------------------|-------------|-------------|-------------|---------------|-------------·
+After:
+·------------------------------------|---------------------------|-------------|-----------------------------·
+|        Solc version: 0.6.12        ·  Optimizer enabled: true  ·  Runs: 200  ·  Block limit: 30000000 gas  │
+·····································|···························|·············|······························
+|  Methods                           ·               5 gwei/gas                ·       2158.40 usd/eth       │
+·················|···················|·············|·············|·············|···············|··············
+|  Contract      ·  Method           ·  Min        ·  Max        ·  Avg        ·  # calls      ·  usd (avg)  │
+·················|···················|·············|·············|·············|···············|··············
+|  TokenVesting  ·  emergencyRevoke  ·          -  ·          -  ·      79585  ·            1  ·       0.86  │
+·················|···················|·············|·············|·············|···············|··············
+|  TokenVesting  ·  revoke           ·      85349  ·      95179  ·      90264  ·            2  ·       0.97  │
+·················|···················|·············|·············|·············|···············|··············
+|  Deployments                       ·                                         ·  % of limit   ·             │
+·····································|·············|·············|·············|···············|··············
+|  TokenVesting                      ·          -  ·          -  ·     940411  ·        3.1 %  ·      10.15  │
+·------------------------------------|-------------|-------------|-------------|---------------|-------------·
+```
+
+As we can see, on deployment we save `995026 - 940411 = 54_615` gas.
+
+Then at runtime, we pay an extra:
+- `79585 - 79522 = 63` gas per `emergencyRevoke` call.
+- `90264 - 90201 = 63` gas per `revoke` call.
+
+Now to judge this tradeoff, we have to consider, that the `owner` of the contract is also set as the deployer, and only the `owner` can call these admin functions `emergencyRevoke`, `revoke`. So it is not a question of user vs deployer cost, the same entity is doing both.
+
+So we can do some simple math to see if this is worth it - `54_615 / 63 = ~867`. Therefore, if the deployer of the contract, expects to revoke packages less than `867` times, this optimization is worth.
+
+For most use cases of this kind of contract, it seems unlikely the admin will revoke packages `867` times, so in normal usage this optimization can be safely recommended.
+
+
+
+
