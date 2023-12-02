@@ -76,3 +76,46 @@ We can see the following improvements:
 - release: 81944 - 73460 = 8_484 gas saved on average
 - revoke: 90201 - 83786 = 6_415 gas saved on average
 
+## [G-02] Pack related variables
+
+Instead of having the following two mappings:
+```solidity
+    mapping(address => uint256) private _released;
+    mapping(address => bool) private _revoked;
+```
+
+It is possible to pack `_released` and `_revoked` into a struct for gas savings:
+
+```solidity
+    struct TokenData {
+        uint248 released;
+        bool revoked;
+    }
+
+    mapping(address => TokenData) private _tokenData;
+```
+
+This leads to the following gas savings:
+```
+Before:
+·················|···················|·············|·············|·············|···············|··············
+|  TokenVesting  ·  release          ·      69505  ·      91919  ·      81944  ·            3  ·       0.88  │
+·················|···················|·············|·············|·············|···············|··············
+|  TokenVesting  ·  revoke           ·      85286  ·      95116  ·      90201  ·            2  ·       0.97  │
+·················|···················|·············|·············|·············|···············|··············
+After:
+·················|···················|·············|·············|·············|···············|··············
+|  TokenVesting  ·  release          ·      50636  ·      90150  ·      75136  ·            3  ·       0.81  │
+·················|···················|·············|·············|·············|···············|··············
+|  TokenVesting  ·  revoke           ·      83354  ·      93201  ·      88278  ·            2  ·       0.95  │
+·················|···················|·············|·············|·············|···············|··············
+```
+
+As we can see:
+- release: 81944 - 75136 = 6_808 gas saved on average
+- revoke: 90201 - 88278 = 1_923 gas saved on average
+
+
+## cache storage reads
+
+notice dual reading of `released` in _releasableAmount and _vestedAmount - just pass it through the args instead.
