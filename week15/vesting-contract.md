@@ -204,4 +204,86 @@ After:
 |  TokenVesting  ·  revoke           ·      85124  ·      94761  ·      89943  ·            2  ·       0.97  │
 ```
 
-## cache external calls balanceOf
+## [G-04] Cache calls to external contracts where it makes sense (like caching return data from chainlink oracle)
+
+There are unnecessary duplicate `token.balanceOf` calls.
+
+Before:
+```solidity
+    function revoke(IERC20 token) public onlyOwner {
+        require(_revocable, "TokenVesting: cannot revoke");
+        require(!_revoked[address(token)], "TokenVesting: token already revoked");
+
+        uint256 balance = token.balanceOf(address(this));
+
+        uint256 unreleased = _releasableAmount(token);
+        uint256 refund = balance.sub(unreleased);
+
+        _revoked[address(token)] = true;
+
+        token.safeTransfer(owner(), refund);
+
+        emit TokenVestingRevoked(address(token));
+    }
+
+    function _releasableAmount(IERC20 token) private view returns (uint256) {
+        return _vestedAmount(token).sub(_released[address(token)]);
+    }
+
+    function _vestedAmount(IERC20 token) private view returns (uint256) {
+        uint256 currentBalance = token.balanceOf(address(this));
+        uint256 totalBalance = currentBalance.add(_released[address(token)]);
+
+        if (block.timestamp < _cliff) {
+            return 0;
+        } else if (block.timestamp >= _start.add(_duration) || _revoked[address(token)]) {
+            return totalBalance;
+        } else {
+            return totalBalance.mul(block.timestamp.sub(_start)).div(_duration);
+        }
+    }
+```
+
+After:
+```solidity
+    function revoke(IERC20 token) public onlyOwner {
+        require(_revocable, "TokenVesting: cannot revoke");
+        require(!_revoked[address(token)], "TokenVesting: token already revoked");
+
+        uint256 balance = token.balanceOf(address(this));
+
+        uint256 unreleased = _releasableAmount(token, balance);
+        uint256 refund = balance.sub(unreleased);
+
+        _revoked[address(token)] = true;
+
+        token.safeTransfer(owner(), refund);
+
+        emit TokenVestingRevoked(address(token));
+    }
+
+    function _releasableAmount(IERC20 token, uint256 balance) private view returns (uint256) {
+        return _vestedAmount(token, balance).sub(_released[address(token)]);
+    }
+
+    function _vestedAmount(IERC20 token, uint256 balance) private view returns (uint256) {
+        uint256 totalBalance = balance.add(_released[address(token)]);
+
+        if (block.timestamp < _cliff) {
+            return 0;
+        } else if (block.timestamp >= _start.add(_duration) || _revoked[address(token)]) {
+            return totalBalance;
+        } else {
+            return totalBalance.mul(block.timestamp.sub(_start)).div(_duration);
+        }
+    }
+```
+
+```
+Before:
+|  TokenVesting  ·  revoke           ·      85286  ·      95116  ·      90201  ·            2  ·       0.97  │
+After:
+|  TokenVesting  ·  revoke           ·      84323  ·      94153  ·      89238  ·            2  ·       0.96  │
+```
+
+As we can see, on average for `revoke`, `90201 - 89238 = 963` gas saved.
