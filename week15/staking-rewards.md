@@ -192,3 +192,29 @@ Before:
 After:
 |  StakingRewards       ·  withdraw                          ·      113597  ·     175868  ·           134354  ·            3  ·       5.65  │
 ```
+
+## [G-06] Custom errors are (usually) smaller than require statements
+
+Require statements could be updated with custom errors (though this would also require increasing the compiler version to `0.8.4` or higher):
+
+Befoer:
+```solidity
+require(amount > 0, "Cannot stake 0");
+require(amount > 0, "Cannot withdraw 0");
+require(rewardRate <= balance.div(rewardsDuration), "Provided reward too high");
+require(tokenAddress != address(stakingToken), "Cannot withdraw the staking token");
+require(
+    block.timestamp > periodFinish,
+    "Previous rewards period must be complete before changing the duration for the new period"
+);
+```
+
+After:
+```solidity
+if (amount == 0) revert CannotStakeZero();
+if (amount == 0) revert CannotWithdrawZero();
+if (rewardRate > balance.div(rewardsDuration)) revert RewardTooHigh();
+if (tokenAddress != address(stakingToken)) revert CannotWithdrawStakingToken();
+if (block.timestamp <= periodFinish) revert RewardPeriodNotComplete(); 
+```
+
