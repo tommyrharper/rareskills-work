@@ -218,3 +218,66 @@ if (tokenAddress != address(stakingToken)) revert CannotWithdrawStakingToken();
 if (block.timestamp <= periodFinish) revert RewardPeriodNotComplete(); 
 ```
 
+## [G-07] Use inline assembly to check for address(0)
+
+We can use this trick to save some gas in the `updateReward` modifier, which is used mostly everywhere:
+
+Before:
+```solidity
+    modifier updateReward(address account) {
+        rewardPerTokenStored = rewardPerToken();
+        lastUpdateTime = lastTimeRewardApplicable();
+        if (account != address(0)) {
+            rewards[account] = earned(account);
+            userRewardPerTokenPaid[account] = rewardPerTokenStored;
+        }
+        _;
+    }
+```
+
+After:
+```solidity
+    modifier updateReward(address account) {
+        rewardPerTokenStored = rewardPerToken();
+        lastUpdateTime = lastTimeRewardApplicable();
+        bool _isZero;
+        assembly {
+            _isZero := iszero(account)
+        }
+        if (!_isZero) {
+            rewards[account] = earned(account);
+            userRewardPerTokenPaid[account] = rewardPerTokenStored;
+        }
+        _;
+    }
+```
+
+Using this approach we save a small amount of gas (single digits) in the following functions:
+- `exit`
+- `getReward`
+- `notifyRewardAmount`
+- `stake`
+- `withdraw`
+
+```
+Before:
+|  StakingRewards       ·  exit                              ·      172775  ·     243975  ·           208375  ·            2  ·       8.78  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  getReward                         ·      138477  ·     189444  ·           167652  ·            4  ·       7.06  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  notifyRewardAmount                ·       67293  ·     119112  ·           109610  ·           18  ·       4.62  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  stake                             ·           -  ·          -  ·           146866  ·           12  ·       6.19  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  withdraw                          ·       99038  ·     175723  ·           137381  ·            2  ·       5.79  │
+After:
+|  StakingRewards       ·  exit                              ·      172771  ·     243971  ·           208371  ·            2  ·       8.78  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  getReward                         ·      138475  ·     189442  ·           167650  ·            4  ·       7.06  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  notifyRewardAmount                ·       67291  ·     119110  ·           109608  ·           18  ·       4.62  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  stake                             ·           -  ·          -  ·           146864  ·           12  ·       6.19  │
+························|····································|··············|·············|···················|···············|··············
+|  StakingRewards       ·  withdraw                          ·       99036  ·     175721  ·           137379  ·            2  ·       5.79  │
+```
