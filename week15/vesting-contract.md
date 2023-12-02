@@ -116,6 +116,92 @@ As we can see:
 - revoke: 90201 - 88278 = 1_923 gas saved on average
 
 
-## cache storage reads
+## [G-03] Cache storage variables: write and read storage variables exactly once
 
-notice dual reading of `released` in _releasableAmount and _vestedAmount - just pass it through the args instead.
+When we call `revoke` it reads `_revoked[address(token)]` from storage up to two times, and `_released[address(token)]` two times.
+
+This can be reduced to just one read of each.
+
+Before:
+```solidity
+    function revoke(IERC20 token) public onlyOwner {
+        require(_revocable, "TokenVesting: cannot revoke");
+        require(!_revoked[address(token)], "TokenVesting: token already revoked");
+
+        uint256 balance = token.balanceOf(address(this));
+
+        uint256 unreleased = _releasableAmount(token);
+        uint256 refund = balance.sub(unreleased);
+
+        _revoked[address(token)] = true;
+
+        token.safeTransfer(owner(), refund);
+
+        emit TokenVestingRevoked(address(token));
+    }
+
+    function _releasableAmount(IERC20 token) private view returns (uint256) {
+        return _vestedAmount(token).sub(_released[address(token)]);
+    }
+
+    function _vestedAmount(IERC20 token) private view returns (uint256) {
+        uint256 currentBalance = token.balanceOf(address(this));
+        uint256 totalBalance = currentBalance.add(_released[address(token)]);
+
+        if (block.timestamp < _cliff) {
+            return 0;
+        } else if (block.timestamp >= _start.add(_duration) || _revoked[address(token)]) {
+            return totalBalance;
+        } else {
+            return totalBalance.mul(block.timestamp.sub(_start)).div(_duration);
+        }
+    }
+```
+
+After:
+```solidity
+    function revoke(IERC20 token) public onlyOwner {
+        require(_revocable, "TokenVesting: cannot revoke");
+        bool revoked = _revoked[address(token)];
+        require(!revoked, "TokenVesting: token already revoked");
+
+        uint256 balance = token.balanceOf(address(this));
+
+        uint256 released = _released[address(token)];
+        uint256 unreleased = _releasableAmount(token, released, revoked);
+        uint256 refund = balance.sub(unreleased);
+
+        _revoked[address(token)] = true;
+
+        token.safeTransfer(owner(), refund);
+
+        emit TokenVestingRevoked(address(token));
+    }
+
+    function _releasableAmount(IERC20 token, uint256 released, bool revoked) private view returns (uint256) {
+        return _vestedAmount(token, released, revoked).sub(released);
+    }
+
+    function _vestedAmount(IERC20 token, uint256 released, bool revoked) private view returns (uint256) {
+        uint256 currentBalance = token.balanceOf(address(this));
+        uint256 totalBalance = currentBalance.add(released);
+
+        if (block.timestamp < _cliff) {
+            return 0;
+        } else if (block.timestamp >= _start.add(_duration) || revoked) {
+            return totalBalance;
+        } else {
+            return totalBalance.mul(block.timestamp.sub(_start)).div(_duration);
+        }
+    }
+```
+
+This saves on average `90201 - 89943 = 258` gas:
+```
+Before:
+|  TokenVesting  ·  revoke           ·      85286  ·      95116  ·      90201  ·            2  ·       0.97  │
+After:
+|  TokenVesting  ·  revoke           ·      85124  ·      94761  ·      89943  ·            2  ·       0.97  │
+```
+
+## cache external calls balanceOf
