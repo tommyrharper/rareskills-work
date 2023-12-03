@@ -243,6 +243,107 @@ After:
 Average change:
 - getStakeInfo: `10615 - 10381 = 234` gas saved
 
+## [G-06] Calling functions via interface incurs memory expansion costs, so use assembly to re-use data already in memory
+
+Instead of using the `IERC721` interface to call `safeTransferFrom`, use assembly to call the functions directly.
+
+Before:
+```solidity
+        for (uint256 i = 0; i < len; ++i) {
+            isStaking = 2;
+            IERC721(_stakingToken).safeTransferFrom(_stakeMsgSender(), address(this), _tokenIds[i]);
+            ...
+        }
+        ...
+        for (uint256 i = 0; i < len; ++i) {
+            require(stakerAddress[_tokenIds[i]] == _stakeMsgSender(), "Not staker");
+            stakerAddress[_tokenIds[i]] = address(0);
+            IERC721(_stakingToken).safeTransferFrom(address(this), _stakeMsgSender(), _tokenIds[i]);
+        }
+```
+
+After:
+```solidity
+        for (uint256 i = 0; i < len; ++i) {
+            isStaking = 2;
+            uint256 tokenId = _tokenIds[i];
+            assembly {
+                let pointer := mload(0x40)
+
+                mstore(0x00, hex"42842e0e")
+                mstore(0x04, caller())
+                mstore(0x24, address())
+                mstore(0x44, tokenId)
+    
+                if iszero(extcodesize(_stakingToken)) {
+                    revert(0x00, 0x00) // revert if address has no code deployed to it
+                }
+    
+                // gas, address, value, argsOffset, argsSize, retOffset, retSize
+                let success := call(gas(), _stakingToken, 0x00, 0x00, 0x64, 0x00, 0x80)
+
+                
+                if iszero(success) {
+                    revert(0x00, 0x80)
+                }
+
+                mstore(0x40, pointer)
+                mstore(0x60, 0)
+            }
+            ...
+        }
+        ...
+        for (uint256 i = 0; i < len; ++i) {
+            require(stakerAddress[_tokenIds[i]] == _stakeMsgSender(), "Not staker");
+            stakerAddress[_tokenIds[i]] = address(0);
+            uint256 tokenId = _tokenIds[i];
+            assembly {
+                let pointer := mload(0x40)
+
+                mstore(0x00, hex"42842e0e")
+                mstore(0x04, address())
+                mstore(0x24, caller())
+                mstore(0x44, tokenId)
+    
+                if iszero(extcodesize(_stakingToken)) {
+                    revert(0x00, 0x00) // revert if address has no code deployed to it
+                }
+    
+                // gas, address, value, argsOffset, argsSize, retOffset, retSize
+                let success := call(gas(), _stakingToken, 0x00, 0x00, 0x64, 0x00, 0x80)
+
+                
+                if iszero(success) {
+                    revert(0x00, 0x80)
+                }
+
+                mstore(0x40, pointer)
+                mstore(0x60, 0)
+            }
+        }
+```
+
+Before:
+| Deployment Cost                                                          | Deployment Size |        |        |        |         |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| 1977635                                                                  | 10620           |        |        |        |         |
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+| stake                                                                    | 5690            | 264347 | 353748 | 355748 | 11      |
+| withdraw                                                                 | 4316            | 23533  | 20940  | 49415  | 5       |
+
+After;
+| Deployment Cost                                                          | Deployment Size |        |        |        |         |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| 1963213                                                                  | 10548           |        |        |        |         |
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+| stake                                                                    | 5690            | 264023 | 353310 | 355310 | 11      |
+| withdraw                                                                 | 4316            | 23437  | 20940  | 49127  | 5       |
+
+Average change:
+- stake: `264347 - 264023 = 324` gas saved
+- withdraw: `23533 - 23437 = 96` gas saved
+- deployment cost: `1977635 - 1963213 = 14_422` gas saved
+
 ## Todo
 
 - stuff to do with lists
