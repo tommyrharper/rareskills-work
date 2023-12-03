@@ -235,11 +235,11 @@ object "ERC1155" {
             let endPtr := copyBytesToMemory(add(offset, 0xa4), dataOffset) // Copies 'data' to memory
             setFreeMemoryPointer(endPtr)
 
-            // call(g, a, v, in, insize, out, outsize)
             let argsOffset := offset
             let argsBytes := 0xa4
             let returnOffset := 0
             let returnBytes := 0x20
+            // call(gas, address, argsOffset, argsSize, retOffset, retSize)
             let success := call(
               gas(), to, 0, offset, sub(endPtr, offset), 0x00, 0x04
             )
