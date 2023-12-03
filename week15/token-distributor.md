@@ -200,12 +200,62 @@ After:
 Change:
 - deployment: `1784084 - 1781672 = 2412` gas saved
 
+## [G-04] Using assembly when accessing arrays to avoid redundant length checks
+
+In the loop mentioned in [G-03] we can use unsafe access to avoid the redundant length checks.
+
+This is because we have already done the following check earlier:
+
+```solidity
+        require(
+            (_periodLengthesInBlocks.length == _numberPeriods) &&
+                (_rewardsPerBlockForStaking.length == _numberPeriods) &&
+                (_rewardsPerBlockForStaking.length == _numberPeriods),
+            "Distributor: Lengthes must match numberPeriods"
+        );
+```
+
+So lets build on top of the previous optimization:
+
+Now:
+```solidity
+        for (uint256 i = 0; i < _numberPeriods; i++) {
+            uint256 rewardsPerBlockForStaking;
+            uint256 rewardsPerBlockForOthers;
+            uint256 periodLengthInBlock;
+            assembly {
+                rewardsPerBlockForStaking := mload(add(_rewardsPerBlockForStaking, add(0x20, mul(i, 0x20))))
+                rewardsPerBlockForOthers := mload(add(_rewardsPerBlockForOthers, add(0x20, mul(i, 0x20))))
+                periodLengthInBlock := mload(add(_periodLengthesInBlocks, add(0x20, mul(i, 0x20))))
+            }
+
+            amountTokensToBeMinted +=
+                (rewardsPerBlockForStaking * periodLengthInBlock) +
+                (rewardsPerBlockForOthers * periodLengthInBlock);
+
+            stakingPeriod[i] = StakingPeriod({
+                rewardPerBlockForStaking: rewardsPerBlockForStaking,
+                rewardPerBlockForOthers: rewardsPerBlockForOthers,
+                periodLengthInBlock: periodLengthInBlock
+            });
+        }
+
+```
+
+```
+Before:
+|  TokenDistributor                         ·    1781661  ·    1781685  ·       1781672  ·        5.9 %  ·     109.69  │
+After:
+|  TokenDistributor                         ·    1780113  ·    1780137  ·       1780124  ·        5.9 %  ·     116.56  │
+```
+
+Change:
+- deployment: `1781672 - 1780124 = 1548` gas saved
+
 
 ## To Add
 
 - Using unsafeAccess on arrays to avoid redundant length checks
-  - see constructor
-- cache values that are repeatedly accessed in array
   - see constructor
 - revert with assembly
 - do while loop
