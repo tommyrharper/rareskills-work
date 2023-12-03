@@ -395,6 +395,66 @@ Change:
 - deployment: `1784073 - 1774442 = 9631` gas saved
 - runtime: `92896 - 92896 = 0` gas saved
 
-## To Add
+## [G-08] Use ++i instead of i++ to increment
 
-- Use unchecked math where appropriate
+Before:
+```solidity
+    function _updateRewardsPerBlock(uint256 _newStartBlock) internal {
+        // Update current phase
+        currentPhase++;
+
+        // Update rewards per block
+        rewardPerBlockForStaking = stakingPeriod[currentPhase].rewardPerBlockForStaking;
+        rewardPerBlockForOthers = stakingPeriod[currentPhase].rewardPerBlockForOthers;
+
+        emit NewRewardsPerBlock(currentPhase, _newStartBlock, rewardPerBlockForStaking, rewardPerBlockForOthers);
+    }
+```
+
+After:
+```solidity
+    function _updateRewardsPerBlock(uint256 _newStartBlock) internal {
+        // Update current phase
+        ++currentPhase;
+
+        // Update rewards per block
+        rewardPerBlockForStaking = stakingPeriod[currentPhase].rewardPerBlockForStaking;
+        rewardPerBlockForOthers = stakingPeriod[currentPhase].rewardPerBlockForOthers;
+
+        emit NewRewardsPerBlock(currentPhase, _newStartBlock, rewardPerBlockForStaking, rewardPerBlockForOthers);
+    }
+```
+
+```
+Before:
+|  Contract          ·  Method              ·  Min        ·  Max        ·  Avg           ·  # calls      ·  eur (avg)  │
+·····················|······················|·············|·············|················|···············|··············
+|  TokenDistributor  ·  harvestAndCompound  ·      32446  ·     136948  ·         97881  ·           12  ·       5.04  │
+·····················|······················|·············|·············|················|···············|··············
+|  TokenDistributor  ·  withdraw            ·      45218  ·     148043  ·         79316  ·           10  ·       4.08  │
+·····················|······················|·············|·············|················|···············|··············
+|  TokenDistributor  ·  withdrawAll         ·      31194  ·     152831  ·         80861  ·           19  ·       4.16  │
+·····················|······················|·············|·············|················|···············|··············
+|  Deployments                              ·                                            ·  % of limit   ·             │
+············································|·············|·············|················|···············|··············
+|  TokenDistributor                         ·    1784073  ·    1784097  ·       1784084  ·        5.9 %  ·      91.87  │
+
+After:
+|  Contract          ·  Method              ·  Min        ·  Max        ·  Avg           ·  # calls      ·  eur (avg)  │
+·····················|······················|·············|·············|················|···············|··············
+|  TokenDistributor  ·  harvestAndCompound  ·      32446  ·     136948  ·         97879  ·           12  ·       6.21  │
+·····················|······················|·············|·············|················|···············|··············
+|  TokenDistributor  ·  withdraw            ·      45218  ·     148033  ·         79314  ·           10  ·       5.03  │
+·····················|······················|·············|·············|················|···············|··············
+|  TokenDistributor  ·  withdrawAll         ·      31194  ·     152826  ·         80859  ·           19  ·       5.13  │
+·····················|······················|·············|·············|················|···············|··············
+|  Deployments                              ·                                            ·  % of limit   ·             │
+············································|·············|·············|················|···············|··············
+|  TokenDistributor                         ·    1783653  ·    1783677  ·       1783664  ·        5.9 %  ·     113.10  │
+```
+
+Change:
+- harvestAndCompound: `97881 - 97879 = 2` gas saved
+- withdraw: `79316 - 79314 = 2` gas saved
+- withdrawAll: `80861 - 80859 = 2` gas saved
+- deployment: `1784084 - 1783664 = 420` gas saved
