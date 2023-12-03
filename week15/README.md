@@ -15,6 +15,10 @@ As reference I will be using [The RareSkills Book of Solidity Gas Optimization: 
 
 To start with I will summarize all the tips in the book in my [Optimization Tips](./optimization-tips.md) document.
 
+## Notes
+
+For this challenge I didn't do a full and comprehensive optimization. Instead I time-boxed my investigation of each contract and started with looking at the largest optimizations - mostly storage related. Then following that I looked into different optimizations that I predominantly had not done in the other contracts, to cover a wide array of optimizations.
+
 ## Questions
 
 - [ ] Why does adding a `payable` modifier to the admin functions in the `Trader Joe Vesting Contracting` increase the deployed bytecode size?
