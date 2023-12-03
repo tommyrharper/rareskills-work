@@ -344,6 +344,47 @@ Average change:
 - withdraw: `23533 - 23437 = 96` gas saved
 - deployment cost: `1977635 - 1963213 = 14_422` gas saved
 
+## [G-07] Remove SafeMath - it is not needed in solidity version 0.8.0 and above
+
+Before:
+```solidity
+            (bool noOverflowProduct, uint256 rewardsProduct) = SafeMath.tryMul(
+                (endTime - startTime) * staker.amountStaked,
+                condition.rewardsPerUnitTime
+            );
+            (bool noOverflowSum, uint256 rewardsSum) = SafeMath.tryAdd(_rewards, rewardsProduct / condition.timeUnit);
+```
+
+After:
+```solidity
+            uint256 rewardsProduct = ((endTime - startTime) * staker.amountStaked) * condition.rewardsPerUnitTime;
+            uint256 rewardsSum = _rewards + (rewardsProduct / condition.timeUnit);
+```
+
+Before:
+| Deployment Cost                                                          | Deployment Size |        |        |        |         |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| 1977635                                                                  | 10620           |        |        |        |         |
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+| claimRewards                                                             | 5895            | 31874  | 29827  | 61949  | 4       |
+| getStakeInfo                                                             | 7228            | 10615  | 9444   | 17956  | 13      |
+| withdraw                                                                 | 4316            | 23533  | 20940  | 49415  | 5       |
+
+After:
+| Deployment Cost                                                          | Deployment Size |        |        |        |         |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| 1946399                                                                  | 10464           |        |        |        |         |
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+| claimRewards                                                             | 5802            | 31774  | 29744  | 61807  | 4       |
+| getStakeInfo                                                             | 7135            | 10455  | 9160   | 17863  | 13      |
+| withdraw                                                                 | 4316            | 23469  | 20847  | 49301  | 5       |
+
+Average change:
+- claimRewards: `31874 - 31774 = 100` gas saved
+- getStakeInfo: `10615 - 10455 = 160` gas saved
+- withdraw: `23533 - 23469 = 64` gas saved
+- deployment cost: `1977635 - 1946399 = 31_236` gas saved
+
 ## Todo
 
 - stuff to do with lists
