@@ -1,5 +1,10 @@
 # LooksRare Token Distributor Gas Optimizations
 
+Note - I didn't write my own tests for this, I just reused the ones in the `LooksRare/contracts-token-staking` repo, and turned the `gas-reporter` on.
+
+
+[See here for the full tests](https://github.com/LooksRare/contracts-token-staking/blob/master/test/tokenDistributor.test.ts).
+
 ## Gas usage without optimizations
 
 ```
