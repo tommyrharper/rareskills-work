@@ -145,6 +145,75 @@ Average change:
 
 Again very healthy savings.
 
+## [G-04] Use storage pointers instead of memory where appropriate
+
+There are numerous places throughout this codebase where memory is used where storage pointers could be used instead.
+
+Before
+```solidity
+    ...
+        StakingCondition memory condition = stakingConditions[nextConditionId - 1];
+    ...
+        StakingCondition memory condition = stakingConditions[nextConditionId - 1];
+    ...
+        uint256[] memory _indexedTokens = indexedTokens;
+    ...
+            address[] memory _stakersArray = stakersArray;
+    ...
+        Staker memory staker = stakers[_staker];
+    ...
+            StakingCondition memory condition = stakingConditions[i];
+    ...
+```
+
+After
+```solidity
+    ...
+        StakingCondition storage condition = stakingConditions[nextConditionId - 1];
+    ...
+        StakingCondition storage condition = stakingConditions[nextConditionId - 1];
+    ...
+        uint256[] storage _indexedTokens = indexedTokens;
+    ...
+            address[] storage _stakersArray = stakersArray;
+    ...
+        Staker storage staker = stakers[_staker];
+    ...
+            StakingCondition storage condition = stakingConditions[i];
+    ...
+```
+
+Before:
+| Deployment Cost                                                          | Deployment Size |        |        |        |         |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| 1977635                                                                  | 10620           |        |        |        |         |
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+| claimRewards                                                             | 5895            | 31874  | 29827  | 61949  | 4       |
+| getStakeInfo                                                             | 7228            | 10615  | 9444   | 17956  | 13      |
+| setRewardsPerUnitTime                                                    | 632             | 65416  | 92408  | 103208 | 3       |
+| setTimeUnit                                                              | 742             | 65530  | 92524  | 103324 | 3       |
+| withdraw                                                                 | 4316            | 23533  | 20940  | 49415  | 5       |
+
+After:
+| Deployment Cost                                                          | Deployment Size |        |        |        |         |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| 1908957                                                                  | 10277           |        |        |        |         |
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+| claimRewards                                                             | 5601            | 30595  | 28563  | 59655  | 4       |
+| getStakeInfo                                                             | 7215            | 10701  | 9945   | 16405  | 13      |
+| setRewardsPerUnitTime                                                    | 632             | 64628  | 92176  | 101076 | 3       |
+| setTimeUnit                                                              | 742             | 64743  | 92294  | 101194 | 3       |
+| withdraw                                                                 | 4316            | 22683  | 18646  | 47692  | 5       |
+
+Average change:
+- claimRewards: `31874 - 30595 = 1_279` gas saved
+- getStakeInfo: `10615 - 10701 = 86` EXTRA gas used
+  - So this is more expensive here on average, although it is cheaper in the max case - `17956 - 16405 = 1_551` gas saved
+- setRewardPerUnitTime: `65416 - 64628 = 788` gas saved
+- setTimeUnit: `65530 - 64743 = 787` gas saved
+- withdraw: `23533 - 22683 = 850` gas saved
+- deployment cost: `1977635 - 1908957 = 6_678` gas saved
+
 ## Todo
 
 - stuff to do with lists
