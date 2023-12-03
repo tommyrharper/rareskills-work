@@ -18,3 +18,35 @@ To start with I will summarize all the tips in the book in my [Optimization Tips
 ## Questions
 
 - [ ] Why does adding a `payable` modifier to the admin functions in the `Trader Joe Vesting Contracting` increase the deployed bytecode size?
+- [ ] When I tested doing a string revert with assembly in the looks rare `token-distributor`, I got the following error (not sure why)
+  - ` AssertionError: Expected transaction to be reverted with Deposit: Amount must be > 0, but other exception was thrown: Error: VM Exception while processing transaction: reverted with an unrecognized custom error`
+  - Why is this happening?
+This was the code change:
+Before:
+```solidity
+    function deposit(uint256 amount) external nonReentrant {
+        require(amount > 0, "Deposit: Amount must be > 0");
+        ...
+```
+
+After:
+```solidity
+    function deposit(uint256 amount) external nonReentrant {
+        assembly {
+            if iszero(amount) {
+                mstore(0x00, 0x20) // store offset to where length of revert message is stored
+                mstore(0x20, 0x1b) // store length (27)
+                mstore(0x40, 0x4465706f7369743a20416d6f756e74206d757374206265203e20300000000000) // store hex representation of message
+                revert(0x00, 0x60) // revert with data
+            }
+        }
+        ...
+```
+
+This is the test:
+```typescript
+    it.only("Cannot deposit if amount is 0", async () => {
+      await expect(tokenDistributor.connect(user1).deposit("0")).to.be.revertedWith("Deposit: Amount must be > 0");
+    });
+```
+
