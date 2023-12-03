@@ -18,7 +18,7 @@ To start with I will summarize all the tips in the book in my [Optimization Tips
 ## Questions
 
 - [ ] Why does adding a `payable` modifier to the admin functions in the `Trader Joe Vesting Contracting` increase the deployed bytecode size?
-- [ ] When I tested doing a string revert with assembly in the looks rare `token-distributor`, I got the following error (not sure why)
+- [ ] When I tested doing a string revert with assembly in the looks rare `token-distributor` (`[G-07]`), I got the following error (not sure why)
   - ` AssertionError: Expected transaction to be reverted with Deposit: Amount must be > 0, but other exception was thrown: Error: VM Exception while processing transaction: reverted with an unrecognized custom error`
   - Why is this happening?
 This was the code change:
