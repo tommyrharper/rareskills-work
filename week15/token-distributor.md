@@ -340,7 +340,61 @@ Change:
 Total savings with all the optimizations to this piece of code:
 - deployment: `1784084 - 1779197 = 4887` gas saved
 
+## [G-07] Using assembly to revert with an error message
+
+For this one we will use a specific test:
+```ts
+    it.only("Cannot deposit if amount is 0", async () => {
+      await expect(tokenDistributor.connect(user1).deposit("0")).to.be.reverted;
+    });
+```
+
+Before:
+```solidity
+    function deposit(uint256 amount) external nonReentrant {
+        require(amount > 0, "Deposit: Amount must be > 0");
+        ...
+```
+
+After:
+```solidity
+    function deposit(uint256 amount) external nonReentrant {
+        assembly {
+            if iszero(amount) {
+                mstore(0x00, 0x20) // store offset to where length of revert message is stored
+                mstore(0x20, 0x1b) // store length (27)
+                mstore(0x40, 0x4465706f7369743a20416d6f756e74206d757374206265203e20300000000000) // store hex representation of message
+                revert(0x00, 0x60) // revert with data
+            }
+        }
+        ...
+```
+```
+Before:
+|  Contract          ·  Method   ·  Min        ·  Max        ·  Avg           ·  # calls      ·  eur (avg)  │
+·····················|···········|·············|·············|················|···············|··············
+|  TokenDistributor  ·  deposit  ·      84346  ·     118546  ·         92896  ·            4  ·       5.52  │
+·····················|···········|·············|·············|················|···············|··············
+|  Deployments                   ·                                            ·  % of limit   ·             │
+·································|·············|·············|················|···············|··············
+|  TokenDistributor              ·          -  ·          -  ·       1784073  ·        5.9 %  ·     105.92  │
+
+After:
+|  Contract          ·  Method   ·  Min        ·  Max        ·  Avg           ·  # calls      ·  eur (avg)  │
+·····················|···········|·············|·············|················|···············|··············
+|  TokenDistributor  ·  deposit  ·      84346  ·     118546  ·         92896  ·            4  ·       6.25  │
+·····················|···········|·············|·············|················|···············|··············
+|  Deployments                   ·                                            ·  % of limit   ·             │
+·································|·············|·············|················|···············|··············
+|  TokenDistributor              ·          -  ·          -  ·       1774442  ·        5.9 %  ·     119.38  │
+```
+
+Interestingly the outcome of this is not as expected. The runtime gas cost is actually the same in both scenarios, however there was a decrease in the deployment cost, which is interesting:
+
+Change:
+- deployment: `1784073 - 1774442 = 9631` gas saved
+- runtime: `92896 - 92896 = 0` gas saved
 
 ## To Add
 
-- revert with assembly
+- Use unchecked math where appropriate
