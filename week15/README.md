@@ -11,6 +11,8 @@ The challenge this week is to gas optimize the following real world contracts:
   - [See tests here](https://github.com/LooksRare/contracts-token-staking/blob/master/test/tokenDistributor.test.ts) - not my own.
   - [See report here](./token-distributor.md)
 - [ ] [Thirdweb ERC721 Staking](https://github.com/thirdweb-dev/contracts/blob/main/contracts/extension/Staking721.sol)
+  - [See tests here](https://github.com/thirdweb-dev/contracts/blob/main/src/test/sdk/extension/StakingExtension.t.sol) - not my own.
+  - [See report here](./erc721-staking.md)
 
 As reference I will be using [The RareSkills Book of Solidity Gas Optimization: 80+ Tips](https://www.rareskills.io/post/gas-optimization).
 
@@ -56,8 +58,7 @@ This is the test:
     });
 ```
 
-## Bonus
-
+## Gas optimizations done by:
 
 //   $$\
 //   $$ | 
