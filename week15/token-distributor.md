@@ -147,3 +147,65 @@ Change:
 - harvestAndCompound: `97881 - 88880 = 9001` gas saved
 - withdraw: `79316 - 67955 = 11361` gas saved
 - withdrawAll: `80861 - 79037 = 1824` gas saved
+
+
+## [G-03] Cache variables read from array multiple times
+
+Before:
+```solidity
+        for (uint256 i = 0; i < _numberPeriods; i++) {
+            amountTokensToBeMinted +=
+                (_rewardsPerBlockForStaking[i] * _periodLengthesInBlocks[i]) +
+                (_rewardsPerBlockForOthers[i] * _periodLengthesInBlocks[i]);
+
+            stakingPeriod[i] = StakingPeriod({
+                rewardPerBlockForStaking: _rewardsPerBlockForStaking[i],
+                rewardPerBlockForOthers: _rewardsPerBlockForOthers[i],
+                periodLengthInBlock: _periodLengthesInBlocks[i]
+            });
+        }
+```
+
+After:
+```solidity
+        for (uint256 i = 0; i < _numberPeriods; i++) {
+            uint256 rewardsPerBlockForStaking = _rewardsPerBlockForStaking[i];
+            uint256 rewardsPerBlockForOthers = _rewardsPerBlockForOthers[i];
+            uint256 periodLengthInBlock = _periodLengthesInBlocks[i];
+
+            amountTokensToBeMinted +=
+                (rewardsPerBlockForStaking * periodLengthInBlock) +
+                (rewardsPerBlockForOthers * periodLengthInBlock);
+
+            stakingPeriod[i] = StakingPeriod({
+                rewardPerBlockForStaking: rewardsPerBlockForStaking,
+                rewardPerBlockForOthers: rewardsPerBlockForOthers,
+                periodLengthInBlock: periodLengthInBlock
+            });
+        }
+```
+
+```
+Before:
+|  Deployments                              ·                                            ·  % of limit   ·             │
+············································|·············|·············|················|···············|··············
+|  TokenDistributor                         ·    1784073  ·    1784097  ·       1784084  ·        5.9 %  ·      91.87  │
+
+After:
+|  Deployments                              ·                                            ·  % of limit   ·             │
+············································|·············|·············|················|···············|··············
+|  TokenDistributor                         ·    1781661  ·    1781685  ·       1781672  ·        5.9 %  ·     109.69  │
+```
+
+Change:
+- deployment: `1784084 - 1781672 = 2412` gas saved
+
+
+## To Add
+
+- Using unsafeAccess on arrays to avoid redundant length checks
+  - see constructor
+- cache values that are repeatedly accessed in array
+  - see constructor
+- revert with assembly
+- do while loop
