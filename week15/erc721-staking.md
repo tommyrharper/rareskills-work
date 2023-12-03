@@ -59,17 +59,43 @@ After:
 | stake                                                                    | 5690            | 264175 | 353540 | 355540 | 11      |
 | withdraw                                                                 | 4316            | 23466  | 20810  | 49311  | 5       |
 
-Change:
-- claimRewards: `61949 - 61937 = 12` gas saved
-- getStakeInfo: `17956 - 17950 = 6` gas saved
+Average change:
+- claimRewards: `31874 - 31866 = 8` gas saved
+- getStakeInfo: `10615 - 10609 = 6` gas saved
 - onERC721Received: `974 - 957 = 17` gas saved
-- setRewardPerUnitTime: `103208 - 103202 = 6` gas saved
-- setTimeUnit: `103324 - 103318 = 6` gas saved
-- stake: `355748 - 355540 = 208` gas saved
-- withdraw: `49415 - 49311 = 104` gas saved
+- setRewardPerUnitTime: `65416 - 65412 = 4` gas saved
+- setTimeUnit: `65530 - 65526 = 4` gas saved
+- stake: `264347 - 264175 = 172` gas saved
+- withdraw: `23533 - 23466 = 67` gas saved
 
+## [G-02] Use bitmaps instead of bools when a significant amount of booleans are used
+
+Before:
+```solidity
+    mapping(address => bool) public isIndexed;
+```
+
+After:
+```solidity
+    BitMaps.BitMap internal isIndexed;
+```
+
+Before:
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| stake                                                                    | 5690            | 264347 | 353748 | 355748 | 11      |
+
+
+After:
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| stake                                                                    | 5690            | 234678 | 310227 | 312227 | 11      |
+
+Average change:
+- stake: `264347 - 234678 = 29_669` gas saved
+
+This is a big saving!
 
 ## Todo
 
-- bitmap for isIndexed
 - stuff to do with lists
