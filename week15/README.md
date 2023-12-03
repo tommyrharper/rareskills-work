@@ -2,9 +2,10 @@
 
 The challenge this week is to gas optimize the following real world contracts:
 - [x] [Synthetix Staking Reward](https://github.com/Synthetixio/synthetix/blob/develop/contracts/StakingRewards.sol)
+  - [See tests here](https://github.com/Synthetixio/synthetix/blob/develop/test/contracts/StakingRewards.js) - not my own.
   - [See report here](./staking-rewards.md)
 - [ ] [Trader Joe Vesting Contract](https://github.com/traderjoe-xyz/joe-core/blob/main/contracts/TokenVesting.sol)
-  - [See my tests here](https://github.com/tommyrharper/joe-core/blob/main/test/TokenVesting.test.ts)
+  - [See my tests here](https://github.com/tommyrharper/joe-core/blob/main/test/TokenVesting.test.ts) - I wrote these.
   - [See report here](./vesting-contract.md)
 - [ ] [LooksRare Token Distributor](https://github.com/LooksRare/contracts-token-staking/blob/master/contracts/TokenDistributor.sol)
 - [ ] [Thirdweb ERC721 Staking](https://github.com/thirdweb-dev/contracts/blob/main/contracts/extension/Staking721.sol)

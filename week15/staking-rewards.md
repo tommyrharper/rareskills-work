@@ -2,6 +2,8 @@
 
 Note - I didn't write my own tests for this, I just reused the ones in the `synthetix` repo, and turned the `gas-reporter` on.
 
+[See here for the full tests](https://github.com/Synthetixio/synthetix/blob/develop/test/contracts/StakingRewards.js).
+
 ## Gas useage before changes are made
 
 
