@@ -96,6 +96,56 @@ Average change:
 
 This is a big saving!
 
+## [G-03] Pack structs
+
+Before:
+```
+    struct StakingCondition {
+        uint256 timeUnit;
+        uint256 rewardsPerUnitTime;
+        uint256 startTimestamp;
+        uint256 endTimestamp;
+    }
+```
+
+After:
+```
+    struct StakingCondition {
+        uint136 rewardsPerUnitTime;
+        uint40 timeUnit;
+        uint40 startTimestamp;
+        uint40 endTimestamp;
+    }
+```
+
+Before:
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| claimRewards                                                             | 5895            | 31874  | 29827  | 61949  | 4       |
+| getStakeInfo                                                             | 7228            | 10615  | 9444   | 17956  | 13      |
+| setRewardsPerUnitTime                                                    | 632             | 65416  | 92408  | 103208 | 3       |
+| setTimeUnit                                                              | 742             | 65530  | 92524  | 103324 | 3       |
+| withdraw                                                                 | 4316            | 23533  | 20940  | 49415  | 5       |
+
+After:
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| claimRewards                                                             | 5694            | 28684  | 26647  | 55748  | 4       |
+| getStakeInfo                                                             | 7027            | 9438   | 9072   | 11755  | 13      |
+| setRewardsPerUnitTime                                                    | 632             | 20294  | 26325  | 33925  | 3       |
+| setTimeUnit                                                              | 742             | 20411  | 26446  | 34046  | 3       |
+| withdraw                                                                 | 4316            | 21269  | 14739  | 44454  | 5       |
+
+Average change:
+- claimRewards: `31874 - 28684 = 3_190` gas saved
+- getStakeInfo: `10615 - 9438 = 1_177` gas saved
+- setRewardPerUnitTime: `65416 - 20294 = 45_122` gas saved
+- setTimeUnit: `65530 - 20411 = 45_119` gas saved
+- withdraw: `23533 - 21269 = 2_264` gas saved
+
+Again very healthy savings.
+
 ## Todo
 
 - stuff to do with lists
+- memory stuff
