@@ -21,6 +21,7 @@ For this challenge I didn't do a full and comprehensive optimization. Instead I 
 
 ## Questions
 
+- [ ] In the Rareskills Gas Optimisation book it says under `Design Patterns` - `4. Consider packing calldata, especially on an L2`. Why especially on an L2? I would have thought this would be more important on L1 where gas costs are higher.
 - [ ] Why does adding a `payable` modifier to the admin functions in the `Trader Joe Vesting Contracting` increase the deployed bytecode size?
 - [ ] When I tested doing a string revert with assembly in the looks rare `token-distributor` (`[G-07]`), I got the following error (not sure why)
   - ` AssertionError: Expected transaction to be reverted with Deposit: Amount must be > 0, but other exception was thrown: Error: VM Exception while processing transaction: reverted with an unrecognized custom error`
