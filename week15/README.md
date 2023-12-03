@@ -10,7 +10,7 @@ The challenge this week is to gas optimize the following real world contracts:
 - [x] [LooksRare Token Distributor](https://github.com/LooksRare/contracts-token-staking/blob/master/contracts/TokenDistributor.sol)
   - [See tests here](https://github.com/LooksRare/contracts-token-staking/blob/master/test/tokenDistributor.test.ts) - not my own.
   - [See report here](./token-distributor.md)
-- [ ] [Thirdweb ERC721 Staking](https://github.com/thirdweb-dev/contracts/blob/main/contracts/extension/Staking721.sol)
+- [x] [Thirdweb ERC721 Staking](https://github.com/thirdweb-dev/contracts/blob/main/contracts/extension/Staking721.sol)
   - [See tests here](https://github.com/thirdweb-dev/contracts/blob/main/src/test/sdk/extension/StakingExtension.t.sol) - not my own.
   - [See report here](./erc721-staking.md)
 
