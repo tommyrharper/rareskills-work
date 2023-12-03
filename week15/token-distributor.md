@@ -294,12 +294,53 @@ After:
 Change:
 - deployment: `1780124 - 1779380 = 744` gas saved
 
-Total savings with all these 3 optimizations to this piece of code:
-- deployment: `1784084 - 1779380 = 4704` gas saved
+## [G-06] Do-While loops are cheaper than for loops
+
+We can take this one step further yet, using a do-while loop instead of a for-loop.
+
+Now:
+```solidity
+        do {
+            uint256 rewardsPerBlockForStaking;
+            uint256 rewardsPerBlockForOthers;
+            uint256 periodLengthInBlock;
+            assembly {
+                rewardsPerBlockForStaking := mload(add(_rewardsPerBlockForStaking, add(0x20, mul(i, 0x20))))
+                rewardsPerBlockForOthers := mload(add(_rewardsPerBlockForOthers, add(0x20, mul(i, 0x20))))
+                periodLengthInBlock := mload(add(_periodLengthesInBlocks, add(0x20, mul(i, 0x20))))
+            }
+
+            amountTokensToBeMinted +=
+                (rewardsPerBlockForStaking * periodLengthInBlock) +
+                (rewardsPerBlockForOthers * periodLengthInBlock);
+
+            stakingPeriod[i] = StakingPeriod({
+                rewardPerBlockForStaking: rewardsPerBlockForStaking,
+                rewardPerBlockForOthers: rewardsPerBlockForOthers,
+                periodLengthInBlock: periodLengthInBlock
+            });
+
+            unchecked {
+                ++i;
+            }
+        } while (i < _numberPeriods);
+```
+
+
+```
+Before:
+|  TokenDistributor                         ·    1779369  ·    1779393  ·       1779380  ·        5.9 %  ·     134.37  │
+After:
+|  TokenDistributor                         ·    1779186  ·    1779210  ·       1779197  ·        5.9 %  ·     120.10  │
+```
+
+Change:
+- deployment: `1779380 - 1779197 = 183` gas saved
+
+Total savings with all the optimizations to this piece of code:
+- deployment: `1784084 - 1779197 = 4887` gas saved
+
 
 ## To Add
 
-- Using unsafeAccess on arrays to avoid redundant length checks
-  - see constructor
 - revert with assembly
-- do while loop
