@@ -6,7 +6,6 @@ Note - I didn't write my own tests for this, I just reused the ones in the `thir
 
 ## Gas usage without optimizations
 
-
 | Deployment Cost                                                          | Deployment Size |        |        |        |         |
 |--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
 | 1977635                                                                  | 10620           |        |        |        |         |
@@ -23,7 +22,6 @@ Note - I didn't write my own tests for this, I just reused the ones in the `thir
 | stake                                                                    | 5690            | 264347 | 353748 | 355748 | 11      |
 | stakerAddress                                                            | 873             | 873    | 873    | 873    | 10      |
 | withdraw                                                                 | 4316            | 23533  | 20940  | 49415  | 5       |
-
 
 ## [G-01] Variables that are never updated should be immutable or constant
 
@@ -385,8 +383,42 @@ Average change:
 - withdraw: `23533 - 23469 = 64` gas saved
 - deployment cost: `1977635 - 1946399 = 31_236` gas saved
 
-## Todo
+## [G-08] Pack multiple mappings into a single struct
 
-- stuff to do with lists
-- memory stuff
-- getStakeInfo indexedTokens loop cache storage reads
+There are two separate mappings with `tokenId` keys that could be merged into one with a struct:
+
+Before:
+```solidity
+    ///@dev Mapping from token-id to whether it is indexed or not.
+    mapping(uint256 => bool) public isIndexed;
+
+    ...
+
+    /// @dev Mapping from staked token-id to staker address.
+    mapping(uint256 => address) public stakerAddress;
+```
+
+After:
+```solidity
+    struct TokenData {
+        address tokenAddress;
+        bool isIndexed;
+    }
+
+    mapping(uint256 => TokenData) public tokenData;
+```
+
+Before:
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| stake                                                                    | 5690            | 264347 | 353748 | 355748 | 11      |
+
+After:
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| stake                                                                    | 5690            | 218834 | 288447 | 290447 | 11      |
+
+Average change:
+- stake: `264347 - 218834 = 45_513` gas saved
+
+Not bad! This is an alternative to using the bitmap as described above.
