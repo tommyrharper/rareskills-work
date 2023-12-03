@@ -6,6 +6,70 @@ Note - I didn't write my own tests for this, I just reused the ones in the `thir
 
 ## Gas usage without optimizations
 
+
+| Deployment Cost                                                          | Deployment Size |        |        |        |         |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| 1977635                                                                  | 10620           |        |        |        |         |
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+| balanceOf                                                                | 826             | 826    | 826    | 826    | 1       |
+| claimRewards                                                             | 5895            | 31874  | 29827  | 61949  | 4       |
+| getRewardsPerUnitTime                                                    | 769             | 2102   | 769    | 4769   | 3       |
+| getStakeInfo                                                             | 7228            | 10615  | 9444   | 17956  | 13      |
+| getTimeUnit                                                              | 1275            | 2608   | 1275   | 5275   | 3       |
+| onERC721Received                                                         | 974             | 974    | 974    | 974    | 23      |
+| setCondition                                                             | 4490            | 4490   | 4490   | 4490   | 2       |
+| setRewardsPerUnitTime                                                    | 632             | 65416  | 92408  | 103208 | 3       |
+| setTimeUnit                                                              | 742             | 65530  | 92524  | 103324 | 3       |
+| stake                                                                    | 5690            | 264347 | 353748 | 355748 | 11      |
+| stakerAddress                                                            | 873             | 873    | 873    | 873    | 10      |
+| withdraw                                                                 | 4316            | 23533  | 20940  | 49415  | 5       |
+
+
+## [G-01] Variables that are never updated should be immutable or constant
+
+Before:
+```solidity
+    address public stakingToken;
 ```
 
+After:
+```solidity
+    address public immutable stakingToken;
 ```
+
+Before:
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| claimRewards                                                             | 5895            | 31874  | 29827  | 61949  | 4       |
+| getStakeInfo                                                             | 7228            | 10615  | 9444   | 17956  | 13      |
+| onERC721Received                                                         | 974             | 974    | 974    | 974    | 23      |
+| setRewardsPerUnitTime                                                    | 632             | 65416  | 92408  | 103208 | 3       |
+| setTimeUnit                                                              | 742             | 65530  | 92524  | 103324 | 3       |
+| stake                                                                    | 5690            | 264347 | 353748 | 355748 | 11      |
+| withdraw                                                                 | 4316            | 23533  | 20940  | 49415  | 5       |
+
+After:
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| claimRewards                                                             | 5889            | 31866  | 29820  | 61937  | 4       |
+| getStakeInfo                                                             | 7222            | 10609  | 9438   | 17950  | 13      |
+| onERC721Received                                                         | 957             | 957    | 957    | 957    | 23      |
+| setRewardsPerUnitTime                                                    | 632             | 65412  | 92402  | 103202 | 3       |
+| setTimeUnit                                                              | 742             | 65526  | 92518  | 103318 | 3       |
+| stake                                                                    | 5690            | 264175 | 353540 | 355540 | 11      |
+| withdraw                                                                 | 4316            | 23466  | 20810  | 49311  | 5       |
+
+Change:
+- claimRewards: `61949 - 61937 = 12` gas saved
+- getStakeInfo: `17956 - 17950 = 6` gas saved
+- onERC721Received: `974 - 957 = 17` gas saved
+- setRewardPerUnitTime: `103208 - 103202 = 6` gas saved
+- setTimeUnit: `103324 - 103318 = 6` gas saved
+- stake: `355748 - 355540 = 208` gas saved
+- withdraw: `49415 - 49311 = 104` gas saved
+
+
+## Todo
+
+- bitmap for isIndexed
+- stuff to do with lists
