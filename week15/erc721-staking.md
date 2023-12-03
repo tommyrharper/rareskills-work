@@ -214,7 +214,37 @@ Average change:
 - withdraw: `23533 - 22683 = 850` gas saved
 - deployment cost: `1977635 - 1908957 = 6_678` gas saved
 
+## [G-05] Using mappings instead of arrays to avoid length checks
+
+Before:
+```solidity
+    uint256[] public indexedTokens;
+```
+
+After:
+```solidity
+    mapping(uint256 => uint256) public indexedTokens;
+```
+
+Before:
+| Deployment Cost                                                          | Deployment Size |        |        |        |         |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| 1977635                                                                  | 10620           |        |        |        |         |
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+| getStakeInfo                                                             | 7228            | 10615  | 9444   | 17956  | 13      |
+
+After:
+| Deployment Cost                                                          | Deployment Size |        |        |        |         |
+|--------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| 1967221                                                                  | 10568           |        |        |        |         |
+| Function Name                                                            | min             | avg    | median | max    | # calls |
+| getStakeInfo                                                             | 6842            | 10381  | 9304   | 17817  | 13      |
+
+Average change:
+- getStakeInfo: `10615 - 10381 = 234` gas saved
+
 ## Todo
 
 - stuff to do with lists
 - memory stuff
+- getStakeInfo indexedTokens loop cache storage reads
