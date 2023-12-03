@@ -1,4 +1,4 @@
-# Trader Joe TokenVesting
+# Trader Joe TokenVesting Gas Optimizations
 
 I have written the tests used for these gas calculations [here](https://github.com/tommyrharper/joe-core/blob/main/test/TokenVesting.test.ts).
 
