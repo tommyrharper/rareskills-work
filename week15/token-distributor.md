@@ -252,6 +252,50 @@ After:
 Change:
 - deployment: `1781672 - 1780124 = 1548` gas saved
 
+## [G-05] Write gas-optimal for-loops
+
+We can further optimise this same bit of code mentioned in `[G-03]` and `[G-04]` by applying common loop optimizations.
+
+Now
+```solidity
+        for (uint256 i = 0; i < _numberPeriods; ) {
+            uint256 rewardsPerBlockForStaking;
+            uint256 rewardsPerBlockForOthers;
+            uint256 periodLengthInBlock;
+            assembly {
+                rewardsPerBlockForStaking := mload(add(_rewardsPerBlockForStaking, add(0x20, mul(i, 0x20))))
+                rewardsPerBlockForOthers := mload(add(_rewardsPerBlockForOthers, add(0x20, mul(i, 0x20))))
+                periodLengthInBlock := mload(add(_periodLengthesInBlocks, add(0x20, mul(i, 0x20))))
+            }
+
+            amountTokensToBeMinted +=
+                (rewardsPerBlockForStaking * periodLengthInBlock) +
+                (rewardsPerBlockForOthers * periodLengthInBlock);
+
+            stakingPeriod[i] = StakingPeriod({
+                rewardPerBlockForStaking: rewardsPerBlockForStaking,
+                rewardPerBlockForOthers: rewardsPerBlockForOthers,
+                periodLengthInBlock: periodLengthInBlock
+            });
+
+            unchecked {
+                ++i;
+            }
+        }
+```
+
+```
+Before:
+|  TokenDistributor                         ·    1780113  ·    1780137  ·       1780124  ·        5.9 %  ·     116.56  │
+After:
+|  TokenDistributor                         ·    1779369  ·    1779393  ·       1779380  ·        5.9 %  ·     134.37  │
+```
+
+Change:
+- deployment: `1780124 - 1779380 = 744` gas saved
+
+Total savings with all these 3 optimizations to this piece of code:
+- deployment: `1784084 - 1779380 = 4704` gas saved
 
 ## To Add
 
