@@ -28,4 +28,4 @@ https://github.com/RareSkills/gas-puzzles
 
 ## Questions 
 
-- [ ] In `Require` why does using `<=` reduce gas consumption over using `<`?
+- [x] In `Require` why does using `<=` reduce gas consumption over using `<`?
