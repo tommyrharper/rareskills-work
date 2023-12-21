@@ -21,13 +21,42 @@ Here is how to disable some of these checks:
 
 ## **Question 2:** What is a beacon proxy used for?
 
+A beacon proxy is a way to deploy many proxies with the same implementation contract. Each proxy calls the beacon to query their implementation address, and then they delegatecall into that implementation address.
 
-## **********************Question 3:********************** Why does the openzeppelin upgradeable tool insert something like `uint256[50] private __gap;` inside the contracts? To see it, create an upgradeable smart contract that has a parent contract and look in the parent.
+This way you can upgrade an effectively unlimited number of proxies just by changing the implementation address associated with the beacon.
 
+## **Question 3:** Why does the openzeppelin upgradeable tool insert something like `uint256[50] private __gap;` inside the contracts? To see it, create an upgradeable smart contract that has a parent contract and look in the parent.
+
+Because you cannot safely change the storage layout of an upgradeable contract. By leaving the gap inside inherited contracts, it means that you have some extra storage space to play with when upgrading, which offers more flexibility.
 
 ## **Question 4:** What is the difference between initializing the proxy and initializing the implementation? Do you need to do both? When do they need to be done?
 
+Initializing the proxy will set the contract state in the proxy, which should always be done for any proxy contract that has an `initializer`. Initializing the implementation will just change the state in the implementation which shouldn't effect the proxy contract, as they do not share state. However it is generally recommended to ensure that the implementation is initialized too, to prevent a malicious actor messing with that contract. However in reality, leaving the implementation uninitialized is only dangerous if it can be used to trigger a `selfdestruct`, either directly, or via `delegatecall`. In practice, I don't think this is possible to do in most scenarios, but it is worth being aware of, to make sure this is not possible with your contract.
+
+To be safe you can always just initialize both as standard.
 
 ## **Question 5:** What is the use for the [reinitializer](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/master/contracts/proxy/utils/Initializable.sol#L119)? Provide a minimal example of proper use in Solidity
 
+The `reinitializer` is a modifier that can be used to wrap initialization functions for initialization tasks (like setting initial values for new state variables) when doing upgrades. So after deploying the proxy contract for the first time and initializing it, if I want to do an upgrade and that requires further initialization, I will use the reinitializer modifier around my new `initialize` function.
 
+Here is a solidity examples. The `v1` contract has a public state variable `a` that we want to initialize at value `5`. Then we want to upgrade and add variable `b`, but we want that initialized at value `7`.
+
+In order to do this, we cannot reuse the `initializer` modifier, because the contract is already initialized, it won't allow us to call it. So instead we use the `reinitializer` modifier.
+
+```solidity
+Contract A_V1 is Initializable {
+    uint256 public a;
+
+    function initialize() external initializer {
+        a = 5;
+    }
+}
+
+contract A_V2 is A_V1 {
+    uint256 public b;
+
+    function reinitialize() external reinitializer(2) {
+        b = 7;
+    }
+}
+```
