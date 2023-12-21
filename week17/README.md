@@ -1,3 +1,8 @@
 # Week 17
 
-1. [ProxyQ&A](./ProxyQ&A.md)
+- [x] [ProxyQ&A](./ProxyQ&A.md)
+- [ ]  Ethernaut 16
+- [ ]  Ethernaut 24
+- [ ]  Ethernaut 25
+
+
