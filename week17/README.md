@@ -9,7 +9,10 @@
 - [x]  Ethernaut 25 - Motorbike
   - [Online Version](https://ethernaut.openzeppelin.com/level/0x3A78EE8462BD2e31133de2B8f1f9CBD973D6eDd6)
   - [Solution Log](./motorbike.md)
+- [x] [Week 2 Upgradeable Questions][./week2-upgradeable.md]
 
+## Questions
 
-
-
+- [ ] Feel like I am missing something in my answer to:
+  - When a contract calls another call via call, delegatecall, or staticcall, how is information passed between them? Where is this data stored?
+- [ ] Just in general check my response in [Week 2 Upgradeable Questions][./week2-upgradeable.md]
