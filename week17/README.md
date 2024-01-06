@@ -9,6 +9,8 @@
 - [x]  Ethernaut 25 - Motorbike
   - [Online Version](https://ethernaut.openzeppelin.com/level/0x3A78EE8462BD2e31133de2B8f1f9CBD973D6eDd6)
   - [Solution Log](./motorbike.md)
+- [x]  Make Week 2 upgradeable
+    - Decided not to do this as I am already fully confident in my ability to do it and I don't feel it would further my learning.
 - [x] [ProxyQ&A2](./ProxyQ&A2.md)
 
 ## Questions
