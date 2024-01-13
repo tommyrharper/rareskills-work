@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useAccount, useSignTypedData } from "wagmi";
+import { useEffect, useState } from "react";
+import { useAccount, useBlockNumber, usePublicClient, useSignTypedData } from "wagmi";
 import { Bytes32Input, IntegerInput } from "~~/components/scaffold-eth";
 import { Contract, ContractName } from "~~/utils/scaffold-eth/contract";
 
@@ -19,11 +19,27 @@ const splitSig = (sig?: string) => {
   };
 };
 
+const ONE_DAY = 86400;
+
 export const SignTypedMessage = ({ deployedContractData }: { deployedContractData: Contract<ContractName> }) => {
   const [owner, setOwner] = useState<string>("");
   const [spender, setSpender] = useState<string>("");
   const [value, setValue] = useState<bigint | string>("");
   const [nonce, setNonce] = useState<bigint | string>("");
+
+  const [block, setBlock] = useState();
+  console.log("block :", block?.timestamp);
+  const [deadline, setDeadline] = useState<bigint | string>(block?.timestamp);
+  const publicClient = usePublicClient();
+
+  useEffect(() => {
+    publicClient
+      .getBlock() // https://viem.sh/docs/actions/public/getBlock.html
+      .then(x => setBlock(x))
+      .then(x => setDeadline(x?.timestamp ? x?.timestamp + ONE_DAY : 1000))
+      .catch(error => console.log(error));
+  }, [publicClient]);
+
   const { signTypedData, data } = useSignTypedData();
   const account = useAccount();
   const permit = splitSig(data);
@@ -36,6 +52,13 @@ export const SignTypedMessage = ({ deployedContractData }: { deployedContractDat
         <Bytes32Input value={spender} onChange={setSpender} name={"Spender"} placeholder={"Spender"} disabled={false} />
         <IntegerInput value={value} onChange={setValue} name={"Value"} placeholder={"Value"} disabled={false} />
         <IntegerInput value={nonce} onChange={setNonce} name={"Nonce"} placeholder={"Nonce"} disabled={false} />
+        <IntegerInput
+          value={deadline}
+          onChange={setDeadline}
+          name={"Deadline"}
+          placeholder={"Deadline"}
+          disabled={false}
+        />
         {permit ? (
           <>
             <p>Owner: 0x8E2f228c0322F872efAF253eF25d7F5A78d5851D</p>
@@ -72,7 +95,7 @@ export const SignTypedMessage = ({ deployedContractData }: { deployedContractDat
                   spender,
                   value,
                   nonce,
-                  deadline: "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                  deadline,
                 },
               });
             }}
