@@ -64,3 +64,6 @@
 [submodule "week17/ethernaut-24-puzzle-wallet/lib/forge-std"]
 	path = week17/ethernaut-24-puzzle-wallet/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "week19/order-book/lib/forge-std"]
+	path = week19/order-book/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
