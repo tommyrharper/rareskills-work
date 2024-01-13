@@ -67,3 +67,6 @@
 [submodule "week19/order-book/lib/forge-std"]
 	path = week19/order-book/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "week19/order-book/lib/openzeppelin-contracts"]
+	path = week19/order-book/lib/openzeppelin-contracts
+	url = https://github.com/openzeppelin/openzeppelin-contracts
