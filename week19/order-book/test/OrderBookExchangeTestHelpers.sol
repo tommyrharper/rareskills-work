@@ -2,9 +2,10 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
-import {OrderBookExchange} from "../src/OrderBookExchange.sol";
+import {OrderBookExchange, Order} from "../src/OrderBookExchange.sol";
 import {PermitToken, Permit} from "../src/PermitToken.sol";
 import {SigUtils} from "./SigUtils.sol";
+import {OrderBookSigUtils} from "./OrderBookSigUtils.sol";
 
 contract OrderBookExchangeTestHelpers is Test {
     PermitToken internal tokenA;
@@ -12,6 +13,7 @@ contract OrderBookExchangeTestHelpers is Test {
     OrderBookExchange internal orderBookExchange;
 
     SigUtils internal sigUtils;
+    OrderBookSigUtils internal orderBookSigUtils;
 
     uint256 internal user1PrivateKey;
     uint256 internal user2PrivateKey;
@@ -35,6 +37,7 @@ contract OrderBookExchangeTestHelpers is Test {
         orderBookExchange = new OrderBookExchange(tokenA, tokenB);
 
         sigUtils = new SigUtils();
+        orderBookSigUtils = new OrderBookSigUtils(orderBookExchange);
     }
 
     function executePermit(
