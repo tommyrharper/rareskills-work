@@ -1,18 +1,9 @@
 import { useState } from "react";
-import { secp256k1 } from "@noble/curves/secp256k1";
-import { hexToNumber } from "viem";
 import { useAccount, useSignTypedData } from "wagmi";
-import { Bytes32Input } from "~~/components/scaffold-eth";
-import { Contract, ContractName, GenericContract, InheritedFunctions } from "~~/utils/scaffold-eth/contract";
+import { Bytes32Input, IntegerInput } from "~~/components/scaffold-eth";
+import { Contract, ContractName } from "~~/utils/scaffold-eth/contract";
 
-const getVRS = (signatureHex?: string): object | null => {
-  if (!signatureHex) return null;
-  const { r, s } = secp256k1.Signature.fromCompact(signatureHex.slice(2, 130));
-  const v = hexToNumber(`0x${signatureHex.slice(130)}`);
-  return { v, r, s };
-};
-
-const splitSig = sig => {
+const splitSig = (sig?: string) => {
   if (!sig) return null;
   // splits the signature to r, s, and v values.
   const pureSig = sig.replace("0x", "");
@@ -28,39 +19,24 @@ const splitSig = sig => {
   };
 };
 
-// r: 0xecf66027ee8417a28c2d3f7f24d9b22665edb3fc6edcb2f1decef4306e8c3374, s: 0x1fdc7a04625e7a3c6aac54c28f96a06171184875e4511f83b86e30134d08143d, v: 27, sig: undefined
-
 export const SignTypedMessage = ({ deployedContractData }: { deployedContractData: Contract<ContractName> }) => {
-  const [message, setMessage] = useState<string>("");
-  const res = useSignTypedData();
-  const { signTypedData, data } = res;
-  console.log("data :", data);
+  const [owner, setOwner] = useState<string>("");
+  const [spender, setSpender] = useState<string>("");
+  const [value, setValue] = useState<bigint | string>("");
+  const [nonce, setNonce] = useState<bigint | string>("");
+  const { signTypedData, data } = useSignTypedData();
   const account = useAccount();
-
-  const signatureVRS = getVRS(data);
-  console.log("signatureVRS :", signatureVRS);
   const permit = splitSig(data);
-  if (permit) {
-    console.log("permit :", permit);
-    console.log(
-      `r: 0x${permit.r.toString("hex")}, s: 0x${permit.s.toString("hex")}, v: ${permit.v}, sig: ${permit.signature}`,
-    );
-  }
-
-  //   const splitSignature = data ? ethers.utils.splitSignature(data) : null;
-  //   console.log('splitSignature :', splitSignature);
 
   return (
     <>
       <div className="flex flex-col gap-3 py-5 first:pt-0 last:pb-1">
-        <Bytes32Input
-          value={message}
-          onChange={setMessage}
-          name={"Message to sign"}
-          placeholder={"Message to sign"}
-          disabled={false}
-        />
-        {data ? (
+        <p>You account: {account.address}</p>
+        <Bytes32Input value={owner} onChange={setOwner} name={"Owner"} placeholder={"Owner"} disabled={false} />
+        <Bytes32Input value={spender} onChange={setSpender} name={"Spender"} placeholder={"Spender"} disabled={false} />
+        <IntegerInput value={value} onChange={setValue} name={"Value"} placeholder={"Value"} disabled={false} />
+        <IntegerInput value={nonce} onChange={setNonce} name={"Nonce"} placeholder={"Nonce"} disabled={false} />
+        {permit ? (
           <>
             <p>Owner: 0x8E2f228c0322F872efAF253eF25d7F5A78d5851D</p>
             <p>spender: 0xfC102Ac6cA62f976797b6bF2a423b137649Bf52F</p>
@@ -92,16 +68,16 @@ export const SignTypedMessage = ({ deployedContractData }: { deployedContractDat
                 },
                 primaryType: "Permit",
                 message: {
-                  owner: account.address,
-                  spender: "0xfC102Ac6cA62f976797b6bF2a423b137649Bf52F",
-                  value: 1,
-                  nonce: 0,
+                  owner,
+                  spender,
+                  value,
+                  nonce,
                   deadline: "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                 },
               });
             }}
           >
-            Sign Message
+            Sign ERC20 Permit
           </button>
         </div>
       </div>
