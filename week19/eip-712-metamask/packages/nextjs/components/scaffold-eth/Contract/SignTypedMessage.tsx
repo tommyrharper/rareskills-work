@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAccount, useBlockNumber, usePublicClient, useSignTypedData } from "wagmi";
+import { useAccount, usePublicClient, useSignTypedData } from "wagmi";
 import { Bytes32Input, IntegerInput } from "~~/components/scaffold-eth";
 import { Contract, ContractName } from "~~/utils/scaffold-eth/contract";
 
@@ -19,8 +19,6 @@ const splitSig = (sig?: string) => {
   };
 };
 
-const ONE_DAY = 86400;
-
 export const SignTypedMessage = ({ deployedContractData }: { deployedContractData: Contract<ContractName> }) => {
   const [owner, setOwner] = useState<string>("");
   const [spender, setSpender] = useState<string>("");
@@ -28,7 +26,6 @@ export const SignTypedMessage = ({ deployedContractData }: { deployedContractDat
   const [nonce, setNonce] = useState<bigint | string>("");
 
   const [block, setBlock] = useState();
-  console.log("block :", block?.timestamp);
   const [deadline, setDeadline] = useState<bigint | string>(block?.timestamp);
   const publicClient = usePublicClient();
 
@@ -36,7 +33,6 @@ export const SignTypedMessage = ({ deployedContractData }: { deployedContractDat
     publicClient
       .getBlock() // https://viem.sh/docs/actions/public/getBlock.html
       .then(x => setBlock(x))
-      .then(x => setDeadline(x?.timestamp ? x?.timestamp + ONE_DAY : 1000))
       .catch(error => console.log(error));
   }, [publicClient]);
 
@@ -48,6 +44,7 @@ export const SignTypedMessage = ({ deployedContractData }: { deployedContractDat
     <>
       <div className="flex flex-col gap-3 py-5 first:pt-0 last:pb-1">
         <p>You account: {account.address}</p>
+        <p>Block Timestamp: {block?.timestamp.toString()}</p>
         <Bytes32Input value={owner} onChange={setOwner} name={"Owner"} placeholder={"Owner"} disabled={false} />
         <Bytes32Input value={spender} onChange={setSpender} name={"Spender"} placeholder={"Spender"} disabled={false} />
         <IntegerInput value={value} onChange={setValue} name={"Value"} placeholder={"Value"} disabled={false} />
@@ -61,9 +58,9 @@ export const SignTypedMessage = ({ deployedContractData }: { deployedContractDat
         />
         {permit ? (
           <>
-            <p>Owner: 0x8E2f228c0322F872efAF253eF25d7F5A78d5851D</p>
-            <p>spender: 0xfC102Ac6cA62f976797b6bF2a423b137649Bf52F</p>
-            <p>v: {permit.v}</p>
+            <p>Owner: {owner}</p>
+            <p>spender: {spender}</p>
+            <p>v: {permit.v.toString()}</p>
             <p>r: {`0x${permit.r.toString("hex")}`}</p>
             <p>s: {`0x${permit.s.toString("hex")}`}</p>
           </>
