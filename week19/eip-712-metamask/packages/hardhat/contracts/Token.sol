@@ -6,6 +6,6 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 
 contract Token is ERC20Permit {
     constructor(address _to) ERC20Permit("MyToken") ERC20("MyToken", "MT") {
-        _mint(_to, 1_000_000 * 10 ** decimals());
+        _mint(0x8E2f228c0322F872efAF253eF25d7F5A78d5851D, 1_000_000 * 10 ** decimals());
     }
 }
