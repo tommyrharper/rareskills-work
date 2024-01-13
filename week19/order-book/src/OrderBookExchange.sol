@@ -86,34 +86,6 @@ contract OrderBookExchange is EIP712, Nonces {
         tokenB.transferFrom(orderB.owner, orderA.owner, amountForA);
     }
 
-    // function calculateSwapAmounts(
-    //     uint256 sellAmountA,
-    //     uint256 buyAmountA,
-    //     uint256 sellAmountB,
-    //     uint256 buyAmountB
-    // ) internal pure returns (uint256 amountForA, uint256 amountForB) {
-    //     if (sellAmountA == buyAmountA) {
-    //         return
-    //             calculateFlatSwap(
-    //                 sellAmountA,
-    //                 buyAmountA,
-    //                 sellAmountB,
-    //                 buyAmountB
-    //             );
-    //     } else if (sellAmountA > buyAmountA) {
-    //         return calculateACheaperSwap(
-    //             sellAmountA,
-    //             buyAmountA,
-    //             sellAmountB,
-    //             buyAmountB
-    //         );
-    //     } else {
-    //         uint256 ratioA = buyAmountA / sellAmountA;
-    //         uint256 ratioB = sellAmountB / buyAmountB;
-    //         require(ratioA == ratioB, "wrong ratios");
-    //     }
-    // }
-
     function calculateSwapAmounts(
         uint256 sellAmountA,
         uint256 buyAmountA,
@@ -132,41 +104,6 @@ contract OrderBookExchange is EIP712, Nonces {
             amountForB = sellAmountA;
         }
     }
-
-
-    // function calculateACheaperSwap(
-    //     uint256 sellAmountA,
-    //     uint256 buyAmountA,
-    //     uint256 sellAmountB,
-    //     uint256 buyAmountB
-    // ) internal pure returns (uint256 amountForA, uint256 amountForB) {
-    //     // A is willing to sell more than B is willing to buy
-    //     if (sellAmountA > buyAmountB) {
-    //         // hence do the smaller (Bs) swap
-    //         amountForB = buyAmountB;
-    //         amountForA = sellAmountB
-    //     } else {
-    //         // A is willing to sell less than B is willing to buy
-    //         // hence do the larger (As) swap
-    //         amountForA = buyAmountA;
-    //         amountForB = sellAmountA;
-    //     }
-    // }
-
-    // function calculateFlatSwap(
-    //     uint256 sellAmountA,
-    //     uint256 buyAmountA,
-    //     uint256 sellAmountB,
-    //     uint256 buyAmountB
-    // ) internal pure returns (uint256 amountForA, uint256 amountForB) {
-    //     if (sellAmountA > sellAmountB) {
-    //         amountForA = sellAmountB;
-    //         amountForB = sellAmountB;
-    //     } else {
-    //         amountForA = sellAmountA;
-    //         amountForB = sellAmountA;
-    //     }
-    // }
 
     function executePermit(SignedOrderAndPermit memory order) internal {
         address token = order.orderWithSig.order.sellToken;
