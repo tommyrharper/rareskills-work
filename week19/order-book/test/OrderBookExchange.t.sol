@@ -11,8 +11,7 @@ contract OrderBookExchangeTest is Test {
     PermitToken internal tokenB;
     OrderBookExchange internal orderBookExchange;
 
-    SigUtils internal sigUtilsA;
-    SigUtils internal sigUtilsB;
+    SigUtils internal sigUtils;
 
     uint256 internal user1PrivateKey;
     uint256 internal user2PrivateKey;
@@ -36,13 +35,12 @@ contract OrderBookExchangeTest is Test {
         orderBookExchange = new OrderBookExchange();
         orderBookExchange.setNumber(0);
 
-        sigUtilsA = new SigUtils(address(tokenA));
-        sigUtilsB = new SigUtils(address(tokenB));
+        sigUtils = new SigUtils();
     }
 
     function test_permit_tx() public {
-        (Permit memory permit, uint8 v, bytes32 r, bytes32 s) = sigUtilsA
-            .getSignedPermit(user1PrivateKey, user1, user2, 1 ether);
+        (Permit memory permit, uint8 v, bytes32 r, bytes32 s) = sigUtils
+            .getSignedPermit(tokenA, user1PrivateKey, user1, user2, 1 ether);
 
         vm.prank(user2);
         tokenA.permit(user1, user2, 1 ether, permit.deadline, v, r, s);

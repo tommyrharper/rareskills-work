@@ -23,14 +23,6 @@ contract SigUtils is Test {
             "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
         );
 
-    bytes32 internal DOMAIN_SEPARATOR;
-    PermitToken permitToken;
-
-    constructor(address _verifyingContract) {
-        permitToken = PermitToken(_verifyingContract);
-        DOMAIN_SEPARATOR = permitToken.DOMAIN_SEPARATOR();
-    }
-
     // computes the hash of a ballot
     function getStructHash(
         Permit memory _permit
@@ -50,13 +42,14 @@ contract SigUtils is Test {
 
     // computes the hash of the fully encoded EIP-712 message for the domain, which can be used to recover the signer
     function getTypedDataHash(
-        Permit memory _permit
+        Permit memory _permit,
+        PermitToken _permitToken
     ) public view returns (bytes32) {
         return
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    DOMAIN_SEPARATOR,
+                    _permitToken.DOMAIN_SEPARATOR(),
                     getStructHash(_permit)
                 )
             );
@@ -64,19 +57,21 @@ contract SigUtils is Test {
 
     // computes incorrect hash of the fully encoded EIP-712 message for the domain, which can be used to recover the signer
     function getDodgyTypedDataHash(
-        Permit memory _permit
+        Permit memory _permit,
+        PermitToken _permitToken
     ) public view returns (bytes32) {
         return
             keccak256(
                 abi.encodePacked(
                     "\x19\x02",
-                    DOMAIN_SEPARATOR,
+                    _permitToken.DOMAIN_SEPARATOR(),
                     getStructHash(_permit)
                 )
             );
     }
 
     function getSignedPermit(
+        PermitToken _permitToken,
         uint256 privateKey,
         address _owner,
         address _spender,
@@ -86,7 +81,7 @@ contract SigUtils is Test {
         view
         returns (Permit memory permit, uint8 v, bytes32 r, bytes32 s)
     {
-        uint256 nextNonce = permitToken.nonces(_owner);
+        uint256 nextNonce = _permitToken.nonces(_owner);
 
         permit = Permit({
             owner: _owner,
@@ -96,7 +91,7 @@ contract SigUtils is Test {
             deadline: block.timestamp + 1000
         });
 
-        bytes32 digest = getTypedDataHash(permit);
+        bytes32 digest = getTypedDataHash(permit, _permitToken);
         (v, r, s) = vm.sign(privateKey, digest);
 
         return (permit, v, r, s);
