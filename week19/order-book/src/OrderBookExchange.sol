@@ -69,23 +69,21 @@ contract OrderBookExchange is EIP712, Nonces {
             orderB.permitWithSig.permit
         );
 
-        PermitToken(orderA.orderWithSig.order.sellToken).permit(
-            orderA.permitWithSig.permit.owner,
-            orderA.permitWithSig.permit.spender,
-            orderA.permitWithSig.permit.value,
-            orderA.permitWithSig.permit.deadline,
-            orderA.permitWithSig.v,
-            orderA.permitWithSig.r,
-            orderA.permitWithSig.s
-        );
-        PermitToken(orderB.orderWithSig.order.sellToken).permit(
-            orderB.permitWithSig.permit.owner,
-            orderB.permitWithSig.permit.spender,
-            orderB.permitWithSig.permit.value,
-            orderB.permitWithSig.permit.deadline,
-            orderB.permitWithSig.v,
-            orderB.permitWithSig.r,
-            orderB.permitWithSig.s
+        executePermit(orderA);
+        executePermit(orderB);
+    }
+
+    function executePermit(SignedOrderAndPermit memory order) internal {
+        address token = order.orderWithSig.order.sellToken;
+        PermitWithSig memory permitWithSig = order.permitWithSig;
+        PermitToken(token).permit(
+            permitWithSig.permit.owner,
+            permitWithSig.permit.spender,
+            permitWithSig.permit.value,
+            permitWithSig.permit.deadline,
+            permitWithSig.v,
+            permitWithSig.r,
+            permitWithSig.s
         );
     }
 
@@ -106,6 +104,31 @@ contract OrderBookExchange is EIP712, Nonces {
         require(orderB.buyAmount > 0, "zero buy amount");
         require(orderA.sellAmount > 0, "zero sell amount");
         require(orderB.sellAmount > 0, "zero sell amount");
+        checkRatiosMatch(
+            orderA.sellAmount,
+            orderA.buyAmount,
+            orderB.sellAmount,
+            orderB.buyAmount
+        );
+    }
+
+    function checkRatiosMatch(
+        uint256 sellAmountA,
+        uint256 buyAmountA,
+        uint256 sellAmountB,
+        uint256 buyAmountB
+    ) internal pure {
+        if (sellAmountA == buyAmountA) {
+            require(sellAmountB == buyAmountB, "wrong ratios");
+        } else if (sellAmountA > buyAmountA) {
+            uint256 ratioA = sellAmountA / buyAmountA;
+            uint256 ratioB = buyAmountB / sellAmountB;
+            require(ratioA == ratioB, "wrong ratios");
+        } else {
+            uint256 ratioA = buyAmountA / sellAmountA;
+            uint256 ratioB = sellAmountB / buyAmountB;
+            require(ratioA == ratioB, "wrong ratios");
+        }
     }
 
     function checkOrderIsValid(OrderWithSig memory orderWithSig) internal {

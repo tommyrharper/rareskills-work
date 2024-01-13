@@ -12,7 +12,6 @@ struct Permit {
     uint256 deadline;
 }
 
-
 contract PermitToken is ERC20Permit {
     constructor(
         string memory _name,
