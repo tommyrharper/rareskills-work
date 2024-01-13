@@ -1,6 +1,7 @@
 import { useReducer } from "react";
 import { ContractReadMethods } from "./ContractReadMethods";
 import { SignMessage } from "./SignMessage";
+import { SignTypedMessage } from "./SignTypedMessage";
 import { ContractVariables } from "./ContractVariables";
 import { ContractWriteMethods } from "./ContractWriteMethods";
 import { Address, Balance } from "~~/components/scaffold-eth";
@@ -77,7 +78,7 @@ export const ContractUI = ({ contractName, className = "" }: ContractUIProps) =>
                       </div>
                     </div>
                     <div className="p-5 divide-y divide-base-300">
-                      <SignMessage deployedContractData={deployedContractData} />
+                      <SignTypedMessage />
                     </div>
                   </div>
                 </div>
