@@ -94,7 +94,13 @@ contract OrderBookExchangeTestHelpers is Test {
         view
         returns (Permit memory permit, uint8 v, bytes32 r, bytes32 s)
     {
-        return sigUtils.getSignedPermit(tokenA, user1PrivateKey, user2, _value);
+        return
+            sigUtils.getSignedPermit(
+                tokenA,
+                user1PrivateKey,
+                address(orderBookExchange),
+                _value
+            );
     }
 
     function getTokenBPermit(
@@ -104,7 +110,13 @@ contract OrderBookExchangeTestHelpers is Test {
         view
         returns (Permit memory permit, uint8 v, bytes32 r, bytes32 s)
     {
-        return sigUtils.getSignedPermit(tokenB, user2PrivateKey, user1, _value);
+        return
+            sigUtils.getSignedPermit(
+                tokenB,
+                user2PrivateKey,
+                address(orderBookExchange),
+                _value
+            );
     }
 
     function executePermit(

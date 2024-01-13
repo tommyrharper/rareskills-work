@@ -33,18 +33,44 @@ contract OrderBookExchange is EIP712, Nonces {
         tokenB = _tokenB;
     }
 
-    function matchOrders(
-        Permit memory permitA,
-        uint8 vA,
-        bytes32 rA,
-        bytes32 sA,
-        Permit memory permitB,
-        uint8 vB,
-        bytes32 rB,
-        bytes32 sB
-    ) external {
-        // require(permitA)
-    }
+    // TODO: merge order and permit into one struct
+    // function matchOrders(
+    //     Permit memory permitA,
+    //     uint8 vA,
+    //     bytes32 rA,
+    //     bytes32 sA,
+    //     Permit memory permitB,
+    //     uint8 vB,
+    //     bytes32 rB,
+    //     bytes32 sB,
+    //     Order memory order1,
+    //     uint8 v1,
+    //     bytes32 r1,
+    //     bytes32 s1,
+    //     Order memory order2,
+    //     uint8 v2,
+    //     bytes32 r2,
+    //     bytes32 s2
+    // ) external {
+    //     tokenA.permit(
+    //         permitA.owner,
+    //         permitA.spender,
+    //         permitA.value,
+    //         permitA.deadline,
+    //         vA,
+    //         rA,
+    //         sA
+    //     );
+    //     tokenB.permit(
+    //         permitB.owner,
+    //         permitB.spender,
+    //         permitB.value,
+    //         permitB.deadline,
+    //         vB,
+    //         rB,
+    //         sB
+    //     );
+    // }
 
     function checkOrderIsValid(
         Order memory order,
