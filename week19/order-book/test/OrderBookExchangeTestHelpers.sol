@@ -40,6 +40,73 @@ contract OrderBookExchangeTestHelpers is Test {
         orderBookSigUtils = new OrderBookSigUtils(orderBookExchange);
     }
 
+    function getTokenAOrder(
+        uint256 sellAmount,
+        uint256 buyAmount
+    )
+        internal
+        view
+        returns (Order memory order, uint8 v, bytes32 r, bytes32 s)
+    {
+        (order, v, r, s) = orderBookSigUtils.getSignedOrder(
+            address(tokenA),
+            address(tokenB),
+            sellAmount,
+            buyAmount,
+            user1PrivateKey
+        );
+    }
+
+    function getTokenBOrder(
+        uint256 sellAmount,
+        uint256 buyAmount
+    )
+        internal
+        view
+        returns (Order memory order, uint8 v, bytes32 r, bytes32 s)
+    {
+        (order, v, r, s) = orderBookSigUtils.getSignedOrder(
+            address(tokenB),
+            address(tokenA),
+            sellAmount,
+            buyAmount,
+            user2PrivateKey
+        );
+    }
+
+    function checkOrderIsValid(
+        Order memory order,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) internal {
+        if (order.owner == user1) {
+            orderBookExchange.checkOrderIsValid(order, v, r, s);
+        } else {
+            orderBookExchange.checkOrderIsValid(order, v, r, s);
+        }
+    }
+
+    function getTokenAPermit(
+        uint256 _value
+    )
+        internal
+        view
+        returns (Permit memory permit, uint8 v, bytes32 r, bytes32 s)
+    {
+        return sigUtils.getSignedPermit(tokenA, user1PrivateKey, user2, _value);
+    }
+
+    function getTokenBPermit(
+        uint256 _value
+    )
+        internal
+        view
+        returns (Permit memory permit, uint8 v, bytes32 r, bytes32 s)
+    {
+        return sigUtils.getSignedPermit(tokenB, user2PrivateKey, user1, _value);
+    }
+
     function executePermit(
         Permit memory permit,
         uint8 v,
@@ -67,25 +134,5 @@ contract OrderBookExchangeTestHelpers is Test {
                 s
             );
         }
-    }
-
-    function getTokenAPermit(
-        uint256 _value
-    )
-        internal
-        view
-        returns (Permit memory permit, uint8 v, bytes32 r, bytes32 s)
-    {
-        return sigUtils.getSignedPermit(tokenA, user1PrivateKey, user2, _value);
-    }
-
-    function getTokenBPermit(
-        uint256 _value
-    )
-        internal
-        view
-        returns (Permit memory permit, uint8 v, bytes32 r, bytes32 s)
-    {
-        return sigUtils.getSignedPermit(tokenB, user2PrivateKey, user1, _value);
     }
 }

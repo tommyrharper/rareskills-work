@@ -65,18 +65,23 @@ contract OrderBookSigUtils is Test {
     }
 
     function getSignedOrder(
-        Order memory _order,
+        address sellToken,
+        address buyToken,
+        uint256 sellAmount,
+        uint256 buyAmount,
         uint256 _privateKey
     ) public view returns (Order memory order, uint8 v, bytes32 r, bytes32 s) {
-        uint256 nextNonce = orderBookExchange.nonces(_order.owner);
+        address owner = vm.addr(_privateKey);
+
+        uint256 nextNonce = orderBookExchange.nonces(owner);
 
         order = Order({
-            owner: _order.owner,
-            sellToken: _order.sellToken,
-            buyToken: _order.buyToken,
-            sellAmount: _order.sellAmount,
-            buyAmount: _order.buyAmount,
-            expires: _order.expires,
+            owner: owner,
+            sellToken: sellToken,
+            buyToken: buyToken,
+            sellAmount: sellAmount,
+            buyAmount: buyAmount,
+            expires: block.timestamp + 1000,
             nonce: nextNonce
         });
 
