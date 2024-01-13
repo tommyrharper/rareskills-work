@@ -16,7 +16,27 @@ struct Order {
     uint256 nonce;
 }
 
+struct PermitWithSig {
+    Permit permit;
+    uint8 v;
+    bytes32 r;
+    bytes32 s;
+}
+
+struct OrderWithSig {
+    Order order;
+    uint8 v;
+    bytes32 r;
+    bytes32 s;
+}
+
+struct SignedOrderAndPermit {
+    OrderWithSig orderWithSig;
+    PermitWithSig permitWithSig;
+}
+
 contract OrderBookExchange is EIP712, Nonces {
+    // TODO: merge order and permit into one struct
     bytes32 public constant ORDER_TYPEHASH =
         keccak256(
             "Order(addres owner,address sellToken,address buyToken,uint256 sellAmount,uint256 buyAmount,uint256 expires,uint256 nonce)"
@@ -33,51 +53,76 @@ contract OrderBookExchange is EIP712, Nonces {
         tokenB = _tokenB;
     }
 
-    // TODO: merge order and permit into one struct
-    // function matchOrders(
-    //     Permit memory permitA,
-    //     uint8 vA,
-    //     bytes32 rA,
-    //     bytes32 sA,
-    //     Permit memory permitB,
-    //     uint8 vB,
-    //     bytes32 rB,
-    //     bytes32 sB,
-    //     Order memory order1,
-    //     uint8 v1,
-    //     bytes32 r1,
-    //     bytes32 s1,
-    //     Order memory order2,
-    //     uint8 v2,
-    //     bytes32 r2,
-    //     bytes32 s2
-    // ) external {
-    //     tokenA.permit(
-    //         permitA.owner,
-    //         permitA.spender,
-    //         permitA.value,
-    //         permitA.deadline,
-    //         vA,
-    //         rA,
-    //         sA
-    //     );
-    //     tokenB.permit(
-    //         permitB.owner,
-    //         permitB.spender,
-    //         permitB.value,
-    //         permitB.deadline,
-    //         vB,
-    //         rB,
-    //         sB
-    //     );
-    // }
+    function matchOrders(
+        SignedOrderAndPermit memory orderA,
+        SignedOrderAndPermit memory orderB
+    ) external {
+        checkOrderIsValid(orderA.orderWithSig);
+        checkOrderIsValid(orderB.orderWithSig);
+        checkOrdersMatch(orderA.orderWithSig.order, orderB.orderWithSig.order);
+        checkOrderMatchesPermit(
+            orderA.orderWithSig.order,
+            orderA.permitWithSig.permit
+        );
+        checkOrderMatchesPermit(
+            orderB.orderWithSig.order,
+            orderB.permitWithSig.permit
+        );
+
+        PermitToken(orderA.orderWithSig.order.sellToken).permit(
+            orderA.permitWithSig.permit.owner,
+            orderA.permitWithSig.permit.spender,
+            orderA.permitWithSig.permit.value,
+            orderA.permitWithSig.permit.deadline,
+            orderA.permitWithSig.v,
+            orderA.permitWithSig.r,
+            orderA.permitWithSig.s
+        );
+        PermitToken(orderB.orderWithSig.order.sellToken).permit(
+            orderB.permitWithSig.permit.owner,
+            orderB.permitWithSig.permit.spender,
+            orderB.permitWithSig.permit.value,
+            orderB.permitWithSig.permit.deadline,
+            orderB.permitWithSig.v,
+            orderB.permitWithSig.r,
+            orderB.permitWithSig.s
+        );
+    }
+
+    function checkOrderMatchesPermit(
+        Order memory order,
+        Permit memory permit
+    ) internal pure {
+        require(order.owner == permit.owner, "wrong owner");
+    }
+
+    function checkOrdersMatch(
+        Order memory orderA,
+        Order memory orderB
+    ) internal pure {
+        require(orderA.sellToken == orderB.buyToken, "wrong tokens");
+        require(orderA.buyToken == orderB.sellToken, "wrong tokens");
+        require(orderA.buyAmount > 0, "zero buy amount");
+        require(orderB.buyAmount > 0, "zero buy amount");
+        require(orderA.sellAmount > 0, "zero sell amount");
+        require(orderB.sellAmount > 0, "zero sell amount");
+    }
+
+    function checkOrderIsValid(OrderWithSig memory orderWithSig) internal {
+        checkOrderIsValid(
+            orderWithSig.order,
+            orderWithSig.v,
+            orderWithSig.r,
+            orderWithSig.s
+        );
+    }
 
     function checkOrderIsValid(
         Order memory order,
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public virtual {
+    ) public {
         if (block.timestamp > order.expires) {
             revert ExpiredSignature(order.expires);
         }
