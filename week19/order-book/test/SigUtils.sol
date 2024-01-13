@@ -4,6 +4,14 @@ pragma solidity ^0.8.13;
 import {Test, console2} from "forge-std/Test.sol";
 import {PermitToken} from "../src/PermitToken.sol";
 
+struct Permit {
+    address owner;
+    address spender;
+    uint256 value;
+    uint256 nonce;
+    uint256 deadline;
+}
+
 contract SigUtils is Test {
     /// @notice The EIP-712 typehash for the contract's domain
     bytes32 public constant DOMAIN_TYPEHASH =
@@ -14,14 +22,6 @@ contract SigUtils is Test {
         keccak256(
             "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
         );
-
-    struct Permit {
-        address owner;
-        address spender;
-        uint256 value;
-        uint256 nonce;
-        uint256 deadline;
-    }
 
     bytes32 internal DOMAIN_SEPARATOR;
     PermitToken permitToken;
@@ -81,10 +81,14 @@ contract SigUtils is Test {
         address _owner,
         address _spender,
         uint256 _value
-    ) internal view returns (Permit memory, uint8, bytes32, bytes32) {
+    )
+        public
+        view
+        returns (Permit memory permit, uint8 v, bytes32 r, bytes32 s)
+    {
         uint256 nextNonce = permitToken.nonces(_owner);
 
-        Permit memory permit = Permit({
+        permit = Permit({
             owner: _owner,
             spender: _spender,
             value: _value,
@@ -93,7 +97,7 @@ contract SigUtils is Test {
         });
 
         bytes32 digest = getTypedDataHash(permit);
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, digest);
+        (v, r, s) = vm.sign(privateKey, digest);
 
         return (permit, v, r, s);
     }

@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import {Test, console2} from "forge-std/Test.sol";
 import {OrderBookExchange} from "../src/OrderBookExchange.sol";
 import {PermitToken} from "../src/PermitToken.sol";
-import {SigUtils} from "./SigUtils.sol";
+import {SigUtils, Permit} from "./SigUtils.sol";
 
 contract OrderBookExchangeTest is Test {
     PermitToken internal tokenA;
@@ -40,7 +40,18 @@ contract OrderBookExchangeTest is Test {
         sigUtilsB = new SigUtils(address(tokenB));
     }
 
-    function test_permit_tx() public {}
+    function test_permit_tx() public {
+        (Permit memory permit, uint8 v, bytes32 r, bytes32 s) = sigUtilsA
+            .getSignedPermit(user1PrivateKey, user1, user2, 1 ether);
+
+        vm.prank(user2);
+        tokenA.permit(user1, user2, 1 ether, permit.deadline, v, r, s);
+
+        vm.prank(user2);
+        tokenA.transferFrom(user1, user2, 1 ether);
+
+        assertEq(tokenA.balanceOf(user2), 1 ether);
+    }
 
     function test_Increment() public {
         orderBookExchange.increment();
