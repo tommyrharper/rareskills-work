@@ -82,6 +82,7 @@ contract OrderBookExchange is EIP712, Nonces {
             orderB.sellAmount,
             orderB.buyAmount
         );
+        /// @dev will revert if insufficient allowance
         tokenA.transferFrom(orderA.owner, orderB.owner, amountForB);
         tokenB.transferFrom(orderB.owner, orderA.owner, amountForA);
     }
