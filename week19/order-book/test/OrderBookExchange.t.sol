@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
-import {OrderBookExchange} from "../src/OrderBookExchange.sol";
+import {OrderBookExchange, Order} from "../src/OrderBookExchange.sol";
 import {PermitToken, Permit} from "../src/PermitToken.sol";
 import {SigUtils} from "./SigUtils.sol";
 import {OrderBookExchangeTestHelpers} from "./OrderBookExchangeTestHelpers.sol";
@@ -36,5 +36,23 @@ contract OrderBookExchangeTest is OrderBookExchangeTestHelpers {
         tokenB.transferFrom(user2, user1, 1 ether);
 
         assertEq(tokenB.balanceOf(user1), 1 ether);
+    }
+
+    function test_order_user1() public {
+        (Order memory order, uint8 v, bytes32 r, bytes32 s) = getTokenAOrder(
+            1 ether,
+            1 ether
+        );
+
+        checkOrderIsValid(order, v, r, s);
+    }
+
+    function test_order_user2() public {
+        (Order memory order, uint8 v, bytes32 r, bytes32 s) = getTokenBOrder(
+            1 ether,
+            1 ether
+        );
+
+        checkOrderIsValid(order, v, r, s);
     }
 }
