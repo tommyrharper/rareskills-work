@@ -33,7 +33,6 @@ contract OrderBookExchangeTest is Test {
         tokenA = new PermitToken("TokenA", "A", user1);
         tokenB = new PermitToken("TokenB", "B", user2);
         orderBookExchange = new OrderBookExchange();
-        orderBookExchange.setNumber(0);
 
         sigUtils = new SigUtils();
     }
@@ -84,13 +83,4 @@ contract OrderBookExchangeTest is Test {
         assertEq(tokenB.balanceOf(user1), 1 ether);
     }
 
-    function test_Increment() public {
-        orderBookExchange.increment();
-        assertEq(orderBookExchange.number(), 1);
-    }
-
-    function testFuzz_SetNumber(uint256 x) public {
-        orderBookExchange.setNumber(x);
-        assertEq(orderBookExchange.number(), x);
-    }
 }
