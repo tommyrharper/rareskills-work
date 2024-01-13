@@ -31,6 +31,11 @@ contract OrderBookExchangeTest is OrderBookExchangeTestHelpers {
         );
 
         orderBookExchange.matchOrders(orderA, orderB);
+
+        assertEq(tokenA.balanceOf(address(orderBookExchange)), 0 ether);
+        assertEq(tokenB.balanceOf(address(orderBookExchange)), 0 ether);
+        assertEq(tokenA.balanceOf(user2), 10 ether);
+        assertEq(tokenB.balanceOf(user1), 5 ether);
     }
 
     function test_permit_tokenA() public {
