@@ -2,9 +2,9 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
-import {OrderBookExchange} from "../src/OrderBookExchange.sol";
+import {OrderBookExchange, Permit} from "../src/OrderBookExchange.sol";
 import {PermitToken} from "../src/PermitToken.sol";
-import {SigUtils, Permit} from "./SigUtils.sol";
+import {SigUtils} from "./SigUtils.sol";
 
 contract OrderBookExchangeTestHelpers is Test {
     PermitToken internal tokenA;

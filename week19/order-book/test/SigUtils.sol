@@ -3,14 +3,7 @@ pragma solidity ^0.8.13;
 
 import {Test, console2} from "forge-std/Test.sol";
 import {PermitToken} from "../src/PermitToken.sol";
-
-struct Permit {
-    address owner;
-    address spender;
-    uint256 value;
-    uint256 nonce;
-    uint256 deadline;
-}
+import {Permit} from "../src/OrderBookExchange.sol";
 
 contract SigUtils is Test {
     bytes32 public constant PERMIT_TYPEHASH =
