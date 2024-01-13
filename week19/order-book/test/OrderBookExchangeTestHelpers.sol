@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
-import {OrderBookExchange, Order} from "../src/OrderBookExchange.sol";
+import {OrderBookExchange, Order, SignedOrderAndPermit, OrderWithSig, PermitWithSig} from "../src/OrderBookExchange.sol";
 import {PermitToken, Permit} from "../src/PermitToken.sol";
 import {SigUtils} from "./SigUtils.sol";
 import {OrderBookSigUtils} from "./OrderBookSigUtils.sol";
@@ -40,6 +40,21 @@ contract OrderBookExchangeTestHelpers is Test {
         orderBookSigUtils = new OrderBookSigUtils(orderBookExchange);
     }
 
+    function getTokenAOrderWithSig(
+        uint256 sellAmount,
+        uint256 buyAmount
+    ) internal view returns (OrderWithSig memory orderWithSig) {
+        (Order memory order, uint8 v, bytes32 r, bytes32 s) = orderBookSigUtils
+            .getSignedOrder(
+                address(tokenA),
+                address(tokenB),
+                sellAmount,
+                buyAmount,
+                user1PrivateKey
+            );
+        return OrderWithSig(order, v, r, s);
+    }
+
     function getTokenAOrder(
         uint256 sellAmount,
         uint256 buyAmount
@@ -55,6 +70,21 @@ contract OrderBookExchangeTestHelpers is Test {
             buyAmount,
             user1PrivateKey
         );
+    }
+
+    function getTokenBOrderWithSig(
+        uint256 sellAmount,
+        uint256 buyAmount
+    ) internal view returns (OrderWithSig memory orderWithSig) {
+        (Order memory order, uint8 v, bytes32 r, bytes32 s) = orderBookSigUtils
+            .getSignedOrder(
+                address(tokenB),
+                address(tokenA),
+                sellAmount,
+                buyAmount,
+                user2PrivateKey
+            );
+        return OrderWithSig(order, v, r, s);
     }
 
     function getTokenBOrder(
@@ -87,6 +117,19 @@ contract OrderBookExchangeTestHelpers is Test {
         }
     }
 
+    function getTokenAPermitWithSig(
+        uint256 _value
+    ) internal view returns (PermitWithSig memory permitWithSig) {
+        (Permit memory permit, uint8 v, bytes32 r, bytes32 s) = sigUtils
+            .getSignedPermit(
+                tokenA,
+                user1PrivateKey,
+                address(orderBookExchange),
+                _value
+            );
+        return PermitWithSig(permit, v, r, s);
+    }
+
     function getTokenAPermit(
         uint256 _value
     )
@@ -101,6 +144,19 @@ contract OrderBookExchangeTestHelpers is Test {
                 address(orderBookExchange),
                 _value
             );
+    }
+
+    function getTokenBPermitWithSig(
+        uint256 _value
+    ) internal view returns (PermitWithSig memory permitWithSig) {
+        (Permit memory permit, uint8 v, bytes32 r, bytes32 s) = sigUtils
+            .getSignedPermit(
+                tokenB,
+                user2PrivateKey,
+                address(orderBookExchange),
+                _value
+            );
+        return PermitWithSig(permit, v, r, s);
     }
 
     function getTokenBPermit(

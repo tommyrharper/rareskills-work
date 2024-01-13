@@ -71,6 +71,38 @@ contract OrderBookExchange is EIP712, Nonces {
 
         executePermit(orderA);
         executePermit(orderB);
+
+        doSwap(orderA.orderWithSig.order, orderB.orderWithSig.order);
+    }
+
+    function doSwap(Order memory orderA, Order memory orderB) internal {
+        (uint256 amountForA, uint256 amountForB) = calculateSwapAmounts(
+            orderA.sellAmount,
+            orderA.buyAmount,
+            orderB.sellAmount,
+            orderB.buyAmount
+        );
+        tokenA.transferFrom(orderA.owner, orderB.owner, amountForA);
+        tokenB.transferFrom(orderB.owner, orderA.owner, amountForB);
+    }
+
+    function calculateSwapAmounts(
+        uint256 sellAmountA,
+        uint256 buyAmountA,
+        uint256 sellAmountB,
+        uint256 buyAmountB
+    ) internal pure returns (uint256 amountForA, uint256 amountForB) {
+        // if (sellAmountA == buyAmountA) {
+        //     require(sellAmountB == buyAmountB, "wrong ratios");
+        // } else if (sellAmountA > buyAmountA) {
+        //     uint256 ratioA = sellAmountA / buyAmountA;
+        //     uint256 ratioB = buyAmountB / sellAmountB;
+        //     require(ratioA == ratioB, "wrong ratios");
+        // } else {
+        //     uint256 ratioA = buyAmountA / sellAmountA;
+        //     uint256 ratioB = sellAmountB / buyAmountB;
+        //     require(ratioA == ratioB, "wrong ratios");
+        // }
     }
 
     function executePermit(SignedOrderAndPermit memory order) internal {

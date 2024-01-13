@@ -2,16 +2,35 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
-import {OrderBookExchange, Order} from "../src/OrderBookExchange.sol";
+import {OrderBookExchange, Order, SignedOrderAndPermit, OrderWithSig, PermitWithSig} from "../src/OrderBookExchange.sol";
 import {PermitToken, Permit} from "../src/PermitToken.sol";
 import {SigUtils} from "./SigUtils.sol";
 import {OrderBookExchangeTestHelpers} from "./OrderBookExchangeTestHelpers.sol";
 
 contract OrderBookExchangeTest is OrderBookExchangeTestHelpers {
     function test_match_order() public {
-        // (Permit memory permit, uint8 v, bytes32 r, bytes32 s) = getTokenAPermit(
-        //     1 ether
-        // );
+        PermitWithSig memory permitWithSigA = getTokenAPermitWithSig(100 ether);
+        PermitWithSig memory permitWithSigB = getTokenBPermitWithSig(5 ether);
+        OrderWithSig memory orderWithSigA = getTokenAOrderWithSig(
+            100 ether,
+            50 ether
+        );
+        OrderWithSig memory orderWithSigB = getTokenBOrderWithSig(
+            5 ether,
+            10 ether
+        );
+
+        SignedOrderAndPermit memory orderA = SignedOrderAndPermit(
+            orderWithSigA,
+            permitWithSigA
+        );
+
+        SignedOrderAndPermit memory orderB = SignedOrderAndPermit(
+            orderWithSigB,
+            permitWithSigB
+        );
+
+        orderBookExchange.matchOrders(orderA, orderB);
     }
 
     function test_permit_tokenA() public {
