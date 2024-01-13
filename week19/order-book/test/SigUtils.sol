@@ -13,11 +13,6 @@ struct Permit {
 }
 
 contract SigUtils is Test {
-    /// @notice The EIP-712 typehash for the contract's domain
-    bytes32 public constant DOMAIN_TYPEHASH =
-        keccak256(
-            "EIP712Domain(string name,uint256 chainId,address verifyingContract)"
-        );
     bytes32 public constant PERMIT_TYPEHASH =
         keccak256(
             "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
@@ -72,8 +67,7 @@ contract SigUtils is Test {
 
     function getSignedPermit(
         PermitToken _permitToken,
-        uint256 privateKey,
-        address _owner,
+        uint256 _privateKey,
         address _spender,
         uint256 _value
     )
@@ -81,10 +75,12 @@ contract SigUtils is Test {
         view
         returns (Permit memory permit, uint8 v, bytes32 r, bytes32 s)
     {
-        uint256 nextNonce = _permitToken.nonces(_owner);
+        address owner = vm.addr(_privateKey);
+
+        uint256 nextNonce = _permitToken.nonces(owner);
 
         permit = Permit({
-            owner: _owner,
+            owner: owner,
             spender: _spender,
             value: _value,
             nonce: nextNonce,
@@ -92,7 +88,7 @@ contract SigUtils is Test {
         });
 
         bytes32 digest = getTypedDataHash(permit, _permitToken);
-        (v, r, s) = vm.sign(privateKey, digest);
+        (v, r, s) = vm.sign(_privateKey, digest);
 
         return (permit, v, r, s);
     }

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Test, console2} from "forge-std/Test.sol";
+import {Test, console} from "forge-std/Test.sol";
 import {OrderBookExchange} from "../src/OrderBookExchange.sol";
 import {PermitToken} from "../src/PermitToken.sol";
 import {SigUtils, Permit} from "./SigUtils.sol";
@@ -38,17 +38,50 @@ contract OrderBookExchangeTest is Test {
         sigUtils = new SigUtils();
     }
 
-    function test_permit_tx() public {
+    function test_permit_tokenA() public {
         (Permit memory permit, uint8 v, bytes32 r, bytes32 s) = sigUtils
-            .getSignedPermit(tokenA, user1PrivateKey, user1, user2, 1 ether);
+            .getSignedPermit(tokenA, user1PrivateKey, user2, 1 ether);
 
         vm.prank(user2);
-        tokenA.permit(user1, user2, 1 ether, permit.deadline, v, r, s);
+        tokenA.permit(
+            permit.owner,
+            permit.spender,
+            permit.value,
+            permit.deadline,
+            v,
+            r,
+            s
+        );
+
+        assertEq(tokenA.balanceOf(user2), 0);
 
         vm.prank(user2);
         tokenA.transferFrom(user1, user2, 1 ether);
 
         assertEq(tokenA.balanceOf(user2), 1 ether);
+    }
+
+    function test_permit_tokenB() public {
+        (Permit memory permit, uint8 v, bytes32 r, bytes32 s) = sigUtils
+            .getSignedPermit(tokenB, user2PrivateKey, user1, 1 ether);
+
+        vm.prank(user1);
+        tokenB.permit(
+            permit.owner,
+            permit.spender,
+            permit.value,
+            permit.deadline,
+            v,
+            r,
+            s
+        );
+
+        assertEq(tokenB.balanceOf(user1), 0);
+
+        vm.prank(user1);
+        tokenB.transferFrom(user2, user1, 1 ether);
+
+        assertEq(tokenB.balanceOf(user1), 1 ether);
     }
 
     function test_Increment() public {
