@@ -2,86 +2,87 @@
 pragma solidity ^0.8.13;
 
 import {Test, console2} from "forge-std/Test.sol";
-import {PermitToken, Permit} from "../src/PermitToken.sol";
+import {PermitToken} from "../src/PermitToken.sol";
+import {OrderBookExchange, Order} from "../src/OrderBookExchange.sol";
 
 contract OrderBookSigUtils is Test {
-    bytes32 public constant PERMIT_TYPEHASH =
+    bytes32 public constant ORDER_TYPEHASH =
         keccak256(
-            "Order(address sellToken,address buyToken,uint256 sellAmount,uint256 buyAmount,uint256 expires,uint256 nonce)"
+            "Order(addres owner,address sellToken,address buyToken,uint256 sellAmount,uint256 buyAmount,uint256 expires,uint256 nonce)"
         );
+
+    OrderBookExchange public orderBookExchange;
+
+    constructor(OrderBookExchange _orderBookExchange) {
+        orderBookExchange = _orderBookExchange;
+    }
 
     // computes the hash of a ballot
     function getStructHash(
-        Permit memory _permit
+        Order memory _order
     ) internal pure returns (bytes32) {
         return
             keccak256(
                 abi.encode(
-                    PERMIT_TYPEHASH,
-                    _permit.owner,
-                    _permit.spender,
-                    _permit.value,
-                    _permit.nonce,
-                    _permit.deadline
+                    ORDER_TYPEHASH,
+                    _order.owner,
+                    _order.sellToken,
+                    _order.buyToken,
+                    _order.sellAmount,
+                    _order.buyAmount,
+                    _order.expires,
+                    _order.nonce
                 )
             );
     }
 
     // computes the hash of the fully encoded EIP-712 message for the domain, which can be used to recover the signer
     function getTypedDataHash(
-        Permit memory _permit,
-        PermitToken _permitToken
+        Order memory _order
     ) public view returns (bytes32) {
         return
             keccak256(
                 abi.encodePacked(
                     "\x19\x01",
-                    _permitToken.DOMAIN_SEPARATOR(),
-                    getStructHash(_permit)
+                    orderBookExchange.DOMAIN_SEPARATOR(),
+                    getStructHash(_order)
                 )
             );
     }
 
     // computes incorrect hash of the fully encoded EIP-712 message for the domain, which can be used to recover the signer
     function getDodgyTypedDataHash(
-        Permit memory _permit,
-        PermitToken _permitToken
+        Order memory _order
     ) public view returns (bytes32) {
         return
             keccak256(
                 abi.encodePacked(
                     "\x19\x02",
-                    _permitToken.DOMAIN_SEPARATOR(),
-                    getStructHash(_permit)
+                    orderBookExchange.DOMAIN_SEPARATOR(),
+                    getStructHash(_order)
                 )
             );
     }
 
-    function getSignedPermit(
-        PermitToken _permitToken,
-        uint256 _privateKey,
-        address _spender,
-        uint256 _value
-    )
-        public
-        view
-        returns (Permit memory permit, uint8 v, bytes32 r, bytes32 s)
-    {
-        address owner = vm.addr(_privateKey);
+    function getSignedOrder(
+        Order memory _order,
+        uint256 _privateKey
+    ) public view returns (Order memory order, uint8 v, bytes32 r, bytes32 s) {
+        uint256 nextNonce = orderBookExchange.nonces(_order.owner);
 
-        uint256 nextNonce = _permitToken.nonces(owner);
-
-        permit = Permit({
-            owner: owner,
-            spender: _spender,
-            value: _value,
-            nonce: nextNonce,
-            deadline: block.timestamp + 1000
+        order = Order({
+            owner: _order.owner,
+            sellToken: _order.sellToken,
+            buyToken: _order.buyToken,
+            sellAmount: _order.sellAmount,
+            buyAmount: _order.buyAmount,
+            expires: _order.expires,
+            nonce: nextNonce
         });
 
-        bytes32 digest = getTypedDataHash(permit, _permitToken);
+        bytes32 digest = getTypedDataHash(order);
         (v, r, s) = vm.sign(_privateKey, digest);
 
-        return (permit, v, r, s);
+        return (order, v, r, s);
     }
 }

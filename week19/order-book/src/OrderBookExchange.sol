@@ -77,6 +77,10 @@ contract OrderBookExchange is EIP712, Nonces {
         }
     }
 
+    function DOMAIN_SEPARATOR() external view virtual returns (bytes32) {
+        return _domainSeparatorV4();
+    }
+
     error ExpiredSignature(uint256 deadline);
     error InvalidSigner(address signer, address owner);
 }
