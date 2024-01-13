@@ -2,8 +2,8 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
-import {OrderBookExchange, Permit} from "../src/OrderBookExchange.sol";
-import {PermitToken} from "../src/PermitToken.sol";
+import {OrderBookExchange} from "../src/OrderBookExchange.sol";
+import {PermitToken, Permit} from "../src/PermitToken.sol";
 import {SigUtils} from "./SigUtils.sol";
 
 contract OrderBookExchangeTestHelpers is Test {
@@ -32,7 +32,7 @@ contract OrderBookExchangeTestHelpers is Test {
 
         tokenA = new PermitToken("TokenA", "A", user1);
         tokenB = new PermitToken("TokenB", "B", user2);
-        orderBookExchange = new OrderBookExchange();
+        orderBookExchange = new OrderBookExchange(tokenA, tokenB);
 
         sigUtils = new SigUtils();
     }

@@ -4,10 +4,10 @@ pragma solidity ^0.8.13;
 import {Test, console2} from "forge-std/Test.sol";
 import {PermitToken, Permit} from "../src/PermitToken.sol";
 
-contract SigUtils is Test {
+contract OrderBookSigUtils is Test {
     bytes32 public constant PERMIT_TYPEHASH =
         keccak256(
-            "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
+            "Order(address sellToken,address buyToken,uint256 sellAmount,uint256 buyAmount,uint256 expires,uint256 nonce)"
         );
 
     // computes the hash of a ballot
