@@ -73,3 +73,9 @@
 [submodule "week20/capture-the-ether-fuzzy-identity/lib/forge-std"]
 	path = week20/capture-the-ether-fuzzy-identity/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "week21/exercise-2/lib/forge-std"]
+	path = week21/exercise-2/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "week21/exercise-2/lib/openzeppelin-contracts"]
+	path = week21/exercise-2/lib/openzeppelin-contracts
+	url = https://github.com/openzeppelin/openzeppelin-contracts

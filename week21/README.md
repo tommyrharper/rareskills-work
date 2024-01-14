@@ -10,4 +10,6 @@
   - https://github.com/RareSkills/solidity-riddles/blob/main/contracts/DoubleTake.sol
   - [My Solution](./https://github.com/tommyrharper/solidity-riddles/blob/main/test/DoubleTake.js)
 
+## Questions
 
+- [ ] For the EIP 712 delimiter, when would a salt actually be necessary?
