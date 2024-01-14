@@ -4,9 +4,10 @@
 \usepackage{amsfonts}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{pifont}
 
 \title{Exploring Elliptic Curve Digital Signature Algorithm (ECDSA)}
-\author{Your Name}
+\author{Thomas Harper}
 \date{\today}
 
 \begin{document}
@@ -14,48 +15,42 @@
 \maketitle
 
 \begin{abstract}
-% Brief summary of the paper
+
+These are simply my notes on ECDSA, sufficient to complete the RareSkills ECDSA coursework.
+
 \end{abstract}
 
 \section{Introduction}
-% Introduction to ECDSA
 
-\section{Background}
-\subsection{Cryptography}
-% Brief overview of cryptography
-\subsection{Elliptic Curves}
-% Basics of elliptic curves in cryptography
+ECDSA is based upon the Elliptic Curve Discrete Logarithm Problem (ECDLP). The ECDLP is the problem of finding $k$ given $kP$ where $P$ is a point on an elliptic curve. The ECDLP is believed to be hard, and so ECDSA is believed to be secure.
 
-\section{The ECDSA}
-\subsection{Algorithm Overview}
-% Overview of ECDSA
-\subsection{Mathematical Foundations}
-% Mathematical principles behind ECDSA
+\section{Elliptic Curves}
 
-\section{Implementation}
-\subsection{Key Generation}
-% Discuss how keys are generated in ECDSA
-\subsection{Signing Process}
-% Details on the signing process
-\subsection{Verification Process}
-% Explanation of the verification process
+An elliptic curve has the following form:
+$$y^2 = x^3 + ax + b$$
+There are two constants, $a$ and $b$. The curve is defined over a finite field $\mathbb{F}_p$ where $p$ is a prime number. The curve is also defined over a point at infinity, denoted $\mathcal{O}$.
 
-\section{Applications}
-% Discuss where ECDSA is used
+\section{secp256k1}
 
-\section{Advantages and Limitations}
-\subsection{Advantages}
-% Advantages of using ECDSA
-\subsection{Limitations}
-% Limitations and challenges
+For secp256k1 specifically, a = 0 and b = 7:
 
-\section{Future Perspectives}
-% Future research or improvements in ECDSA
+$$y^2 = x^3 + 7$$
 
-\section{Conclusion}
-% Sum up the paper
+It is defined over a field $\mathbb{Z}_p$
+\begin{itemize}
+\item $\mathbb{Z}$ is the set of integers
+\item $p$ is a prime number
+    \begin{itemize}
+        \item[\ding{223}] $p = 2^{256} - 2^{32} - 2^9 - 2^8 - 2^7 - 2^6 - 2^4 - 1$
+        \item[\ding{223}] $p = 2^{256} - 2^{32} - 997$
+        \item[\ding{223}] $p = FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFE FFFFFC2F$
+    \end{itemize}
+\item $\mathbb{Z}_p$ is the set of integers modulo $p$
+\end{itemize}
 
-% \bibliographystyle{IEEEtran}
-% \bibliography{references}
+
+
+% p = FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFE FFFFFC2F
+% = 2256 - 232 - 29 - 28 - 27 - 26 - 24 - 1
 
 \end{document}
