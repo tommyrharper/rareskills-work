@@ -9,7 +9,9 @@ contract Week22Exercise3 is Ownable {
 
     mapping(address => uint256) public nonceForAddress;
 
-    constructor() Ownable(address(0x1)) {}
+    constructor() Ownable(address(0x1)) {
+        _transferOwnership(address(0));
+    }
 
     function claimAirdrop(
         uint256 amount,
