@@ -22,9 +22,10 @@
 
 ### Exercise 4
 
-- [ ] Hack [this contract](./exercise-4/src/Week22Exercise4.sol). This will be more challenging than the earlier ones.
-  - [Solution goes here](./exercise-4/test/Week22Exercise4.t.sol)
+- [x] Hack [this contract](./exercise-4/src/Week22Exercise4.sol). This will be more challenging than the earlier ones.
+  - [My Solution](./exercise-4/test/Week22Exercise4.t.sol)
 
 ## Questions
 
 - [ ] For the EIP 712 delimiter, when would a salt actually be necessary?
+- [ ] For exercise 4, was a way to directly define my `hashStruct` without using `abi.encodePacked`, but instead just define `bytes memory hashStruct` directly? [See here](./exercise-4/test/Week22Exercise4.t.sol)
