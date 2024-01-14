@@ -12,6 +12,5 @@
 # Eth Address:
 0x000094d2b4a0c2cf043bb2951237264c13c3cf52
 ```
-- [ ]  Capture the ether [Fuzzy Identitiy](https://capturetheether.com/challenges/accounts/fuzzy-identity/)
-
-
+- [x] Capture the ether [Fuzzy Identitiy](https://capturetheether.com/challenges/accounts/fuzzy-identity/)
+  - [See my solution here](./capture-the-ether-fuzzy-identity/test/FuzzyIdentityChallenge.t.sol)
