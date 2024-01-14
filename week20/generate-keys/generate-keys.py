@@ -23,10 +23,11 @@ def get_eth_addr(pk):
 
 
 def get_vanity_address(pk, prefix):
+    length = len(prefix)
     vanity_pk = pk
     eth_addr = get_eth_addr(private_key)
     for i in range(2_000_000):
-        if eth_addr[: len(prefix)] == prefix:
+        if eth_addr[:length] == prefix:
             break
         eth_addr = get_eth_addr(vanity_pk)
         vanity_pk += 1
