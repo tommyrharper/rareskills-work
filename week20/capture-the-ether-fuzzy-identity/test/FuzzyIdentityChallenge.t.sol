@@ -25,7 +25,7 @@ contract FuzzyIdentityChallengeTest is Test {
     //     console2.log("address:", _attacker);
     // }
 
-    /// @dev The following data was found by test_Find_Nonce()
+    /// @dev The following data was mined in test_Find_Nonce()
     /// @dev nonce: 23479289
     /// @dev address: 0x2C4C3ACE046024badC0de2Bf319876caD0727a24
     function test_Attack() public {
