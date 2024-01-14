@@ -1,6 +1,7 @@
 
 p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F
 
+# note I haven't supported two's complement
 def is_valid_sepc265k1_point(n):
     x, y = n
     x = int(x)
