@@ -20,6 +20,10 @@
 - [x] [This contract](./exercise-3/src/Week22Exercise3.sol) has a medium severity weakness.
   - [My solution](./exercise-3/test/Week22Exercise3.t.sol)
 
+### Exercise 4
+
+- [ ] Hack [this contract](./exercise-4/src/Week22Exercise4.sol). This will be more challenging than the earlier ones.
+  - [Solution goes here](./exercise-4/test/Week22Exercise4.t.sol)
 
 ## Questions
 
