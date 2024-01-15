@@ -12,8 +12,8 @@
 
 ### Exercise 2
 
-- [ ] Find a message and signature that will [hack this](./exercise-2/src/Week22Exercise2.sol)
-  - [Solution goes here](./exercise-2/test/Week22Exercise2.t.sol)
+- [x] Find a message and signature that will [hack this](./exercise-2/src/Week22Exercise2.sol)
+  - [My solution](./exercise-2/test/Week22Exercise2.t.sol)
 
 ### Exercise 3
 
@@ -28,4 +28,5 @@
 ## Questions
 
 - [ ] For the EIP 712 delimiter, when would a salt actually be necessary?
+- [ ] For exercise 2, did I do the right thing?
 - [ ] For exercise 4, was a way to directly define my `hashStruct` without using `abi.encodePacked`, but instead just define `bytes memory hashStruct` directly? [See here](./exercise-4/test/Week22Exercise4.t.sol)
